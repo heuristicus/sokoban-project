@@ -5,6 +5,8 @@
 package utilities;
 
 import board.Board;
+import board.Symbol;
+
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -41,5 +43,21 @@ public class SokobanUtil {
     public static ArrayList<Point> accessiblePositions(Point p, Board b){
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    /**
+     * @param aGrid
+     * @return an ascii representation of the grid.
+     */
+    public static String stringifyGrid(Symbol[][] aGrid) {
+		StringBuilder sb = new StringBuilder();
+		for (int y = 0; y < aGrid.length; y++) {
+			for (int x = 0; x < aGrid[y].length; x++) {
+				sb.append(aGrid[y][x]);
+			}
+			sb.append('\n');
+		}
+		
+		return sb.toString();
+	}
     
 }
