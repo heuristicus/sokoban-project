@@ -1,5 +1,7 @@
 package board;
 
+import board.Symbol.Type;
+import exceptions.IllegalMoveException;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -147,18 +149,72 @@ public class Board implements Cloneable {
 		
 		return false;
 	}
-	
-	/** Moves the player in one of the directions according to the chosen action.
-	 * If as a result he moves to a box, the box will be pushed.
-	 * @throws Exception If it is impossible to apply the action (moving into a wall, moving into a box that can't be pushed)
-	 * @return new Board
-	 * */
-	public Board applyAction(Action a) {
-//		Board newBoard = this.clone();
-		throw new UnsupportedOperationException("Not supported yet");
-	}
-	
-	protected Board clone() {
+        
+        /** Moves the player in one of the directions according to the chosen action.
+         * If as a result he moves to a box, the box will be pushed.
+         * @param a The action to be applied to the board
+         * @param destructive If true, the action is applied directly to the board
+         * that the function is called on, destroying the previous board state. If false,
+         * the board is cloned and the action is applied to the cloned board
+         * @throws Exception If it is impossible to apply the action (moving into a wall, moving into a box that can't be pushed)
+         * @return The original object if destructive is false, a cloned board otherwise
+         * */
+        public Board applyAction(Action a, boolean destructive) throws IllegalMoveException {
+            Board newBoard;
+            if (destructive){
+                newBoard = this;
+            } else {
+                newBoard = this.clone();
+            }
+                
+            Point player = newBoard.getPlayerPosition();
+            
+            Point destination = SokobanUtil.applyActionToPoint(a, player);
+            Symbol destObject = newBoard.get(destination);
+            if (destObject.type == Type.Box){
+                Point boxDestination = SokobanUtil.applyActionToPoint(a, destination);
+                Symbol boxDest = newBoard.get(boxDestination);
+                if (!boxDest.isWalkable){
+                    throw new IllegalMoveException();
+                }
+                // Move the box first, and then the player, so that the box
+                // symbol is not overwritten.
+                newBoard.moveElement(destination, boxDestination);
+                newBoard.moveElement(player, destination);
+            } else if (!destObject.isWalkable){
+                throw new IllegalMoveException();
+            } else {
+                newBoard.moveElement(player, destination);
+            }
+            
+            return newBoard;
+        }
+        
+        /**
+         * Applies a series of actions to the board
+         * @param aList A list of actions to apply
+         * @param destructive If true, modify the board state, otherwise use a clone.
+         * @return A board with all actions in the actionList applied.
+         */
+        public Board applyActionChained(ArrayList<Action> actionList, boolean destructive) throws IllegalMoveException{
+            Board newBoard;
+            if (destructive){
+                newBoard = this;
+            } else {
+                newBoard = this.clone();
+            }
+            
+            for (Action action : actionList) {
+                // Don't care about modifying board state anymore, so use the
+                // destructive method
+                newBoard.applyAction(action, true);
+            }
+            
+            return newBoard;
+        }
+        
+        @Override
+	public Board clone() {
 		return new Board(new HashMap<Point, Symbol>(mObjects));
 	}
 	

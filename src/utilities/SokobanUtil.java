@@ -59,5 +59,22 @@ public class SokobanUtil {
 		
 		return sb.toString();
 	}
+
+    /**
+     * Applies an action to the given point, returning the point which would be
+     * moved to if the action was legal.
+     * @param a An action
+     * @param p The point to which to apply the action
+     * @return A new point with the action applied.
+     */
+    public static Point applyActionToPoint(Action a, Point p){
+        switch(a){
+            case UP: return new Point(p.x, p.y - 1);
+            case DOWN: return new Point(p.x, p.y + 1);
+            case LEFT: return new Point(p.x - 1, p.y);
+            case RIGHT: return new Point(p.x + 1, p.y);
+            default: return null;
+        }
+    }
     
 }
