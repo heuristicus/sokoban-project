@@ -24,23 +24,21 @@ import utilities.SokobanUtil.Action;
  */
 public class Board implements Cloneable {
 	private final Map<Point, Symbol> mObjects;
-		
-	private Board(Map<Point, Symbol> dynMap) {
-		mObjects = dynMap;
+	private Point playerPosition;
+	
+	
+	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
+		this.mObjects = dynMap;
+		this.playerPosition = playerPosition;
 	}
 
 	public Map<Point, Symbol> getDynamicObjects() {
 		return mObjects;
 	}
 	
-	/** Warning, Not direct access, needs to search in the dynamic objects map */
+	/** No search needed, the position is now always tracked. */
 	public Point getPlayerPosition() {
-		for (Point p : mObjects.keySet()) {
-			if (mObjects.get(p).type == Symbol.Type.Player) {
-				return p;
-			}
-		} 
-		throw new RuntimeException("Player not found");
+		return playerPosition;
 	}
 
 	/** @return Ascii art representation of the board (static + dynamic) */
@@ -82,6 +80,8 @@ public class Board implements Cloneable {
 		// To have the number of lines and initialize the array, it must be done in two steps.
 		Symbol[][] staticMap = new Symbol[tmpStrMap.size()][];
 		Map<Point, Symbol> dynamicMap = new HashMap<>();
+		List<Point> goals = new ArrayList<>();
+		Point playerPosition = null;
 		
 		for (int y = 0; y < tmpStrMap.size(); ++y) {
 			String row = tmpStrMap.get(y);
@@ -89,18 +89,29 @@ public class Board implements Cloneable {
 			for (int x = 0; x < row.length(); ++x) {
 				Symbol s = Symbol.get(row.charAt(x));
 				if (s.type != Symbol.Type.None) {
+					
 					outRow[x] = Symbol.get(s.staticValue);					
 					dynamicMap.put(new Point(x,y), s);
+					
+					if (s.type == Symbol.Type.Player) {
+						playerPosition = new Point(x, y);
+					}
 				} else {
 					outRow[x] = s;
+				}
+				
+				if (s == Symbol.Goal || s == Symbol.BoxOnGoal ) {
+					goals.add(new Point(x,y));
 				}
 			}
 			
 			staticMap[y] = outRow;			
 		}
 		
-		StaticBoard.init(staticMap);
-		return new Board(dynamicMap);
+		if (playerPosition == null) throw new RuntimeException("Player position not detected");
+		
+		StaticBoard.init(staticMap, goals);
+		return new Board(dynamicMap, playerPosition);
 	}
 	
 	/**
@@ -112,10 +123,6 @@ public class Board implements Cloneable {
 		} else { 
 			return StaticBoard.getInstance().get(p);
 		}
-	}
-	
-	public void set(Point p, Symbol s) {
-		mObjects.put(p,s);
 	}
 	
 	/** Moves the element (box or player only!) from one point to another. 
@@ -144,6 +151,10 @@ public class Board implements Cloneable {
 			} else {return false;}
 		
 			mObjects.put(to, finalState);
+			if (element == Symbol.Type.Player) {
+				playerPosition = to;
+			}
+			
 			return true;
 		}
 		
@@ -215,7 +226,7 @@ public class Board implements Cloneable {
         
         @Override
 	public Board clone() {
-		return new Board(new HashMap<Point, Symbol>(mObjects));
+		return new Board(new HashMap<Point, Symbol>(mObjects), playerPosition);
 	}
 	
 	

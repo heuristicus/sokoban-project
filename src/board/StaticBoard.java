@@ -1,6 +1,8 @@
 package board;
 
 import java.awt.Point;
+import java.util.Collections;
+import java.util.List;
 
 import utilities.SokobanUtil;
 
@@ -10,9 +12,10 @@ public class StaticBoard {
 	
 	/** Warning, grid[y][x] is the value at the point (x,y)*/
 	public final Symbol[][] grid; 
+	public final List<Point> goals;
 	
-	public static void init(Symbol[][] grid) {
-		INSTANCE = new StaticBoard(grid);
+	public static void init(Symbol[][] grid, List<Point> goals) {
+		INSTANCE = new StaticBoard(grid, goals);
 	}
 	
 	public static StaticBoard getInstance() {
@@ -20,8 +23,9 @@ public class StaticBoard {
 		return INSTANCE;
 	}
 	
-	private StaticBoard(Symbol[][] grid) {
+	private StaticBoard(Symbol[][] grid, List<Point> goals) {
 		this.grid = grid;
+		this.goals = Collections.unmodifiableList(goals);
 	}
 	
 	public Symbol get(Point point) {
