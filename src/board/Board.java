@@ -23,13 +23,30 @@ import exceptions.IllegalMoveException;
  * is not checked, neither is the fact that there is only one player, etc. The
  * dynamic map must be modified with care.
  */
-public class Board implements Cloneable {
+public class Board {
 	private final Map<Point, Symbol> mObjects;
 	private Point playerPosition;
+	private boolean hasLockedBox;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
-		this.mObjects = new HashMap<>(dynMap);
+		this.mObjects = dynMap;
 		this.playerPosition = playerPosition;
+		this.hasLockedBox = false;
+		
+		// Scan for locked state
+		for (Point p: dynMap.keySet()) {
+			if (get(p).type != Symbol.Type.Box) continue;
+			
+			hasLockedBox = isBoxLockedAtPoint(p);
+			if (hasLockedBox) break;
+		}
+		
+	}
+	
+	private Board(Board original) {
+		this.mObjects = new HashMap<>(original.mObjects);
+		this.playerPosition = original.playerPosition;
+		this.hasLockedBox = original.hasLockedBox;
 	}
 
 	public Map<Point, Symbol> getDynamicObjects() {
@@ -174,6 +191,9 @@ public class Board implements Cloneable {
 			mObjects.put(to, finalState);
 			if (element == Symbol.Type.Player) {
 				playerPosition = to;
+			} else {
+				// Check if we reached a locked state
+				hasLockedBox |= isBoxLockedAtPoint(to);
 			}
 
 			return true;
@@ -205,7 +225,7 @@ public class Board implements Cloneable {
 		if (destructive) {
 			newBoard = this;
 		} else {
-			newBoard = this.clone();
+			newBoard = new Board(this);
 		}
 
 		Point player = newBoard.getPlayerPosition();
@@ -247,7 +267,7 @@ public class Board implements Cloneable {
 		if (destructive) {
 			newBoard = this;
 		} else {
-			newBoard = this.clone();
+			newBoard = new Board(this);
 		}
 
 		for (Action action : actionList) {
@@ -257,11 +277,6 @@ public class Board implements Cloneable {
 		}
 
 		return newBoard;
-	}
-
-	@Override
-	public Board clone() {
-		return new Board(new HashMap<Point, Symbol>(mObjects), playerPosition);
 	}
 	
 	/** 
@@ -293,6 +308,32 @@ public class Board implements Cloneable {
 			}
 		}
 		return freeNeighbours;
+	}
+	
+	/** Basic implementation: checks only that the box can still be moved if the 
+	 * board stays as it currently is. Does not include moving other boxes to clear
+	 * a path, and assumes that the player can get to the free neighbours 
+	 * Also, a box can be considered locked even on a goal (maybe you locked the wrong box there?)
+	 */
+	private boolean isBoxLockedAtPoint(Point p) {
+		// A box is locked when it can't be pushed anymore. It happens when two adjacent 
+		// sides of the box are not walkable. 
+		
+		// TODO: that's a wierd way to do it. Any idea of a more easily understandable
+		// way to do it?
+		
+		List<Point> freeNeighbours = getFreeNeighbours(p);
+		if (freeNeighbours.size() > 2 ) return false;
+		if (freeNeighbours.size() < 2 ) return true;
+		
+		// Only left are the cases with 2 free sides. If they are opposite it's a tunnel, still manageable.
+		int avgX = freeNeighbours.get(0).x + freeNeighbours.get(1).x;
+		int avgY = freeNeighbours.get(0).y + freeNeighbours.get(1).y;
+		
+		// For points with only one other point in between, the sum of the x and y will be even.
+		// Half of it will give the x and y of the middle point.
+		if (avgX % 2 != 0 || avgY != 0 ) return true;
+		return false;
 	}
 	
 
