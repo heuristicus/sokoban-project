@@ -35,8 +35,11 @@ public class Board {
 		
 		// Scan for locked state
 		for (Point p: dynMap.keySet()) {
-			if (get(p).type != Symbol.Type.Box) continue;
-			
+			if (get(p) != Symbol.Box) {
+				// Player is ignored, BoxOnGoal too.
+				continue;
+			}
+						
 			hasLockedBox = isBoxLockedAtPoint(p);
 			if (hasLockedBox) break;
 		}
@@ -56,6 +59,10 @@ public class Board {
 	/** No search needed, the position is now always tracked. */
 	public Point getPlayerPosition() {
 		return playerPosition;
+	}
+	
+	public boolean isInvalid() {
+		return hasLockedBox;
 	}
 
 	/** @return Ascii art representation of the board (static + dynamic) */
@@ -192,8 +199,12 @@ public class Board {
 			if (element == Symbol.Type.Player) {
 				playerPosition = to;
 			} else {
-				// Check if we reached a locked state
-				hasLockedBox |= isBoxLockedAtPoint(to);
+				if (finalState != Symbol.BoxOnGoal) {
+					// Check if we reached a locked state
+					// We allow locked boxes on goals.
+					hasLockedBox |= isBoxLockedAtPoint(to);
+					
+				}
 			}
 
 			return true;
@@ -294,6 +305,17 @@ public class Board {
 		return freeNeighbours;
 	}
 	
+	/** Returns the list of access points for each box*/
+	public Map<Point, List<Point>> getMapBoxAccessPoints() {
+		Map<Point, List<Point>> boxtToAccessPoints = new HashMap<>();
+		for (Point p : mObjects.keySet()) {
+			boxtToAccessPoints.put(p, getFreeNeighbours(p));
+			
+		}
+		return boxtToAccessPoints;
+		
+	}
+	
 	/** Returns the all the walkable that allow to be next to a box */
 	public Set<Point> getBoxAccessPoints() {
 		Set<Point> freeNeighbours = new HashSet<>();
@@ -310,29 +332,37 @@ public class Board {
 		return freeNeighbours;
 	}
 	
-	/** Basic implementation: checks only that the box can still be moved if the 
-	 * board stays as it currently is. Does not include moving other boxes to clear
-	 * a path, and assumes that the player can get to the free neighbours 
+	/** Basic implementation: checks only that the box is not blocked against walls. 
+	 * Boxes are not considered to be blocking, and assumes that the player can get 
+	 * to the free neighbours 
 	 * Also, a box can be considered locked even on a goal (maybe you locked the wrong box there?)
+	 * You can test that it is on a goad before running this method (no point doing it the other way)
 	 */
-	private boolean isBoxLockedAtPoint(Point p) {
+	public boolean isBoxLockedAtPoint(Point p) {
 		// A box is locked when it can't be pushed anymore. It happens when two adjacent 
 		// sides of the box are not walkable. 
 		
 		// TODO: that's a wierd way to do it. Any idea of a more easily understandable
 		// way to do it?
 		
-		List<Point> freeNeighbours = getFreeNeighbours(p);
-		if (freeNeighbours.size() > 2 ) return false;
-		if (freeNeighbours.size() < 2 ) return true;
+		List<Point> surroundingWalls = new ArrayList<>();
+		for (Action a : Action.values()) {
+			Point neighbour = SokobanUtil.applyActionToPoint(a, p);
+			if (get(neighbour) == Symbol.Wall) {
+				surroundingWalls.add(neighbour);
+			}
+		}
+		
+		if (surroundingWalls.size() > 2 ) return false;
+		if (surroundingWalls.size() < 2 ) return true;
 		
 		// Only left are the cases with 2 free sides. If they are opposite it's a tunnel, still manageable.
-		int avgX = freeNeighbours.get(0).x + freeNeighbours.get(1).x;
-		int avgY = freeNeighbours.get(0).y + freeNeighbours.get(1).y;
+		int sumX = surroundingWalls.get(0).x + surroundingWalls.get(1).x;
+		int sumY = surroundingWalls.get(0).y + surroundingWalls.get(1).y;
 		
 		// For points with only one other point in between, the sum of the x and y will be even.
 		// Half of it will give the x and y of the middle point.
-		if (avgX % 2 != 0 || avgY != 0 ) return true;
+		if (sumX % 2 != 0 || sumY != 0 ) return true;
 		return false;
 	}
 	
