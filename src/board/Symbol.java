@@ -10,9 +10,9 @@ public enum Symbol {
 	Empty(       ' ', ' ', ' ', true, Type.None),
 	Wall(        '#', '#', ' ', false, Type.None),
 	Goal(        '.', '.', ' ', true, Type.None),
-	Player(      '@', ' ', '@', false, Type.Player),
+	Player(      '@', ' ', '@', true, Type.Player),
 	Box(         '$', ' ', '$', false, Type.Box),
-	PlayerOnGoal('+', '.', '@', false, Type.Player),
+	PlayerOnGoal('+', '.', '@', true, Type.Player),
 	BoxOnGoal(   '*', '.', '$', false, Type.Box);
 	
 	public static enum Type {Player, Box, Mark, None};
