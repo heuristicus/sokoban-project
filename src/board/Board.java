@@ -202,13 +202,6 @@ public class Board implements Expandable<Board, Action>{
 			mObjects.put(to, finalState);
 			if (element == Symbol.Type.Player) {
 				playerPosition = to;
-			} else {
-				if (finalState != Symbol.BoxOnGoal) {
-					// Check if we reached a locked state
-					// We allow locked boxes on goals.
-					hasLockedBox |= isBoxLockedAtPoint(to);
-					
-				}
 			}
 
 			return true;
@@ -251,7 +244,9 @@ public class Board implements Expandable<Board, Action>{
 			Point boxDestination = SokobanUtil.applyActionToPoint(a,
 					destination);
 			Symbol boxDest = newBoard.get(boxDestination);
-			if (!boxDest.isWalkable || isBoxLockedAtPoint(boxDestination)) {
+            // If the destination is not walkable or it puts the board into a locked
+            // state, then we don't want to do this action
+			if (!boxDest.isWalkable || (boxDest != Symbol.Goal && isBoxLockedAtPoint(boxDestination))) {
 				throw new IllegalMoveException();
 			}
 			// Move the box first, and then the player, so that the box

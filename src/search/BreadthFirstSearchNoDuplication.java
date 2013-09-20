@@ -22,7 +22,7 @@ public class BreadthFirstSearchNoDuplication<T extends Expandable<T,U>, U> exten
             Queue<SearchNode<T,U>> open = new LinkedList<>();
             // List of nodes which have already been checked, independent of the action taken to reach the state.
             ArrayList<SearchNode<T,U>> closed = new ArrayList<>();
-            open.add(new SearchNode<T,U>(start, null, null)); // Push the start node onto the queue
+            open.add(new SearchNode<>(start, null, null)); // Push the start node onto the queue
             while(!open.isEmpty()){
                 // Retrieve and remove the front of the queue
                 SearchNode<T,U> front = open.remove();

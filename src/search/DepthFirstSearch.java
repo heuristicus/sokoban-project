@@ -21,7 +21,7 @@ public class DepthFirstSearch<T extends Expandable<T,U>, U> extends SearchMethod
         if (start == null || goal == null){
             return null;
         }
-        list.add(new SearchNode<T,U>(start, null, null));
+        list.add(new SearchNode<>(start, null, null));
         while(!list.empty()){
             SearchNode<T,U> top = list.pop(); // Look at the top node on the stack
             if (goal.equals(top.nodeState)){ // Check if top is the goal
