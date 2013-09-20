@@ -15,6 +15,10 @@ import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import search.Expandable;
+import search.SearchNode;
 
 /**
  * Dynamic representation of the world.
@@ -23,7 +27,7 @@ import exceptions.IllegalMoveException;
  * is not checked, neither is the fact that there is only one player, etc. The
  * dynamic map must be modified with care.
  */
-public class Board {
+public class Board implements Expandable<Board, Action>{
 	private final Map<Point, Symbol> mObjects;
 	private Point playerPosition;
 	private boolean hasLockedBox;
@@ -247,7 +251,7 @@ public class Board {
 			Point boxDestination = SokobanUtil.applyActionToPoint(a,
 					destination);
 			Symbol boxDest = newBoard.get(boxDestination);
-			if (!boxDest.isWalkable) {
+			if (!boxDest.isWalkable || isBoxLockedAtPoint(boxDestination)) {
 				throw new IllegalMoveException();
 			}
 			// Move the box first, and then the player, so that the box
@@ -365,6 +369,23 @@ public class Board {
 		if (sumX % 2 != 0 || sumY != 0 ) return true;
 		return false;
 	}
+
+
+    
+    @Override
+    public ArrayList<SearchNode<Board, Action>> expand(SearchNode<Board, Action> parent) {
+        ArrayList<SearchNode<Board, Action>> expanded = new ArrayList<>();
+        
+        for (Action a : Action.values()) {
+            try {
+                expanded.add(new SearchNode<>(this.applyAction(a, false), parent, a, 1));
+            } catch (IllegalMoveException ex) {
+                
+            }
+        }
+        
+        return expanded;
+    }
 	
 
 }

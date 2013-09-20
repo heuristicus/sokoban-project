@@ -16,7 +16,7 @@ import java.util.ArrayList;
  *
  * @author michal
  */
-public class SearchNode<T,U> implements Comparable<SearchNode<T,U>>{
+public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<SearchNode<T,U>>{
 
     protected Float pathCost;
     protected Float estimatedCost;
@@ -115,6 +115,10 @@ public class SearchNode<T,U> implements Comparable<SearchNode<T,U>>{
              path.add(this.generatingAction);
              return path;
          }
+     }
+     
+     public ArrayList<SearchNode<T,U>> expand(){
+         return this.nodeState.expand(this);
      }
      
 

@@ -33,7 +33,7 @@ public class BreadthFirstSearchNoDuplication<T extends Expandable<T,U>, U> exten
                     // If it is already expanded, then just move onto the next loop.
                     if (!closed.contains(front)){
                         // The front node has not yet been expanded. Expand it
-                        ArrayList<SearchNode<T,U>> expanded = front.nodeState.expand();
+                        ArrayList<SearchNode<T,U>> expanded = front.expand();
                         // Go through the closed list again for each successor
                         for (SearchNode<T, U> successor : expanded) {
                             if (!closed.contains(successor)){

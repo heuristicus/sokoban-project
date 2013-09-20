@@ -27,7 +27,7 @@ public class DepthFirstSearch<T extends Expandable<T,U>, U> extends SearchMethod
             if (goal.equals(top.nodeState)){ // Check if top is the goal
                 return top.actionUnwind(); // Goal, so backtrace the path to get to it
             } else { // Not the goal, expand the node and push onto the stack
-                list.addAll(top.nodeState.expand());
+                list.addAll(top.expand());
             }
         }
         return null; // The list was empty and no goal was found - there is no path.

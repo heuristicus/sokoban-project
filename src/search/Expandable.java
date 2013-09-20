@@ -10,6 +10,6 @@ import java.util.ArrayList;
  *
  * @author michal
  */
-public interface Expandable<T, U> {
-    public ArrayList<SearchNode<T,U>> expand();
+public interface Expandable<T extends Expandable<T,U>, U> {
+    public ArrayList<SearchNode<T,U>> expand(SearchNode<T,U> parent);
 }

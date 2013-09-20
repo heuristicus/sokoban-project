@@ -54,7 +54,7 @@ public class AStar<T extends Expandable<T, U>, U, S> extends SearchMethod<T, U>{
                 closed.add(front);
             }
             
-            ArrayList<SearchNode<T,U>> successors = front.nodeState.expand();
+            ArrayList<SearchNode<T,U>> successors = front.expand();
             for (SearchNode<T, U> successor : successors) {
                 // Look through the open list to see if the successor is
                 // already present
