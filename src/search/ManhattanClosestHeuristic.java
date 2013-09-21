@@ -42,8 +42,8 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 						float MHdistance = Math.abs(startPt.x - goalPt.x) + Math.abs(startPt.y - goalPt.y);
 						bestDistance = Math.min(bestDistance, MHdistance);
 					}
-					estimation += bestDistance;
 				}
+				estimation += bestDistance;
 			}
 		}
 		return estimation;
