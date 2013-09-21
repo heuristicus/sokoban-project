@@ -14,15 +14,22 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 	public static Symbol[] START_SYMBOLS = {Symbol.Box, Symbol.BoxOnGoal};
 	public static Symbol[] GOAL_SYMBOLS = {Symbol.Box, Symbol.BoxOnGoal};
 	
+	
+	/** Returns an optimistic estimation of the coast to go from state start to state goal.
+	 * 	Wrapper for the Map<Point,Symbol> version.
+	 */
 	public float utility(Board start, Board goal)
 	{
 		return utility(start.getDynamicObjects(), goal.getDynamicObjects());
 	}
 	
+	
 	@Override
+	/** Returns an optimistic estimation of the coast to go from state start to state goal.
+	 * 	
+	 */
 	public float utility(Map<Point, Symbol> start, Map<Point, Symbol> goal)
 	{		
-		
 		float estimation = 0;
 		for (Point startPt : start.keySet())
 		{
