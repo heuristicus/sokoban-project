@@ -15,8 +15,6 @@ import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import search.Expandable;
 import search.SearchNode;
 
@@ -381,6 +379,48 @@ public class Board implements Expandable<Board, Action>{
         
         return expanded;
     }
-	
 
+    /**
+     * Checks whether the given object is equal to this Board. The position
+     * of the player is ignored in the check.
+     * @param obj An object to check for equality. Should be a board.
+     * @return true if obj is a Board, and the dynamic object hashmap contains
+     * boxes at the same positions as this instance of Board. false if obj is not
+     * a Board, or the objects in the dynamic map are in different locations, or
+     * there is a different number of them.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Board){
+            Board comp = (Board)obj;
+            Map<Point, Symbol> compObjects = comp.getDynamicObjects();
+            Map<Point, Symbol> thisObjects = this.getDynamicObjects();
+            // If one of the dynamic maps has more objects than the other, they
+            // cannot be the same.
+            if (compObjects.size() != thisObjects.size())
+                return false;
+            
+            for (Point p : compObjects.keySet()) {
+                Symbol thisSymbol = thisObjects.get(p);
+                // Ignore the player in the check
+                if (thisSymbol == Symbol.Player || thisSymbol == Symbol.PlayerOnGoal)
+                    continue;
+                // Get the symbol at the point on this board
+                Symbol compSymbol = compObjects.get(p);
+                if (compSymbol != null && compSymbol == compSymbol)
+                    continue; // The symbols at the two points match
+                
+                // If the dynamic map of the compared board does not contain the
+                // point we are looking at, or the symbols do not match, then
+                // the boards are not equal.
+                return false;
+            }
+            
+            // If we get through the whole keySet without returning, then they
+            // contain the same keys
+            return true;
+        }
+        // obj is not an instance of Board.
+        return false;
+    }
 }
