@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import search.Expandable;
+import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
-import search.Expandable;
-import search.SearchNode;
 
 /**
  * Dynamic representation of the world.

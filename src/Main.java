@@ -1,14 +1,13 @@
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import board.Board;
-import board.StaticBoard;
-import exceptions.IllegalMoveException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import utilities.SokobanUtil.Action;
+import board.Board;
+import board.StaticBoard;
+import exceptions.IllegalMoveException;
 
 public class Main {
 

@@ -1,7 +1,6 @@
 package search;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.Map;
 
 import board.Board;
@@ -37,12 +36,14 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 			{
 				float bestDistance = Float.POSITIVE_INFINITY;
 				for (Point goalPt : goal.keySet())
-				if (isGoalSymbol(goal.get(goalPt)))
 				{
-					float MHdistance = Math.abs(startPt.x - goalPt.x) + Math.abs(startPt.y - goalPt.y);
-					bestDistance = Math.min(bestDistance, MHdistance);
+					if (isGoalSymbol(goal.get(goalPt)))
+					{
+						float MHdistance = Math.abs(startPt.x - goalPt.x) + Math.abs(startPt.y - goalPt.y);
+						bestDistance = Math.min(bestDistance, MHdistance);
+					}
+					estimation += bestDistance;
 				}
-				estimation += bestDistance;
 			}
 		}
 		return estimation;

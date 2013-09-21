@@ -4,12 +4,12 @@
  */
 package pathfinding;
 
-import board.Board;
 import java.util.ArrayList;
 import java.util.HashMap;
-import search.MultiGoalBreadthFirstSearch;
+
 import search.SearchMethod;
 import utilities.SokobanUtil.Action;
+import board.Board;
 
 /**
  *

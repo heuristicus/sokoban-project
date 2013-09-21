@@ -4,11 +4,11 @@
  */
 package utilities;
 
-import board.Board;
-import board.Symbol;
-
 import java.awt.Point;
 import java.util.ArrayList;
+
+import board.Board;
+import board.Symbol;
 
 /**
  *
