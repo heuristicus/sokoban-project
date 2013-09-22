@@ -408,7 +408,7 @@ public class Board implements Expandable<Board, Action>{
 		
 		// For points with only one other point in between, the sum of the x and y will be even.
 		// Half of it will give the x and y of the middle point.
-		if (sumX % 2 != 0 || sumY != 0 ) return true;
+		if (sumX % 2 != 0 || sumY %2 != 0 ) return true;
 		return false;
 	}
 
