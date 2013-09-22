@@ -116,7 +116,7 @@ public class Main {
             System.out.println("BFS could not find path.");
         }
         
-		// Solution for map zero
+ 		// Solution for map zero
 		Action sa[] = { Action.RIGHT, Action.UP, Action.RIGHT, Action.UP,
 						Action.LEFT, Action.LEFT, Action.LEFT, Action.UP, Action.LEFT,
 						Action.LEFT, Action.DOWN, Action.RIGHT, Action.RIGHT,

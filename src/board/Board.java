@@ -17,6 +17,8 @@ import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Dynamic representation of the world.
@@ -70,7 +72,17 @@ public class Board implements Expandable<Board, Action>{
 	/** @return Ascii art representation of the board (static + dynamic) */
 	@Override
 	public String toString() {
-		Symbol[][] grid = StaticBoard.getInstance().grid;
+		return toStringMarked(null);
+	}
+    
+    /**
+     * Returns a string representation of the board, with points in the
+     * given list marked with an X.
+     * @param toMark
+     * @return 
+     */
+    public String toStringMarked(List<Point> toMark){
+        Symbol[][] grid = StaticBoard.getInstance().grid;
 		Symbol[][] gridCopy = new Symbol[grid.length][];
 		for (int i = 0; i < grid.length; i++) {
 			gridCopy[i] = grid[i].clone();
@@ -79,8 +91,15 @@ public class Board implements Expandable<Board, Action>{
 		for (Point p : mObjects.keySet()) {
 			gridCopy[p.y][p.x] = mObjects.get(p);
 		}
-		return SokobanUtil.stringifyGrid(gridCopy);
-	}
+        
+        if (toMark != null){
+            for (Point p : toMark) {
+                gridCopy[p.y][p.x] = Symbol.Mark;
+            }
+        }
+        
+        return SokobanUtil.stringifyGrid(gridCopy);
+    }
 
 	/**
 	 * Initializes a new board and the singleton static map.
@@ -288,6 +307,35 @@ public class Board implements Expandable<Board, Action>{
 
 		return newBoard;
 	}
+    
+    /**
+     * Gets the points on this board which are accessible from the given point.
+     * This is done using something like a flood fill.
+     * @param p The point for which to find accessible points
+     * @return The points which are accessible from the given point. Accessible
+     * points are those which are walkable.
+     */
+    public List<Point> getAccessiblePoints(Point p){
+        Queue<Point> q = new LinkedList<>();
+        Board ref = new Board(this);
+        q.add(p);
+        List<Point> accessible = new ArrayList<>();
+        accessible.add(p);
+        while(!q.isEmpty()){
+            Point next = q.remove();
+            if (ref.get(next).isWalkable){
+                List<Point> neighbours = getFreeNeighbours(next);
+                for (Point point : neighbours) {
+                    if (!accessible.contains(point)){
+                        accessible.add(point);
+                        q.add(point);
+                    }
+                }
+            }
+        }
+        
+        return accessible;
+    }
 	
 	/** 
 	 * Returns which of the points around the one provided are free.
@@ -365,8 +413,6 @@ public class Board implements Expandable<Board, Action>{
 		return false;
 	}
 
-
-    
     @Override
     public ArrayList<SearchNode<Board, Action>> expand(SearchNode<Board, Action> parent) {
         ArrayList<SearchNode<Board, Action>> expanded = new ArrayList<>();
@@ -411,8 +457,8 @@ public class Board implements Expandable<Board, Action>{
             for (Point p : thisObjects.keySet()) {
                 Symbol thisSymbol = thisObjects.get(p);
                 // Ignore the player in the check
-                if (thisSymbol == Symbol.Player || thisSymbol == Symbol.PlayerOnGoal)
-                    continue;
+//                if (thisSymbol == Symbol.Player || thisSymbol == Symbol.PlayerOnGoal)
+//                    continue;
                 // Get the symbol at the point on this board
                 Symbol compSymbol = compObjects.get(p);
                 if (compSymbol != null && thisSymbol == compSymbol)

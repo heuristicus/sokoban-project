@@ -11,6 +11,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import board.Board;
 import board.Symbol;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -33,17 +36,6 @@ public class SokobanUtil {
             case RIGHT: return Action.LEFT;
             default: return null;
         }
-    }
-    
-    /**
-     * See which points around a given point on the specified board are accessible, that is,
-     * are not blocked by something.
-     * @param p A point on the board.
-     * @param b A board.
-     * @return A list of points with distance 1 from the original which are not blocked.
-     */
-    public static ArrayList<Point> accessiblePositions(Point p, Board b){
-        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     /**
@@ -95,4 +87,24 @@ public class SokobanUtil {
         return Board.read(new InputStreamReader(new FileInputStream(filename)));
     }
     
+    public static String readMapAsString(String filename) throws FileNotFoundException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
+
+		// Step 1: read the input.
+		StringBuilder sb = new StringBuilder();
+        String line;
+		try {
+			while (br.ready()) {
+				line = br.readLine();
+                sb.append(line);
+                sb.append('\n');
+			}
+		} catch (IOException e) {
+			// Crash the program, there is nothing much to do but give a better
+			// input source.
+			throw new RuntimeException(e);
+		}
+        return sb.toString();
+    }
+
 }
