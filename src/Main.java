@@ -1,9 +1,13 @@
 import java.awt.Point;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.FileInputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import search.BreadthFirstSearchNoDuplication;
 import search.SearchMethod;
 import search.SearchNode;
@@ -19,12 +23,11 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
-		Board board = Board.read(new InputStreamReader(System.in));
+		Board board = Board.read(new BufferedReader(new InputStreamReader(System.in)));
 		System.out.println("Static map only:");
 		System.out.println(StaticBoard.getInstance());
 		System.out.println("Dynamic board:");
 		System.out.println(board);
-        System.out.println("Board==board ? " + (board == board));
         System.out.println("Board.equals(board) ? " + (board.equals(board)));
         
 
@@ -84,8 +87,8 @@ public class Main {
 		System.out.println("Moving player up");
 		Board newBoard = null;
 
-        Board start = Board.read(new InputStreamReader(new FileInputStream("./maps/test/searchTestStart.map")));
-        Board goal = Board.read(new InputStreamReader(new FileInputStream("./maps/test/searchTestGoal.map")));
+        Board start = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
+        Board goal = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
         SearchMethod<Board,Action> bfs = new BreadthFirstSearchNoDuplication<>();
         ArrayList<Action> path = bfs.findPath(start, goal);
         if (path != null){

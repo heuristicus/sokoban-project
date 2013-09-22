@@ -4,22 +4,29 @@
  */
 package board;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.Point;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 import search.SearchNode;
 import utilities.SokobanUtil;
 
@@ -32,6 +39,17 @@ public class BoardTest {
     public static final String testMapDir = "./maps/test/";
     
     public BoardTest() {
+    }
+    
+    public Board initBoard(String mapName) {
+    	Path path = Paths.get(testMapDir, mapName);
+    	try {
+			return Board.read( Files.newBufferedReader(path, Charset.defaultCharset()));
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("File not found: " + path.toAbsolutePath());
+			return null;
+		}
     }
     
     @BeforeClass
@@ -51,88 +69,45 @@ public class BoardTest {
     }
 
     /**
-     * Test of getDynamicObjects method, of class Board.
+     * Test of read method, compare the result using the toString method
      */
     @Test
-    public void testGetDynamicObjects() {
-        System.out.println("getDynamicObjects");
-        Board instance = null;
-        Map expResult = null;
-        Map result = instance.getDynamicObjects();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testRead() throws IOException {
+    	final String TEST_FILE = "readTest1.map";
+        Board board = initBoard(TEST_FILE);
+        String referenceMap = new String(Files.readAllBytes(Paths.get(testMapDir, TEST_FILE)));
+        assertEquals(referenceMap, board.toString());
     }
-
+    
     /**
-     * Test of getPlayerPosition method, of class Board.
+     * Test of read method, test the result using the getters
      */
     @Test
-    public void testGetPlayerPosition() {
-        System.out.println("getPlayerPosition");
-        Board instance = null;
-        Point expResult = null;
-        Point result = instance.getPlayerPosition();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testRead2() throws IOException {
+    	final String TEST_FILE = "readTest2.map";
+        Board board = initBoard(TEST_FILE);
+        assertEquals("Wrong player position", new Point(1,2), board.getPlayerPosition());
+        Map<Point, Symbol> dynMap = new HashMap<>();
+        dynMap.put(new Point(1,2), Symbol.PlayerOnGoal);
+        dynMap.put(new Point(1,1), Symbol.Box);
+        dynMap.put(new Point(3,1), Symbol.BoxOnGoal);
+        assertEquals("Wrong dynamic objects", dynMap, board.getDynamicObjects());
+        assertEquals("Wrong get(0,0)", Symbol.Wall, board.get(new Point(0,0)));
+        assertEquals("Wrong get(3,2)", Symbol.Empty, board.get(new Point(3,2)));
+        assertEquals("Wrong get(3,1)", Symbol.BoxOnGoal, board.get(new Point(3,1)));
     }
-
-    /**
-     * Test of isInvalid method, of class Board.
+    
+    /** 
+     * Test the static map generated while reading the board. The output is tested using
+     * StaticMap#toString() 
      */
     @Test
-    public void testIsInvalid() {
-        System.out.println("isInvalid");
-        Board instance = null;
-        boolean expResult = false;
-        boolean result = instance.isInvalid();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of toString method, of class Board.
-     */
-    @Test
-    public void testToString() {
-        System.out.println("toString");
-        Board instance = null;
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of read method, of class Board.
-     */
-    @Test
-    public void testRead() {
-        System.out.println("read");
-        InputStreamReader inputStreamReader = null;
-        Board expResult = null;
-        Board result = Board.read(inputStreamReader);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of get method, of class Board.
-     */
-    @Test
-    public void testGet() {
-        System.out.println("get");
-        Point p = null;
-        Board instance = null;
-        Symbol expResult = null;
-        Symbol result = instance.get(p);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testReadStatic() throws IOException {
+    	final String INPUT_TEST_FILE = "readTest1.map";
+    	final String OUTPUT_TEST_FILE = "readTest1Static.map";
+        initBoard(INPUT_TEST_FILE);
+        String referenceMap = new String(Files.readAllBytes(Paths.get(testMapDir, OUTPUT_TEST_FILE)));
+        assertEquals(referenceMap, StaticBoard.getInstance().toString());
     }
 
     /**
@@ -140,15 +115,59 @@ public class BoardTest {
      */
     @Test
     public void testMoveElement() {
-        System.out.println("moveElement");
-        Point from = null;
-        Point to = null;
-        Board instance = null;
-        boolean expResult = false;
-        boolean result = instance.moveElement(from, to);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Board board = initBoard("readTest1.map");
+        boolean result;
+        Point from, to;
+        
+        // Moving a box to an empty tile
+        from = new Point(1,1);
+        to = new Point(4,1);
+        result = board.moveElement(from, to);
+        assertEquals(true, result);
+        assertEquals(Symbol.Empty, board.get(from));
+        assertEquals(Symbol.Box, board.get(to));
+        
+        // Moving the box to a goal
+        from = to;
+        to = new Point(2,1);
+        result = board.moveElement(from, to);
+        assertEquals(true, result);
+        assertEquals(Symbol.Empty, board.get(from));
+        assertEquals(Symbol.BoxOnGoal, board.get(to));
+        
+        // Moving the box on top of the player (should fail)
+        from = to;
+        to = new Point(1,2);
+        result = board.moveElement(from, to);
+        assertEquals(false, result);
+        assertEquals(Symbol.BoxOnGoal, board.get(from));
+        assertEquals(Symbol.Player, board.get(to));
+        
+        // Moving the box on top of a non walkable tile (wall) (should fail)
+        to = new Point(0,0);
+        result = board.moveElement(from, to);
+        assertEquals(false, result);
+        assertEquals(Symbol.BoxOnGoal, board.get(from));
+        assertEquals(Symbol.Wall, board.get(to));
+        
+        // Moving the box back to its initial position
+        result = board.moveElement(from, new Point(1,1));
+        
+        // Moving the player to an empty tile
+        from = new Point(1,2);
+        to = new Point(4,1);
+        result = board.moveElement(from, to);
+        assertEquals(true, result);
+        assertEquals(Symbol.Empty, board.get(from));
+        assertEquals(Symbol.Player, board.get(to));
+        
+        // Moving the player to a goal
+        from = to;
+        to = new Point(2,1);
+        result = board.moveElement(from, to);
+        assertEquals(true, result);
+        assertEquals(Symbol.Empty, board.get(from));
+        assertEquals(Symbol.PlayerOnGoal, board.get(to));
     }
 
     /**
@@ -188,14 +207,17 @@ public class BoardTest {
      */
     @Test
     public void testGetFreeNeighbours() {
-        System.out.println("getFreeNeighbours");
-        Point p = null;
-        Board instance = null;
-        List expResult = null;
-        List result = instance.getFreeNeighbours(p);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Board board = initBoard("freeNeighboursTest.map");
+        // Box in top left corner
+        assertEquals(Arrays.asList(new Point(2,1), new Point(1,2)), 
+        		board.getFreeNeighbours(new Point(1,1)));
+        
+        // Called on an empty tile
+        assertEquals(Arrays.asList(new Point(3,2), new Point(2,3), new Point(4,3), new Point(3,4)),
+        		board.getFreeNeighbours(new Point(3,3)));
+                
+        // Next box to a player: not counted as an obstacle
+        assertEquals(4, board.getFreeNeighbours(new Point(10,2)).size());
     }
 
     /**
@@ -231,12 +253,8 @@ public class BoardTest {
      */
     @Test
     public void testIsBoxLockedAtPoint() {
-        Board tb = null;
-        try {
-            tb = SokobanUtil.readMap(testMapDir + "boardTestLocked.map");
-        } catch (FileNotFoundException ex) {
-            fail("Could not find test file boardTestLocked.map");
-        }
+        Board tb = SokobanUtil.readMap(Paths.get(testMapDir,"boardTestLocked.map"));
+        
         // True cases - the box should be considered blocked
         // top left corner - completely walled in
         assertTrue(tb.isBoxLockedAtPoint(new Point(1,1)));
@@ -274,18 +292,14 @@ public class BoardTest {
         // The boards that are expected to be received upon expansion of the two states
         ArrayList<Board> blockedSol = new ArrayList<>();
         ArrayList<Board> surroundedSol = new ArrayList<>();
-        try {
-            blocked = SokobanUtil.readMap(testMapDir + "boardTestExpandBlocked.map");
-            surrounded = SokobanUtil.readMap(testMapDir + "boardTestExpandSurrounded.map");
-            for (String fname : fileListBlocked) {
-                blockedSol.add(SokobanUtil.readMap(testMapDir + fname));
-            }
-            for (String fname : fileListSurrounded) {
-                surroundedSol.add(SokobanUtil.readMap(testMapDir + fname));
-            }
-        } catch (FileNotFoundException ex) {
-            System.out.println("Exception in testExpand: " + ex.getMessage());
-            fail("Could not find map file boardTestExpandBlocked.map or boardTestExpandSurrounded.map, or solution maps");
+        	
+        blocked = SokobanUtil.readMap(Paths.get(testMapDir,"boardTestExpandBlocked.map"));
+        surrounded = SokobanUtil.readMap(Paths.get(testMapDir,"boardTestExpandSurrounded.map"));
+        for (String fname : fileListBlocked) {
+            blockedSol.add(SokobanUtil.readMap(testMapDir + fname));
+        }
+        for (String fname : fileListSurrounded) {
+            surroundedSol.add(SokobanUtil.readMap(testMapDir + fname));
         }
         
         ArrayList<SearchNode<Board, SokobanUtil.Action>> bexp = blocked.expand(null);

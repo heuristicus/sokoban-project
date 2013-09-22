@@ -3,7 +3,6 @@ package board;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,8 +87,7 @@ public class Board implements Expandable<Board, Action>{
 	 * @param inputStreamReader
 	 *            input source
 	 */
-	public static Board read(InputStreamReader inputStreamReader) {
-		BufferedReader br = new BufferedReader(inputStreamReader);
+	public static Board read(BufferedReader br) {
 
 		// Step 1: read the input.
 		List<String> tmpStrMap = new ArrayList<>();
@@ -166,7 +164,7 @@ public class Board implements Expandable<Board, Action>{
 		if (!mObjects.containsKey(from))
 			return false;
 
-		Symbol.Type element = mObjects.remove(from).type;
+		Symbol.Type element = mObjects.get(from).type;
 		Symbol destination = StaticBoard.getInstance().get(to);
 		Symbol finalState;
 
@@ -197,6 +195,7 @@ public class Board implements Expandable<Board, Action>{
 				return false;
 			}
 
+			mObjects.remove(from);
 			mObjects.put(to, finalState);
 			if (element == Symbol.Type.Player) {
 				playerPosition = to;

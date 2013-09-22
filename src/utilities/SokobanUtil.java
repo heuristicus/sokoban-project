@@ -5,10 +5,13 @@
 package utilities;
 
 import java.awt.Point;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+
 import board.Board;
 import board.Symbol;
 
@@ -56,7 +59,7 @@ public class SokobanUtil {
 			for (int x = 0; x < aGrid[y].length; x++) {
 				sb.append(aGrid[y][x]);
 			}
-			sb.append('\n');
+			if (y < aGrid.length - 1) sb.append('\n');
 		}
 		
 		return sb.toString();
@@ -89,8 +92,17 @@ public class SokobanUtil {
         }
     }
     
-    public static Board readMap(String filename) throws FileNotFoundException{
-        return Board.read(new InputStreamReader(new FileInputStream(filename)));
+    
+    public static Board readMap(String filename) {
+        return readMap(Paths.get(filename));
+    }
+    
+    public static Board readMap(Path filePath) {
+    	try {
+			return Board.read( Files.newBufferedReader(filePath, Charset.defaultCharset()));
+		} catch (IOException e) {
+			throw new RuntimeException("File no found: " + filePath.toAbsolutePath(), e);
+		}
     }
     
 }

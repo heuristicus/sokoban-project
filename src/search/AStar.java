@@ -22,7 +22,7 @@ import java.util.Queue;
  */
 public class AStar<T extends Expandable<T, U>, U, S> extends SearchMethod<T, U>{
 
-    Heuristic h;
+    Heuristic<T> h;
     
     /**
      * Basic constructor
