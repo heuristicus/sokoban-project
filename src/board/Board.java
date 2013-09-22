@@ -29,30 +29,15 @@ import java.util.Queue;
 public class Board implements Expandable<Board, Action>{
 	private final Map<Point, Symbol> mObjects;
 	private Point playerPosition;
-	private boolean hasLockedBox;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
 		this.playerPosition = playerPosition;
-		this.hasLockedBox = false;
-		
-		// Scan for locked state
-		for (Point p: dynMap.keySet()) {
-			if (get(p) != Symbol.Box) {
-				// Player is ignored, BoxOnGoal too.
-				continue;
-			}
-						
-			hasLockedBox = isBoxLockedAtPoint(p);
-			if (hasLockedBox) break;
-		}
-		
 	}
 	
 	protected Board(Board original) {
 		this.mObjects = new HashMap<>(original.mObjects);
 		this.playerPosition = original.playerPosition;
-		this.hasLockedBox = original.hasLockedBox;
 	}
 
 	public Map<Point, Symbol> getDynamicObjects() {
@@ -62,10 +47,6 @@ public class Board implements Expandable<Board, Action>{
 	/** No search needed, the position is now always tracked. */
 	public Point getPlayerPosition() {
 		return playerPosition;
-	}
-	
-	public boolean isInvalid() {
-		return hasLockedBox;
 	}
 
 	/** @return Ascii art representation of the board (static + dynamic) */
@@ -378,7 +359,8 @@ public class Board implements Expandable<Board, Action>{
 		return freeNeighbours;
 	}
 	
-	/** Basic implementation: checks only that the box is not blocked against walls. 
+	/** 
+	 * Basic implementation: checks only that the box is not blocked against walls. 
 	 * Boxes are not considered to be blocking, and assumes that the player can get 
 	 * to the free neighbours 
 	 * Also, a box can be considered locked even on a goal (maybe you locked the wrong box there?)
