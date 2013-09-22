@@ -4,14 +4,13 @@
  */
 package utilities;
 
-import board.Board;
-import board.Symbol;
-
 import java.awt.Point;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import board.Board;
+import board.Symbol;
 
 /**
  *

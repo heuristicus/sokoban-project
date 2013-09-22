@@ -1,19 +1,16 @@
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import board.Board;
-import board.StaticBoard;
-import exceptions.IllegalMoveException;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import search.BreadthFirstSearchNoDuplication;
 import search.SearchMethod;
 import search.SearchNode;
 import utilities.SokobanUtil.Action;
+import board.Board;
+import board.StaticBoard;
+import exceptions.IllegalMoveException;
 
 
 public class Main {
