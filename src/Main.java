@@ -11,6 +11,10 @@ import utilities.SokobanUtil.Action;
 import board.Board;
 import board.StaticBoard;
 import exceptions.IllegalMoveException;
+import java.io.FileNotFoundException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import utilities.SokobanUtil;
 
 
 public class Main {
@@ -19,7 +23,11 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
-		Board board = Board.read(new InputStreamReader(System.in));
+		mainTest();
+	}
+    
+    public static void mainTest(){
+        Board board = Board.read(new InputStreamReader(System.in));
 		System.out.println("Static map only:");
 		System.out.println(StaticBoard.getInstance());
 		System.out.println("Dynamic board:");
@@ -84,14 +92,24 @@ public class Main {
 		System.out.println("Moving player up");
 		Board newBoard = null;
 
-        Board start = Board.read(new InputStreamReader(new FileInputStream("./maps/test/searchTestStart.map")));
-        Board goal = Board.read(new InputStreamReader(new FileInputStream("./maps/test/searchTestGoal.map")));
+
+        Board goal = null, start = null;
+        try {
+            goal = Board.read(new InputStreamReader(new FileInputStream("./maps/test/searchTestGoal.map")));
+            start = Board.read(new InputStreamReader(new FileInputStream("./maps/test/searchTestStart.map")));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        System.out.println("BFS finding solution for initial map");
+        System.out.println(start);
         SearchMethod<Board,Action> bfs = new BreadthFirstSearchNoDuplication<>();
         ArrayList<Action> path = bfs.findPath(start, goal);
+
         if (path != null){
             System.out.println("BFS completed, path length " + path.size());
             for (Action action : path) {
-                System.out.print(action);
+                System.out.print(SokobanUtil.actionToString(action));
             }
             System.out.println("");
         } else {
@@ -122,5 +140,6 @@ public class Main {
 			System.out.println("Could not move player.");
 		}
 
-	}
+    }
+    
 }

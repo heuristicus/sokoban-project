@@ -80,6 +80,8 @@ public class SokobanUtil {
     }
     
     public static char actionToString(Action a){
+        if (a == null)
+            return ' ';
         switch(a){
             case UP: return 'U';
             case DOWN: return 'D';

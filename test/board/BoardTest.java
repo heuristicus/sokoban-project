@@ -241,23 +241,23 @@ public class BoardTest {
         // top left corner - completely walled in
         assertTrue(tb.isBoxLockedAtPoint(new Point(1,1)));
         // bottom left corner - three walls
-        assertTrue(tb.isBoxLockedAtPoint(new Point(5,1)));
+        assertTrue(tb.isBoxLockedAtPoint(new Point(1,5)));
         // bottom right corner - two walls
-        assertTrue(tb.isBoxLockedAtPoint(new Point(5,6)));
+        assertTrue(tb.isBoxLockedAtPoint(new Point(6,5)));
         
         // False cases - the box should not be considered blocked
         // single wall left
-        assertFalse(tb.isBoxLockedAtPoint(new Point(4,1)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(1,4)));
         // single wall right
-        assertFalse(tb.isBoxLockedAtPoint(new Point(4,6)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(6,4)));
         // single wall down
         assertFalse(tb.isBoxLockedAtPoint(new Point(5,5)));
         // single wall up
-        assertFalse(tb.isBoxLockedAtPoint(new Point(1,4)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(4,1)));
         // up-down corridor
-        assertFalse(tb.isBoxLockedAtPoint(new Point(3,8)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(8,3)));
         // left-right corridor
-        assertFalse(tb.isBoxLockedAtPoint(new Point(3,15)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(15,3)));
         
     }
 
@@ -305,10 +305,31 @@ public class BoardTest {
             bsol.add(searchNode.getNodeState());
         }
         
-        assertEquals(ssol, blockedSol);
-        assertEquals(ssol, surroundedSol);
-        
-        
-        fail("The test case is a prototype.");
+        // The two lists are the same size - make sure they contain the same 
+            assertTrue(surroundedSol.containsAll(ssol));
+            assertTrue(blockedSol.containsAll(bsol));
     }
+    
+    @Test
+    public void testEquals(){
+        Board b1 = null, b2 = null;
+        try {
+            b1 = SokobanUtil.readMap(testMapDir + "boardTestEq1.map");
+            b2 = SokobanUtil.readMap(testMapDir + "boardTestEq2.map");
+        } catch (FileNotFoundException ex) {
+            fail("Could not find maps boardTestEq[12].map");
+        }
+        
+        assertTrue(b1.equals(b2));
+        assertTrue(b2.equals(b1));
+        Board b3 = new Board(b1);
+        b3.moveElement(new Point(2,3), new Point(2,4));
+        System.out.println(b1);
+        System.out.println(b3);
+        assertFalse(b1.equals(b3));
+        assertFalse(b2.equals(b3));
+
+        
+    }
+    
 }

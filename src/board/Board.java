@@ -48,7 +48,7 @@ public class Board implements Expandable<Board, Action>{
 		
 	}
 	
-	private Board(Board original) {
+	protected Board(Board original) {
 		this.mObjects = new HashMap<>(original.mObjects);
 		this.playerPosition = original.playerPosition;
 		this.hasLockedBox = original.hasLockedBox;
@@ -244,7 +244,7 @@ public class Board implements Expandable<Board, Action>{
 			Symbol boxDest = newBoard.get(boxDestination);
             // If the destination is not walkable or it puts the board into a locked
             // state, then we don't want to do this action
-			if (!boxDest.isWalkable || (boxDest != Symbol.Goal && isBoxLockedAtPoint(boxDestination))) {
+			if (!boxDest.isWalkable) {// || (boxDest != Symbol.Goal && isBoxLockedAtPoint(boxDestination))) {
 				throw new IllegalMoveException("Direction " + SokobanUtil.actionToString(a) 
                         + " is a box, but the box would become locked or there is a wall blocking it from being pushed.");
 			}
@@ -375,7 +375,7 @@ public class Board implements Expandable<Board, Action>{
             try {
                 expanded.add(new SearchNode<>(this.applyAction(a, false), parent, a, 1));
             } catch (IllegalMoveException ex) {
-                System.out.println(ex.getMessage());
+//                System.out.println(ex.getMessage());
             }
         }
         
@@ -408,7 +408,7 @@ public class Board implements Expandable<Board, Action>{
             if (compObjects.size() != thisObjects.size())
                 return false;
             
-            for (Point p : compObjects.keySet()) {
+            for (Point p : thisObjects.keySet()) {
                 Symbol thisSymbol = thisObjects.get(p);
                 // Ignore the player in the check
                 if (thisSymbol == Symbol.Player || thisSymbol == Symbol.PlayerOnGoal)
