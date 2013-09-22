@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -95,6 +97,7 @@ public class Board implements Expandable<Board, Action>{
 		try {
 			while (br.ready()) {
 				line = br.readLine();
+				if (line == null) break; // happens when the source is a StringReader
 				tmpStrMap.add(line);
 			}
 		} catch (IOException e) {
@@ -245,7 +248,8 @@ public class Board implements Expandable<Board, Action>{
             // state, then we don't want to do this action
 			if (!boxDest.isWalkable) {// || (boxDest != Symbol.Goal && isBoxLockedAtPoint(boxDestination))) {
 				throw new IllegalMoveException("Direction " + SokobanUtil.actionToString(a) 
-                        + " is a box, but the box would become locked or there is a wall blocking it from being pushed.");
+                        + " is a box, but the box would become locked or there is a wall "
+                        + "blocking it from being pushed.");
 			}
 			// Move the box first, and then the player, so that the box
 			// symbol is not overwritten.
@@ -270,7 +274,7 @@ public class Board implements Expandable<Board, Action>{
 	 *            If true, modify the board state, otherwise use a clone.
 	 * @return A board with all actions in the actionList applied.
 	 */
-	public Board applyActionChained(ArrayList<Action> actionList,
+	public Board applyActionChained(List<Action> actionList,
 			boolean destructive) throws IllegalMoveException {
 		Board newBoard;
 		if (destructive) {
@@ -283,6 +287,45 @@ public class Board implements Expandable<Board, Action>{
 			// Don't care about modifying board state anymore, so use the
 			// destructive method
 			newBoard.applyAction(action, true);
+		}
+
+		return newBoard;
+	}
+	
+	public Board reverseAction(Action a, boolean destructive) throws IllegalMoveException {
+		Board newBoard = destructive ? this : new Board(this);
+
+		Point player = newBoard.getPlayerPosition();
+		
+		Point previousPosition = SokobanUtil.applyActionToPoint(SokobanUtil.inverseAction(a), player);
+		Point pushedBoxPosition = SokobanUtil.applyActionToPoint(a, player);
+		
+		Symbol previousPositionSymbol = newBoard.get(previousPosition); 
+		if (!previousPositionSymbol.isWalkable) {
+			throw new IllegalMoveException("Unable to revert the action '" + a.name() + "': State at point (" 
+					+ previousPosition.x + "," + previousPosition.y + ") is :" + previousPositionSymbol);
+		}
+		
+		newBoard.moveElement(player, previousPosition);
+		
+		if (get(pushedBoxPosition).type == Symbol.Type.Box) {
+			newBoard.moveElement(pushedBoxPosition, player);
+		}
+
+		return newBoard;
+	}
+	
+	public Board reverseActionChained(List<Action> actions, boolean destructive) 
+			throws IllegalMoveException {
+		Board newBoard = destructive ? this : new Board(this);
+		
+		List<Action> reversedActionList = new ArrayList<>(actions);
+		Collections.reverse(reversedActionList);
+
+		for (Action action : reversedActionList) {
+			// Don't care about modifying board state anymore, so use the
+			// destructive method
+			newBoard.reverseAction(action, true);
 		}
 
 		return newBoard;
@@ -336,6 +379,7 @@ public class Board implements Expandable<Board, Action>{
 	public Map<Point, List<Point>> getMapBoxAccessPoints() {
 		Map<Point, List<Point>> boxtToAccessPoints = new HashMap<>();
 		for (Point p : mObjects.keySet()) {
+			if (get(p).type != Symbol.Type.Box) continue;
 			boxtToAccessPoints.put(p, getFreeNeighbours(p));
 			
 		}

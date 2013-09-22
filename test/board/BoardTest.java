@@ -10,7 +10,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.awt.Point;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +33,7 @@ import org.junit.Test;
 
 import search.SearchNode;
 import utilities.SokobanUtil;
+import utilities.SokobanUtil.Action;
 
 /**
  *
@@ -38,6 +42,8 @@ import utilities.SokobanUtil;
 public class BoardTest {
     
     public static final String testMapDir = "./maps/test/";
+    
+    public static final Map<String, String> inlineMaps = new HashMap<>();
     
     public BoardTest() {
     }
@@ -53,8 +59,26 @@ public class BoardTest {
 		}
     }
     
+    public Board initBoardFromString(String map) {
+    	return Board.read(new BufferedReader(new StringReader(map)));
+    }
+    
     @BeforeClass
     public static void setUpClass() {
+    	inlineMaps.put("MAP_00", "" +
+    			"########\n" +
+    			"#   # .#\n" +
+    			"#   $$.#\n" +
+    			"####   #\n" +
+    			"   #@ ##\n" +
+    			"   ####");
+    	inlineMaps.put("MAP_00_RESULT", "" +
+    			"########\n" +
+    			"#   # *#\n" +
+    			"#    @*#\n" +
+    			"####   #\n" +
+    			"   #  ##\n" +
+    			"   ####");
     }
     
     @AfterClass
@@ -176,15 +200,15 @@ public class BoardTest {
      */
     @Test
     public void testApplyAction() throws Exception {
-        System.out.println("applyAction");
-        SokobanUtil.Action a = null;
-        boolean destructive = false;
-        Board instance = null;
-        Board expResult = null;
-        Board result = instance.applyAction(a, destructive);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    	Board board = initBoardFromString(inlineMaps.get("MAP_00"));
+        Board result = board.applyAction(Action.UP, false);
+        assertFalse(board.equals(result));
+        assertEquals(Symbol.Empty, board.get(new Point(4,3)));
+        assertEquals(Symbol.Player, result.get(new Point(4,3)));
+        
+        result = board.applyAction(Action.UP, true);
+        assertTrue(board.equals(result));
+        assertEquals(board.get(new Point(4,3)), Symbol.Player);
     }
 
     /**
@@ -192,15 +216,9 @@ public class BoardTest {
      */
     @Test
     public void testApplyActionChained() throws Exception {
-        System.out.println("applyActionChained");
-        ArrayList<SokobanUtil.Action> actionList = null;
-        boolean destructive = false;
-        Board instance = null;
-        Board expResult = null;
-        Board result = instance.applyActionChained(actionList, destructive);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    	Board board = initBoardFromString(inlineMaps.get("MAP_00"));
+        Board result = board.applyActionChained(Arrays.asList(Action.UP, Action.RIGHT, Action.RIGHT, Action.UP, Action.UP, Action.LEFT, Action.DOWN, Action.LEFT, Action.LEFT, Action.UP, Action.LEFT, Action.LEFT, Action.DOWN, Action.RIGHT, Action.RIGHT, Action.RIGHT, Action.RIGHT, Action.LEFT, Action.DOWN, Action.DOWN, Action.RIGHT, Action.UP, Action.RIGHT, Action.UP, Action.DOWN, Action.LEFT, Action.LEFT, Action.UP, Action.RIGHT), true);
+        assertEquals(result.toString(), inlineMaps.get("MAP_00_RESULT"));
     }
 
     /**
@@ -209,16 +227,22 @@ public class BoardTest {
     @Test
     public void testGetFreeNeighbours() {
         Board board = initBoard("freeNeighboursTest.map");
+        List<Point> expected, result;
+
         // Box in top left corner
-        assertEquals(Arrays.asList(new Point(2,1), new Point(1,2)), 
-        		board.getFreeNeighbours(new Point(1,1)));
+        expected = Arrays.asList(new Point(2,1), new Point(1,2)); 
+        result = board.getFreeNeighbours(new Point(1,1)); 
+        assertEquals(expected.size(), result.size()); 
+        assertTrue(expected.containsAll(result));
         
         // Called on an empty tile
-        assertEquals(Arrays.asList(new Point(3,2), new Point(2,3), new Point(4,3), new Point(3,4)),
-        		board.getFreeNeighbours(new Point(3,3)));
+        expected = Arrays.asList(new Point(3,2), new Point(2,3), new Point(4,3), new Point(3,4)); 
+        result = board.getFreeNeighbours(new Point(3,3)); 
+        assertEquals(expected.size(), result.size()); 
+        assertTrue(expected.containsAll(result));
                 
         // Next box to a player: not counted as an obstacle
-        assertEquals(4, board.getFreeNeighbours(new Point(10,2)).size());
+        assertEquals(4, board.getFreeNeighbours(new Point(9,2)).size());
     }
 
     /**
@@ -226,13 +250,18 @@ public class BoardTest {
      */
     @Test
     public void testGetMapBoxAccessPoints() {
-        System.out.println("getMapBoxAccessPoints");
-        Board instance = null;
-        Map expResult = null;
-        Map result = instance.getMapBoxAccessPoints();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Board board = initBoard("readTest1.map");
+        Map<Point, List<Point>> expResult = new HashMap<>();
+        expResult.put(new Point(1,1), Arrays.asList(new Point(2,1), new Point(1,2)));
+        expResult.put(new Point(3,1), Arrays.asList(new Point(2,1), new Point(3,2), new Point(4,1)));
+        Map<Point, List<Point>> result = board.getMapBoxAccessPoints();
+        
+        // Deep equals with unsignificative item order.
+        assertEquals(expResult.keySet(), result.keySet());
+        for (Point key : expResult.keySet()) {
+        	assertTrue(result.get(key).size() == expResult.get(key).size());
+        	assertTrue(expResult.get(key).containsAll(result.get(key)));
+        }
     }
 
     /**
@@ -240,13 +269,12 @@ public class BoardTest {
      */
     @Test
     public void testGetBoxAccessPoints() {
-        System.out.println("getBoxAccessPoints");
-        Board instance = null;
-        Set expResult = null;
-        Set result = instance.getBoxAccessPoints();
+    	Board board = initBoard("readTest1.map");
+        Set<Point> expResult = new HashSet<>(Arrays.asList(
+        		new Point(2,1), new Point(1,2), new Point(3,2), new Point(4,1)));
+        Set<Point> result = board.getBoxAccessPoints();
+        
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
