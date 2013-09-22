@@ -11,6 +11,7 @@ import java.util.Arrays;
 import search.BreadthFirstSearchNoDuplication;
 import search.SearchMethod;
 import search.SearchNode;
+import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Board;
 import board.StaticBoard;
@@ -23,7 +24,11 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
-		Board board = Board.read(new BufferedReader(new InputStreamReader(System.in)));
+		mainTest();
+	}
+    
+    public static void mainTest() throws IOException{
+    	Board board = Board.read(new BufferedReader(new InputStreamReader(System.in)));
 		System.out.println("Static map only:");
 		System.out.println(StaticBoard.getInstance());
 		System.out.println("Dynamic board:");
@@ -87,21 +92,26 @@ public class Main {
 		System.out.println("Moving player up");
 		Board newBoard = null;
 
+		// Can throw IOException, but that is not recoverable inside the method. So throw it anyway.
         Board start = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
         Board goal = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
+        
+        System.out.println("BFS finding solution for initial map");
+        System.out.println(start);
         SearchMethod<Board,Action> bfs = new BreadthFirstSearchNoDuplication<>();
         ArrayList<Action> path = bfs.findPath(start, goal);
+
         if (path != null){
             System.out.println("BFS completed, path length " + path.size());
             for (Action action : path) {
-                System.out.print(action);
+                System.out.print(SokobanUtil.actionToString(action));
             }
             System.out.println("");
         } else {
             System.out.println("BFS could not find path.");
         }
         
-		// Solution for map zero
+ 		// Solution for map zero
 		Action sa[] = { Action.RIGHT, Action.UP, Action.RIGHT, Action.UP,
 						Action.LEFT, Action.LEFT, Action.LEFT, Action.UP, Action.LEFT,
 						Action.LEFT, Action.DOWN, Action.RIGHT, Action.RIGHT,
@@ -125,5 +135,6 @@ public class Main {
 			System.out.println("Could not move player.");
 		}
 
-	}
+    }
+    
 }

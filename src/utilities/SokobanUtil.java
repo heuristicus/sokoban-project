@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 import board.Board;
 import board.Symbol;
@@ -36,17 +35,6 @@ public class SokobanUtil {
             case RIGHT: return Action.LEFT;
             default: return null;
         }
-    }
-    
-    /**
-     * See which points around a given point on the specified board are accessible, that is,
-     * are not blocked by something.
-     * @param p A point on the board.
-     * @param b A board.
-     * @return A list of points with distance 1 from the original which are not blocked.
-     */
-    public static ArrayList<Point> accessiblePositions(Point p, Board b){
-        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     /**
@@ -83,6 +71,8 @@ public class SokobanUtil {
     }
     
     public static char actionToString(Action a){
+        if (a == null)
+            return ' ';
         switch(a){
             case UP: return 'U';
             case DOWN: return 'D';
@@ -105,4 +95,8 @@ public class SokobanUtil {
 		}
     }
     
+    public static String readMapAsString(String filename) throws IOException {
+    	return new String(Files.readAllBytes(Paths.get(filename)));
+    }
+
 }

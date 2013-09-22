@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -259,23 +260,23 @@ public class BoardTest {
         // top left corner - completely walled in
         assertTrue(tb.isBoxLockedAtPoint(new Point(1,1)));
         // bottom left corner - three walls
-        assertTrue(tb.isBoxLockedAtPoint(new Point(5,1)));
+        assertTrue(tb.isBoxLockedAtPoint(new Point(1,5)));
         // bottom right corner - two walls
-        assertTrue(tb.isBoxLockedAtPoint(new Point(5,6)));
+        assertTrue(tb.isBoxLockedAtPoint(new Point(6,5)));
         
         // False cases - the box should not be considered blocked
         // single wall left
-        assertFalse(tb.isBoxLockedAtPoint(new Point(4,1)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(1,4)));
         // single wall right
-        assertFalse(tb.isBoxLockedAtPoint(new Point(4,6)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(6,4)));
         // single wall down
         assertFalse(tb.isBoxLockedAtPoint(new Point(5,5)));
         // single wall up
-        assertFalse(tb.isBoxLockedAtPoint(new Point(1,4)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(4,1)));
         // up-down corridor
-        assertFalse(tb.isBoxLockedAtPoint(new Point(3,8)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(8,3)));
         // left-right corridor
-        assertFalse(tb.isBoxLockedAtPoint(new Point(3,15)));
+        assertFalse(tb.isBoxLockedAtPoint(new Point(15,3)));
         
     }
 
@@ -319,10 +320,62 @@ public class BoardTest {
             bsol.add(searchNode.getNodeState());
         }
         
-        assertEquals(ssol, blockedSol);
-        assertEquals(ssol, surroundedSol);
-        
-        
-        fail("The test case is a prototype.");
+        // The two lists are the same size - make sure they contain the same 
+        assertTrue(surroundedSol.containsAll(ssol));
+        assertTrue(blockedSol.containsAll(bsol));
     }
+    
+    @Test
+    public void testEquals(){
+        Board b1 = null, b2 = null;
+        b1 = SokobanUtil.readMap(testMapDir + "boardTestEq1.map");
+        b2 = SokobanUtil.readMap(testMapDir + "boardTestEq2.map");
+        
+        assertTrue(b1.equals(b2));
+        assertTrue(b2.equals(b1));
+        Board b3 = new Board(b1);
+        b3.moveElement(new Point(2,3), new Point(2,4));
+        System.out.println(b1);
+        System.out.println(b3);
+        assertFalse(b1.equals(b3));
+        assertFalse(b2.equals(b3));
+    }
+    
+    @Test
+    public void testGetAccessiblePoints(){
+        Board accTest = null;
+        String pl = null, tr = null, bl = null, tl = null;
+        try {
+            accTest = SokobanUtil.readMap(testMapDir + "boardTestAccessible.map");
+            pl = SokobanUtil.readMapAsString(testMapDir + "boardTestAccessiblePL.map");
+            tr = SokobanUtil.readMapAsString(testMapDir + "boardTestAccessibleTR.map");
+            bl = SokobanUtil.readMapAsString(testMapDir + "boardTestAccessibleBL.map");
+            tl = SokobanUtil.readMapAsString(testMapDir + "boardTestAccessibleTL.map");
+        } catch (IOException ex) {
+            fail("Could not find boardTestAccessible test maps.");
+        } catch (RuntimeException ex){ // the player isn't on one of the boards, but we don't care
+            
+        }
+
+        
+        List<Point> playerAccess = accTest.getAccessiblePoints(accTest.getPlayerPosition());
+
+        assertTrue(pl.equals(accTest.toStringMarked(playerAccess)));
+        
+//        System.out.println("Player accessible points");
+//        System.out.println(accTest.toStringMarked(playerAccess));
+        List<Point> topRight = accTest.getAccessiblePoints(new Point(10,3));
+        assertTrue(tr.equals(accTest.toStringMarked(topRight)));
+//        System.out.println("Top right block accessible");
+//        System.out.println(accTest.toStringMarked(topRight));
+        List<Point> bottomLeft = accTest.getAccessiblePoints(new Point(1,5));
+        assertTrue(bl.equals(accTest.toStringMarked(bottomLeft)));
+//        System.out.println("Bottom left accessible");
+//        System.out.println(accTest.toStringMarked(bottomLeft));
+        List<Point> topLeft = accTest.getAccessiblePoints(new Point(1,1));
+        assertTrue(tl.equals(accTest.toStringMarked(topLeft)));
+//        System.out.println("Top left accessible");
+//        System.out.println(accTest.toStringMarked(topLeft));
+    }
+    
 }

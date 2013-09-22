@@ -24,7 +24,6 @@ public class BreadthFirstSearchNoDuplication<T extends Expandable<T,U>, U> exten
             ArrayList<SearchNode<T,U>> closed = new ArrayList<>();
             open.add(new SearchNode<>(start, null, null)); // Push the start node onto the queue
             while(!open.isEmpty()){
-//                System.out.println("open list size:" + open.size());
                 // Retrieve and remove the front of the queue
 //                System.out.println("closed size: " + closed.size());
 //                System.out.println("open size: " + open.size());
@@ -53,6 +52,7 @@ public class BreadthFirstSearchNoDuplication<T extends Expandable<T,U>, U> exten
                 }
             }
             // Only reach this point if the open list was empty - no goal was found.
+            System.out.println("Open list empty");
             return null;
         }
 }
