@@ -5,11 +5,15 @@
 package board;
 
 import java.awt.Point;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -24,6 +28,8 @@ import utilities.SokobanUtil;
  * @author michal
  */
 public class BoardTest {
+    
+    public static final String testMapDir = "./maps/test/";
     
     public BoardTest() {
     }
@@ -225,14 +231,34 @@ public class BoardTest {
      */
     @Test
     public void testIsBoxLockedAtPoint() {
-        System.out.println("isBoxLockedAtPoint");
-        Point p = null;
-        Board instance = null;
-        boolean expResult = false;
-        boolean result = instance.isBoxLockedAtPoint(p);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Board tb = null;
+        try {
+            tb = SokobanUtil.readMap(testMapDir + "boardTestLocked.map");
+        } catch (FileNotFoundException ex) {
+            fail("Could not find test file boardTestLocked.map");
+        }
+        // True cases - the box should be considered blocked
+        // top left corner - completely walled in
+        assertTrue(tb.isBoxLockedAtPoint(new Point(1,1)));
+        // bottom left corner - three walls
+        assertTrue(tb.isBoxLockedAtPoint(new Point(5,1)));
+        // bottom right corner - two walls
+        assertTrue(tb.isBoxLockedAtPoint(new Point(5,6)));
+        
+        // False cases - the box should not be considered blocked
+        // single wall left
+        assertFalse(tb.isBoxLockedAtPoint(new Point(4,1)));
+        // single wall right
+        assertFalse(tb.isBoxLockedAtPoint(new Point(4,6)));
+        // single wall down
+        assertFalse(tb.isBoxLockedAtPoint(new Point(5,5)));
+        // single wall up
+        assertFalse(tb.isBoxLockedAtPoint(new Point(1,4)));
+        // up-down corridor
+        assertFalse(tb.isBoxLockedAtPoint(new Point(3,8)));
+        // left-right corridor
+        assertFalse(tb.isBoxLockedAtPoint(new Point(3,15)));
+        
     }
 
     /**
@@ -240,13 +266,49 @@ public class BoardTest {
      */
     @Test
     public void testExpand() {
-        System.out.println("expand");
-        SearchNode<Board, SokobanUtil.Action> parent = null;
-        Board instance = null;
-        ArrayList expResult = null;
-        ArrayList result = instance.expand(parent);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
+        Board blocked = null, surrounded = null;
+        // List of files containing expected expansion of blocked state
+        String fileListBlocked[] = {"bs1.map", "bs2.map", "bs3.map"};
+        // List of files containig expansion of surrounded state
+        String fileListSurrounded[] = {"ss1.map", "ss2.map", "ss3.map", "ss4.map"};
+        // The boards that are expected to be received upon expansion of the two states
+        ArrayList<Board> blockedSol = new ArrayList<>();
+        ArrayList<Board> surroundedSol = new ArrayList<>();
+        try {
+            blocked = SokobanUtil.readMap(testMapDir + "boardTestExpandBlocked.map");
+            surrounded = SokobanUtil.readMap(testMapDir + "boardTestExpandSurrounded.map");
+            for (String fname : fileListBlocked) {
+                blockedSol.add(SokobanUtil.readMap(testMapDir + fname));
+            }
+            for (String fname : fileListSurrounded) {
+                surroundedSol.add(SokobanUtil.readMap(testMapDir + fname));
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println("Exception in testExpand: " + ex.getMessage());
+            fail("Could not find map file boardTestExpandBlocked.map or boardTestExpandSurrounded.map, or solution maps");
+        }
+        
+        ArrayList<SearchNode<Board, SokobanUtil.Action>> bexp = blocked.expand(null);
+        ArrayList<SearchNode<Board, SokobanUtil.Action>> sexp = surrounded.expand(null);
+        
+        assertEquals(blockedSol.size(), bexp.size());
+        assertEquals(surroundedSol.size(), sexp.size());
+                
+        System.out.println("Surrounded expansions :");
+        ArrayList<Board> bsol = new ArrayList<>();
+        ArrayList<Board> ssol = new ArrayList<>();
+        for (SearchNode<Board, SokobanUtil.Action> searchNode : sexp) {
+            ssol.add(searchNode.getNodeState());
+        }
+        System.out.println("Blocked expansions: ");
+        for (SearchNode<Board, SokobanUtil.Action> searchNode : bexp) {
+            bsol.add(searchNode.getNodeState());
+        }
+        
+        assertEquals(ssol, blockedSol);
+        assertEquals(ssol, surroundedSol);
+        
+        
         fail("The test case is a prototype.");
     }
 }
