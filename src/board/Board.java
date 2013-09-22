@@ -245,14 +245,16 @@ public class Board implements Expandable<Board, Action>{
             // If the destination is not walkable or it puts the board into a locked
             // state, then we don't want to do this action
 			if (!boxDest.isWalkable || (boxDest != Symbol.Goal && isBoxLockedAtPoint(boxDestination))) {
-				throw new IllegalMoveException();
+				throw new IllegalMoveException("Direction " + SokobanUtil.actionToString(a) 
+                        + " is a box, but the box would become locked or there is a wall blocking it from being pushed.");
 			}
 			// Move the box first, and then the player, so that the box
 			// symbol is not overwritten.
 			newBoard.moveElement(destination, boxDestination);
 			newBoard.moveElement(player, destination);
 		} else if (!destObject.isWalkable) {
-			throw new IllegalMoveException();
+			throw new IllegalMoveException("Direction " + SokobanUtil.actionToString(a) 
+                    + " is not a box, and is not walkable.");
 		} else {
 			newBoard.moveElement(player, destination);
 		}
@@ -350,8 +352,8 @@ public class Board implements Expandable<Board, Action>{
 			}
 		}
 		
-		if (surroundingWalls.size() > 2 ) return false;
-		if (surroundingWalls.size() < 2 ) return true;
+		if (surroundingWalls.size() > 2 ) return true;
+		if (surroundingWalls.size() < 2 ) return false;
 		
 		// Only left are the cases with 2 free sides. If they are opposite it's a tunnel, still manageable.
 		int sumX = surroundingWalls.get(0).x + surroundingWalls.get(1).x;
@@ -373,7 +375,7 @@ public class Board implements Expandable<Board, Action>{
             try {
                 expanded.add(new SearchNode<>(this.applyAction(a, false), parent, a, 1));
             } catch (IllegalMoveException ex) {
-                
+                System.out.println(ex.getMessage());
             }
         }
         
@@ -393,6 +395,12 @@ public class Board implements Expandable<Board, Action>{
     public boolean equals(Object obj) {
         if (obj instanceof Board){
             Board comp = (Board)obj;
+            
+//            System.out.println("Checking whether board");
+//            System.out.println(comp.toString());
+//            System.out.println("is equal to this:");
+//            System.out.println(this.toString());
+            
             Map<Point, Symbol> compObjects = comp.getDynamicObjects();
             Map<Point, Symbol> thisObjects = this.getDynamicObjects();
             // If one of the dynamic maps has more objects than the other, they
@@ -407,7 +415,7 @@ public class Board implements Expandable<Board, Action>{
                     continue;
                 // Get the symbol at the point on this board
                 Symbol compSymbol = compObjects.get(p);
-                if (compSymbol != null && compSymbol == compSymbol)
+                if (compSymbol != null && thisSymbol == compSymbol)
                     continue; // The symbols at the two points match
                 
                 // If the dynamic map of the compared board does not contain the

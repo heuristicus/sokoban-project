@@ -8,6 +8,9 @@ import board.Board;
 import board.Symbol;
 
 import java.awt.Point;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -75,6 +78,20 @@ public class SokobanUtil {
             case RIGHT: return new Point(p.x + 1, p.y);
             default: return null;
         }
+    }
+    
+    public static char actionToString(Action a){
+        switch(a){
+            case UP: return 'U';
+            case DOWN: return 'D';
+            case LEFT: return 'L';
+            case RIGHT: return 'R';
+            default: return ' ';
+        }
+    }
+    
+    public static Board readMap(String filename) throws FileNotFoundException{
+        return Board.read(new InputStreamReader(new FileInputStream(filename)));
     }
     
 }

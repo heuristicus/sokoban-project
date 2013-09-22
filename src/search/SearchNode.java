@@ -127,13 +127,21 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
     }
 
     /**
-     * Nodes are assumed to be equal if the states they contain are identical.
-     * Uses the equals method of the T class.
-     * @param node
-     * @return 
+     * Nodes are equal if they contain the same state, checked using the equals
+     * method of type T
+     * @param obj
+     * @return True if the object received is a SearchNode, and the nodeState
+     * which that node contains is equal to that which this node contains.
      */
-    public boolean equals(SearchNode<T,U> node) {
-        return this.nodeState.equals(node.nodeState);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SearchNode){
+            SearchNode node = (SearchNode)obj;
+            boolean ret = this.nodeState.equals(node.nodeState);
+//            System.out.println(ret == true ? "yep!" : "nope...");
+            return ret;
+        }
+        return false;
     }
     
     @Override
