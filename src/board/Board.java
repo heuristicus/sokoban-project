@@ -265,6 +265,27 @@ public class Board implements Expandable<Board, Action>{
 		return newBoard;
 	}
 
+	public Board applyPullAction(Action a, boolean destructive, Point Goal)
+			throws IllegalMoveException {
+		Board newBoard;
+		if (destructive) {
+			newBoard = this;
+		} else {
+			newBoard = new Board(this);
+		}
+
+		
+
+		Point destination = SokobanUtil.applyActionToPoint(a, Goal);
+		Symbol destObject = newBoard.get(destination);
+		if((!destObject.isWalkable)||(!(newBoard.get(SokobanUtil.applyActionToPoint(a, destination)).isWalkable))){
+			throw new IllegalMoveException("Cannot be reached");
+		}else{
+			newBoard.moveElement(Goal, destination);
+		}
+
+		return newBoard;
+	}
 	/**
 	 * Applies a series of actions to the board
 	 * 
@@ -359,7 +380,34 @@ public class Board implements Expandable<Board, Action>{
         
         return accessible;
     }
-	
+
+	//Get the reachable point from one point by pulling
+    public List<Point> getAccessiblePointsfromGoal(Point p){
+        Queue<Point> q = new LinkedList<>();
+        q.add(p);
+        List<Point> accessible = new ArrayList<>();
+        accessible.add(p);
+        while(!q.isEmpty()){
+            Point next = q.remove();
+            for(Action a : Action.values()){
+            	try {
+					applyPullAction(a,true,next);
+					Point ReachPoint = SokobanUtil.applyActionToPoint(a, next);
+					System.out.print("Reach:" + ReachPoint.toString());
+					
+					if(!accessible.contains(ReachPoint))
+						{accessible.add(ReachPoint);
+						q.add(ReachPoint);}
+					
+				} catch (IllegalMoveException e) {
+					
+				}
+            }
+           
+        }
+        
+        return accessible;
+    }
 	/** 
 	 * Returns which of the points around the one provided are free.
 	 * No check is done on whether the point is a box, a wall or anything else.
