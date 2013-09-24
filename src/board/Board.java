@@ -550,4 +550,14 @@ public class Board implements Expandable<Board, Action>{
         // obj is not an instance of Board.
         return false;
     }
+    
+    public Board applyBoxMove(Action action, Point movedBox, boolean destructive) throws IllegalMoveException {
+    	Board newBoard = destructive ? this : new Board(this);
+    	
+    	// No check here, we just teleport the player.
+    	newBoard.moveElement(playerPosition, SokobanUtil.applyActionToPoint(SokobanUtil.inverseAction(action), movedBox));
+    	newBoard = newBoard.applyAction(action, true);
+    	
+    	return newBoard;
+    }
 }
