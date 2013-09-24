@@ -585,8 +585,10 @@ public class Board implements Expandable<Board, Action>{
             Map<Point, Symbol> thisObjects = this.getDynamicObjects();
             // If one of the dynamic maps has more objects than the other, they
             // cannot be the same.
-            if (compObjects.size() != thisObjects.size())
+            if (compObjects.size() != thisObjects.size()){
+//                System.out.println("The number of dynamic objects are different - the map cannot be the same. Returning false.");
                 return false;
+            }
             
             for (Point p : thisObjects.keySet()) {
                 Symbol thisSymbol = thisObjects.get(p);
@@ -601,14 +603,17 @@ public class Board implements Expandable<Board, Action>{
                 // If the dynamic map of the compared board does not contain the
                 // point we are looking at, or the symbols do not match, then
                 // the boards are not equal.
+//                System.out.println("The dynamic map of the compared object did not contain a point in the dynamic map of this object. Returning false.");
                 return false;
             }
             
             // If we get through the whole keySet without returning, then they
             // contain the same keys
+//            System.out.println("All keys match! Returning true.");
             return true;
         }
         // obj is not an instance of Board.
+//        System.out.println("Not a board. Returning false.");
         return false;
     }
     

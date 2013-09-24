@@ -16,6 +16,8 @@ import utilities.SokobanUtil.Action;
 import board.Board;
 import board.StaticBoard;
 import exceptions.IllegalMoveException;
+import search.AStar;
+import search.ManhattanHeuristic;
 
 
 public class Main {
@@ -109,6 +111,28 @@ public class Main {
             System.out.println("");
         } else {
             System.out.println("BFS could not find path.");
+        }
+        
+        
+        Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
+        Board goalas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
+        
+        System.out.println("astar finding solution for initial map");
+        System.out.println(startas);
+        
+        // Essentially does DFS!
+        SearchMethod<Board,Action> astar = new AStar<>(new ManhattanHeuristic());
+        
+        ArrayList<Action> pathas = astar.findPath(startas, goalas);
+
+        if (pathas != null){
+            System.out.println("astar completed, path length " + pathas.size());
+            for (Action action : pathas) {
+                System.out.print(SokobanUtil.actionToString(action));
+            }
+            System.out.println("");
+        } else {
+            System.out.println("astar could not find path.");
         }
         
  		// Solution for map zero

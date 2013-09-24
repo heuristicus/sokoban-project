@@ -10,6 +10,6 @@ package search;
  * @param <T> The type on which to perform the computation of the cost estimate
  * @author michal
  */
-interface Heuristic<T> {
+public interface Heuristic<T> {
     float utility(T start, T goal);
 }

@@ -5,10 +5,11 @@
 package search;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+
 
 /**
  * An A* implementation. Some assumptions are made:
@@ -20,7 +21,7 @@ import java.util.Queue;
  * @param <U> A type (usually an enum) which specifies the actions that can be
  * applied to the T type
  */
-public class AStar<T extends Expandable<T, U>, U, S> extends SearchMethod<T, U>{
+public class AStar<T extends Expandable<T, U>, U> extends SearchMethod<T, U>{
 
     Heuristic<T> h;
     
@@ -28,52 +29,87 @@ public class AStar<T extends Expandable<T, U>, U, S> extends SearchMethod<T, U>{
      * Basic constructor
      * @param h The heuristic to use for state evaluation
      */
-    AStar(Heuristic<T> h){
+    public AStar(Heuristic<T> h){
         this.h = h;
     }
     
     @Override
     public ArrayList<U> findPath(T start, T goal) {
         // Store already visited nodes
-        HashSet<SearchNode<T,U>> closed = new HashSet<>();
+        List<SearchNode<T,U>> closed = new ArrayList<>();
         // Store as yet unvisited nodes in a priority queue - we expand from the best
         Queue<SearchNode<T,U>> open = new PriorityQueue<>();
         
         // Add the start state as a node with zero path cost
-        open.add(new SearchNode<T, U>(start, null, null, 0, h.utility(start, goal)));
+        open.add(new SearchNode<>(start, null, null, 0, h.utility(start, goal)));
         
         while(!open.isEmpty()){
+//            System.out.println("open size: " + open.size() + " closed size: " + closed.size());
+//            System.out.println("OPEN LIST =============");
+//            for (SearchNode<T, U> searchNode : open) {
+//                System.out.println(searchNode);
+//            }
+//            System.out.println("CLOSED LIST ===========");
+//            for (SearchNode<T, U> searchNode : closed) {
+//                System.out.println(searchNode);
+//            }
             SearchNode<T,U> front = open.remove(); // The best node in the queue
             // If front is the goal, return the action sequence.
+//            System.out.println("Checking goal state");
             if (front.nodeState.equals(goal)){
                 return front.actionUnwind();
             }
             
+//            System.out.println("Checking if closed contains the front node");
+//            System.out.println(front);
             // Add the parent to the closed list - we do not need to expand it more than once
             if (!closed.contains(front)){ // #TODO Is this check really necessary?
+//                System.out.println("closed does not contain the front node. adding.");
                 closed.add(front);
             }
             
             ArrayList<SearchNode<T,U>> successors = front.expand();
             for (SearchNode<T, U> successor : successors) {
+//                System.out.println("Examining successor of front node");
+//                System.out.println(successor);
                 // Look through the open list to see if the successor is
                 // already present
                 Iterator<SearchNode<T,U>> it = open.iterator();
+//                System.out.println("Checking open list to see if it contains the successor.");
+                boolean inOpen = false;
                 while(it.hasNext()){
                     SearchNode<T,U> element = it.next();
-                    if (element.equals(successor) && element.pathCost > successor.pathCost){
-                        // If the current state is in the open list and the path cost to that
-                        // state node is greater than that of the path cost to this node,
-                        // remove it from the open list - the path via this node is better
-                        it.remove();
-                        break;
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException ex) {
+//                        
+//                    }
+                    if (element.equals(successor)){
+                        if (element.pathCost > successor.pathCost){
+                            // If the current state is in the open list and the path cost to that
+                            // state node is greater than that of the path cost to this node,
+                            // remove it from the open list - the path via this node is better
+//                            System.out.println("open list already contained successor, but this path is better.");
+                            it.remove();
+                            break;
+                        }
+                        // we set this if the successor is in the open list, but does
+                        // not have a better path cost so that we don't have to check again.
+                        // do this after the above check instead of before so that we don't
+                        // say that it's present and then remove it.
+                        inOpen = true;
                     }
                 }
+//                System.out.println("Finished checking open list - successor in open? " + inOpen);
                 // If neither of the open or closed lists contains the successor, then
                 // we compute the estimated cost to get to the goal from this node state,
                 // add it to the path cost and then add the node to the open list
-                if (!open.contains(successor) && !closed.contains(successor)){
+//                System.out.println("Checking if the successor is in the closed list");
+                boolean inClosed = closed.contains(successor);
+//                System.out.println("successor in closed? " + inClosed);
+                if (!inOpen && !inClosed){
                     successor.estimatedCost = successor.pathCost + h.utility(successor.nodeState, goal);
+//                    System.out.println("Successor not in either list - Adding the successor to the open list");
                     open.add(successor);
                 }
             }

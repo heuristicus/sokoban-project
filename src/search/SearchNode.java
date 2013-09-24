@@ -146,6 +146,7 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
     
     @Override
     public int compareTo(SearchNode<T,U> o) {
+//        System.out.println("compareto node called");
         if (this.estimatedCost == o.estimatedCost)
             return 0;
         return this.estimatedCost < o.estimatedCost ? -1 : 1;
@@ -153,7 +154,7 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
 
     @Override
     public String toString() {
-        return this.nodeState.toString() + ", cost " + this.pathCost;
+        return this.nodeState.toString() + ", cost " + this.pathCost + ", estimated cost " + this.estimatedCost;
     }
     
 }
