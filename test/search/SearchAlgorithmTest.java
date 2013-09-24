@@ -4,11 +4,14 @@
  */
 package search;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
@@ -25,6 +28,7 @@ public class SearchAlgorithmTest {
     SearchMethod<Board, Action> BFS;
     Board testMapStart;
     Board testMapGoal;
+    Board testMapIntermediate1;
         
     public SearchAlgorithmTest() {
         aStar = new AStar<>(new ManhattanHeuristic());
@@ -32,6 +36,7 @@ public class SearchAlgorithmTest {
         BFS = new BreadthFirstSearch<>();
         testMapStart = SokobanUtil.readMap("./maps/test/searchTestStart.map");
         testMapGoal = SokobanUtil.readMap("./maps/test/searchTestGoal.map");
+        testMapIntermediate1 = SokobanUtil.readMap("./maps/test/searchTestIntermediate1.map");
     }
     
     @BeforeClass
@@ -50,8 +55,10 @@ public class SearchAlgorithmTest {
     public void tearDown() {
     }
     
+    @Test
     public void testAStar() {
-//        ArrayList<Action> foundPath = aStar.findPath(testMapStart, testMapGoal);
+        ArrayList<Action> foundPath = aStar.findPath(testMapStart, testMapIntermediate1);
+        assertTrue(foundPath.equals(new ArrayList<Action>()));
         
     }
     

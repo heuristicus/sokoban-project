@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import exceptions.IllegalMoveException;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
@@ -369,6 +370,16 @@ public class BoardTest {
         System.out.println(b3);
         assertFalse(b1.equals(b3));
         assertFalse(b2.equals(b3));
+    }
+    
+    @Test
+    public void testApplyBoxMove() throws IllegalMoveException {
+    	final String INPUT_TEST_FILE = "searchTestStart.map";
+    	final String OUTPUT_TEST_FILE = "searchTestIntermediate1.map";
+        Board start = initBoard(INPUT_TEST_FILE);
+        start.applyBoxMove(Action.RIGHT, new Point(4,2), true);
+        assertEquals(start, initBoard(OUTPUT_TEST_FILE));
+        
     }
     
     @Test
