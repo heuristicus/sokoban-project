@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import pathfinding.BoxMovement;
 import exceptions.IllegalMoveException;
 import search.SearchNode;
 import utilities.SokobanUtil;
@@ -373,13 +374,40 @@ public class BoardTest {
     }
     
     @Test
-    public void testApplyBoxMove() throws IllegalMoveException {
+    public void testPrepareNextBoxMove() throws IllegalMoveException {
     	final String INPUT_TEST_FILE = "searchTestStart.map";
     	final String OUTPUT_TEST_FILE = "searchTestIntermediate1.map";
         Board start = initBoard(INPUT_TEST_FILE);
-        start.applyBoxMove(Action.RIGHT, new Point(4,2), true);
+        start.prepareNextBoxMove(Action.RIGHT, new Point(4,2), true);
         assertEquals(start, initBoard(OUTPUT_TEST_FILE));
         
+    }
+    
+    @Test
+    public void testBuildFullPath() throws IllegalMoveException {
+    	final String INPUT_TEST_FILE = "searchTestStart.map";
+    	final String OUTPUT_TEST_FILE = "searchTestGoal.map";
+        Board board = initBoard(INPUT_TEST_FILE);
+        Board expectedResult = initBoard(OUTPUT_TEST_FILE);
+        List<BoxMovement> boxActions = Arrays.asList(
+        		new BoxMovement(Action.RIGHT, new Point(4,2)),
+        		new BoxMovement(Action.RIGHT, new Point(5,2)),
+        		new BoxMovement(Action.RIGHT, new Point(2,1)),
+        		new BoxMovement(Action.RIGHT, new Point(3,1)),
+        		new BoxMovement(Action.RIGHT, new Point(4,1)),
+        		new BoxMovement(Action.RIGHT, new Point(5,1))
+        		);
+        
+        List<Action> actions = board.generateFullActionList(boxActions);
+        board.applyActionChained(actions, true);
+        
+        assertEquals(Arrays.asList(Action.UP, Action.LEFT, Action.UP, 
+        		Action.RIGHT, Action.RIGHT, Action.LEFT, Action.LEFT, 
+        		Action.LEFT, Action.LEFT, Action.UP, Action.RIGHT, 
+        		Action.RIGHT, Action.RIGHT, Action.RIGHT), actions);
+        
+        // TODO: equals still doesn't properly ignore the player's position
+        assertEquals(expectedResult, board);
     }
     
     @Test

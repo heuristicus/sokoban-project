@@ -4,23 +4,26 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
+import pathfinding.BoxMovement;
+import search.AStar;
+import search.DiagonalDistanceHeuristic;
 import search.Expandable;
+import search.SearchMethod;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
-import java.util.Arrays;
-
-import java.util.LinkedList;
-import java.util.Queue;
 
 /**
  * Dynamic representation of the world.
@@ -617,12 +620,11 @@ public class Board implements Expandable<Board, Action>{
         return false;
     }
     
-    public Board applyBoxMove(Action action, Point movedBox, boolean destructive) throws IllegalMoveException {
+    public Board prepareNextBoxMove(Action action, Point movedBox, boolean destructive) throws IllegalMoveException {
     	Board newBoard = destructive ? this : new Board(this);
     	
     	// No check here, we just teleport the player.
     	newBoard.moveElement(playerPosition, SokobanUtil.applyActionToPoint(SokobanUtil.inverseAction(action), movedBox));
-    	newBoard = newBoard.applyAction(action, true);
     	
     	return newBoard;
     }
@@ -664,6 +666,55 @@ public class Board implements Expandable<Board, Action>{
 //        }
 //        
 //        return solved;
+    }
+    
+    /** 
+     * Method to be called on the initial board after the main tree search. 
+     * Builds the complete list of actions, by generating the ones for the player's
+     * movements between the boxes. 
+     * @throws IllegalMoveException 
+     */
+    public List<Action> generateFullActionList(List<BoxMovement> boxActions) 
+    		throws IllegalMoveException {
+    	
+    	Board intermediateBoard;
+    	Board currentBoard = new Board(this);
+    	
+    	boolean doubleCheck = true; // Double check mode: actually execute all the steps before adding them to the list.
+    	
+    	
+    	SearchMethod<Board, Action> aStar = new AStar<>(new DiagonalDistanceHeuristic());
+    	List<Action> completeActionList = new ArrayList<>();
+    	for (BoxMovement bm : boxActions) { // loop through all the box actions
+    		// Get the board state after that action.
+    		intermediateBoard = currentBoard.prepareNextBoxMove(bm.action, bm.position, false);
+    		
+    		if (! currentBoard.equals(intermediateBoard)) { // the player moved in-between. 
+    			// get the list of moves made.
+    			ArrayList<Action> foundPath = aStar.findPath(currentBoard, intermediateBoard);
+    			
+    			if (doubleCheck) {
+    				currentBoard.applyActionChained(foundPath, true);
+    				if (! currentBoard.equals(intermediateBoard)) 
+    					throw new RuntimeException("The intermediate path obtained is not valid.");
+    				
+    			}
+    			
+    			completeActionList.addAll(foundPath);
+    		}
+    		    		
+    		// Now push the box
+    		if (doubleCheck) {
+    			currentBoard.applyAction(bm.action, true);
+    		} else {
+    			currentBoard = intermediateBoard.applyAction(bm.action, true);
+    		}
+    		
+    		completeActionList.add(bm.action);
+    		
+    	}
+    	
+    	return completeActionList;
     }
     
 }

@@ -106,7 +106,6 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
              // Base case. If the parent is null we reach the initial state.
              // Construct a path vector and then return the empty vector.
              ArrayList<U> path = new ArrayList<>();
-             path.add(this.generatingAction);
              return path;
          } else {
              // Recursive case. Get the unwound path from the parent and then

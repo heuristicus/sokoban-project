@@ -4,14 +4,16 @@
  */
 package search;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
@@ -31,7 +33,7 @@ public class SearchAlgorithmTest {
     Board testMapIntermediate1;
         
     public SearchAlgorithmTest() {
-        aStar = new AStar<>(new ManhattanHeuristic());
+        aStar = new AStar<>(new DiagonalDistanceHeuristic());
         noDupBFS = new BreadthFirstSearchNoDuplication<>();
         BFS = new BreadthFirstSearch<>();
         testMapStart = SokobanUtil.readMap("./maps/test/searchTestStart.map");
@@ -58,7 +60,7 @@ public class SearchAlgorithmTest {
     @Test
     public void testAStar() {
         ArrayList<Action> foundPath = aStar.findPath(testMapStart, testMapIntermediate1);
-        assertTrue(foundPath.equals(new ArrayList<Action>()));
+        assertEquals(Arrays.asList(Action.UP, Action.LEFT, Action.UP), foundPath);
         
     }
     
