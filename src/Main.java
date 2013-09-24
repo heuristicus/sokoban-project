@@ -26,6 +26,19 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
+//    	Board board = Board.read(new BufferedReader(new InputStreamReader(System.in)));
+//        // Essentially does DFS!
+//        SearchMethod<Board,Action> astar = new AStar<>(new ManhattanHeuristic());
+//        
+//        ArrayList<Action> pathas = astar.findPath(board, board.getSolvedBoard());
+//
+//        StringBuilder sb = new StringBuilder();
+//        if (pathas != null){
+//            for (Action action : pathas) {
+//                sb.append(SokobanUtil.actionToString(action));
+//            }
+//        }
+//        System.out.println(sb.toString());
 		mainTest();
 	}
     

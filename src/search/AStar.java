@@ -5,6 +5,7 @@
 package search;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -36,7 +37,7 @@ public class AStar<T extends Expandable<T, U>, U> extends SearchMethod<T, U>{
     @Override
     public ArrayList<U> findPath(T start, T goal) {
         // Store already visited nodes
-        List<SearchNode<T,U>> closed = new ArrayList<>();
+        HashSet<SearchNode<T,U>> closed = new HashSet<>();
         // Store as yet unvisited nodes in a priority queue - we expand from the best
         Queue<SearchNode<T,U>> open = new PriorityQueue<>();
         

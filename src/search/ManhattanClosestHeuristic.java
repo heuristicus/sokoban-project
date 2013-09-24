@@ -25,7 +25,7 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 		start.setAvailablePosition();
 		goal.setAvailablePosition();
 		
-		List<Point> Goals = goal.getGoal();
+		List<Point> Goals = goal.getGoalPoints();
 		Map<Point, Symbol> startSet = start.getDynamicObjects();
 		List<List<Integer>> Cost = new ArrayList<List<Integer>>();			
 		List<Integer> DegreeOfOccupied = new ArrayList<Integer>(Goals.size());

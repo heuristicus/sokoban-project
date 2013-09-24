@@ -143,7 +143,12 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
         }
         return false;
     }
-    
+
+    @Override
+    public int hashCode() {
+        return nodeState.hashCode(); //To change body of generated methods, choose Tools | Templates.
+    }
+        
     @Override
     public int compareTo(SearchNode<T,U> o) {
 //        System.out.println("compareto node called");

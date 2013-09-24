@@ -71,7 +71,7 @@ public class Board implements Expandable<Board, Action>{
 		}
 	}
 	
-	public List<Point> getGoal(){
+	public List<Point> getGoalPoints(){
 		return StaticBoard.getInstance().goals;
 	}
 
@@ -626,4 +626,44 @@ public class Board implements Expandable<Board, Action>{
     	
     	return newBoard;
     }
+
+    @Override
+    public int hashCode() {
+        int result = 29;
+        int code = 0;
+        
+        code += mObjects.hashCode();
+        
+        return 37 * result + code;
+    }
+
+    /**
+     * @return A solved board which has boxes on every goal and the player in
+     * some unspecified position.
+     */
+    public Board getSolvedBoard() {
+        Board solved = new Board(this);
+        throw new UnsupportedOperationException("Not implemented yet");
+//        List<Point> goalList = solved.getGoalPoints();
+//        if (goalList.size() != mObjects.size() - 1)
+//            throw new RuntimeException("The number of goals and boxes did not match while constructing a solved board.");
+//        for (Point p : mObjects.keySet()) {
+//            if (get(p) == Symbol.Player){
+//                // Ignore the player position
+//                continue;
+//            } else if (get(p) == Symbol.PlayerOnGoal) {
+//                moveElement(p, p);
+//            } else if (get(p) == Symbol.BoxOnGoal){
+//                // If this is a box on a goal, the goal is filled, so remove it
+//                // from the goal list and continue.
+//                goalList.remove(p);
+//                continue;
+//            }
+//                
+//            moveElement(p, goalList.remove(0));
+//        }
+//        
+//        return solved;
+    }
+    
 }

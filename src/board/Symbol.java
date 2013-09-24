@@ -42,4 +42,5 @@ public enum Symbol {
 	public String toString() {
 		return Character.toString(value);
 	}
+    
 }
