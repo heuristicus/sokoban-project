@@ -34,6 +34,7 @@ public class Board implements Expandable<Board, Action>{
     private static final Action pushableTestDirections[] = {Action.UP, Action.LEFT};
 	private final Map<Point, Symbol> mObjects;
 	private Point playerPosition;
+	public List<List<Point>> availablePosition;
     // Top left most position accessible from the player position.
     private Point topLeftPosition;
 
@@ -56,6 +57,22 @@ public class Board implements Expandable<Board, Action>{
 	/** No search needed, the position is now always tracked. */
 	public Point getPlayerPosition() {
 		return playerPosition;
+		
+	}
+ 
+	public void setAvailablePosition(){
+		try{
+		List<Point> Goals = StaticBoard.getInstance().goals;
+		for(int i = 0 ; i < Goals.size() ; i++){
+			 availablePosition.add(getAccessiblePointsfromGoal(Goals.get(i)));
+		}
+		}catch(Exception e){
+			
+		}
+	}
+	
+	public List<Point> getGoal(){
+		return StaticBoard.getInstance().goals;
 	}
 
     public Point getTopLeftPosition() {
