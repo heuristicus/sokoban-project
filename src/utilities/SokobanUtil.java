@@ -96,7 +96,21 @@ public class SokobanUtil {
     }
     
     public static String readMapAsString(String filename) throws IOException {
-    	return new String(Files.readAllBytes(Paths.get(filename)));
+        return new String(Files.readAllBytes(Paths.get(filename)));
+    }
+    
+    /*
+     * Returns the point of the given two points which is in the top left most position
+     */
+    public static Point pointMin(Point p1, Point p2){
+        System.out.println("comparing " + p1 + " with " + p2);
+        if (p2.y > p1.y){
+            return p1;
+        } else if (p1.y > p2.y)
+            return p2;
+        else {
+            return p2.x >= p1.x ? p1 : p2;
+        }
     }
 
 }

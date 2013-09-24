@@ -17,6 +17,7 @@ import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
+import java.util.Arrays;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -29,17 +30,23 @@ import java.util.Queue;
  * dynamic map must be modified with care.
  */
 public class Board implements Expandable<Board, Action>{
+    
+    private static final Action pushableTestDirections[] = {Action.UP, Action.LEFT};
 	private final Map<Point, Symbol> mObjects;
 	private Point playerPosition;
+    // Top left most position accessible from the player position.
+    private Point topLeftPosition;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
 		this.playerPosition = playerPosition;
+        this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
 	}
 	
 	protected Board(Board original) {
 		this.mObjects = new HashMap<>(original.mObjects);
 		this.playerPosition = original.playerPosition;
+        this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
 	}
 
 	public Map<Point, Symbol> getDynamicObjects() {
@@ -51,6 +58,10 @@ public class Board implements Expandable<Board, Action>{
 		return playerPosition;
 	}
 
+    public Point getTopLeftPosition() {
+        return topLeftPosition;
+    }
+    
 	/** @return Ascii art representation of the board (static + dynamic) */
 	@Override
 	public String toString() {
@@ -229,14 +240,9 @@ public class Board implements Expandable<Board, Action>{
 	 * */
 	public Board applyAction(Action a, boolean destructive)
 			throws IllegalMoveException {
-		Board newBoard;
-		if (destructive) {
-			newBoard = this;
-		} else {
-			newBoard = new Board(this);
-		}
+		Board newBoard = destructive ? this : new Board(this);
 
-		Point player = newBoard.getPlayerPosition();
+        Point player = newBoard.getPlayerPosition();
 
 		Point destination = SokobanUtil.applyActionToPoint(a, player);
 		Symbol destObject = newBoard.get(destination);
@@ -276,12 +282,7 @@ public class Board implements Expandable<Board, Action>{
 	 */
 	public Board applyActionChained(List<Action> actionList,
 			boolean destructive) throws IllegalMoveException {
-		Board newBoard;
-		if (destructive) {
-			newBoard = this;
-		} else {
-			newBoard = new Board(this);
-		}
+		Board newBoard = destructive ? this : new Board(this);
 
 		for (Action action : actionList) {
 			// Don't care about modifying board state anymore, so use the
@@ -336,7 +337,8 @@ public class Board implements Expandable<Board, Action>{
      * This is done using something like a flood fill.
      * @param p The point for which to find accessible points
      * @return The points which are accessible from the given point. Accessible
-     * points are those which are walkable.
+     * points are those which are walkable. The top left most point in the accessible
+     * area will be the first element of the list.
      */
     public List<Point> getAccessiblePoints(Point p){
         Queue<Point> q = new LinkedList<>();
@@ -344,6 +346,9 @@ public class Board implements Expandable<Board, Action>{
         q.add(p);
         List<Point> accessible = new ArrayList<>();
         accessible.add(p);
+        // Track the minimum values of point positions so that we can see which
+        // point is the top left of the flood filled region
+        Point minPoint = p;
         while(!q.isEmpty()){
             Point next = q.remove();
             if (ref.get(next).isWalkable){
@@ -352,10 +357,19 @@ public class Board implements Expandable<Board, Action>{
                     if (!accessible.contains(point)){
                         accessible.add(point);
                         q.add(point);
+                        // Modify the minimum point location if the current point
+                        // is "lower" than the current minimum
+                        minPoint = SokobanUtil.pointMin(minPoint, point);
+                        System.out.println("min point is: " + minPoint);
                     }
                 }
             }
         }
+        
+        // Move the point with the minimum value to the beginning of the list.
+        accessible.remove(minPoint);
+        accessible.add(0, minPoint);
+        
         
         return accessible;
     }
@@ -402,6 +416,37 @@ public class Board implements Expandable<Board, Action>{
 		}
 		return freeNeighbours;
 	}
+    
+    /**
+     * Gets a map of points to actions which indicate the directions in which each
+     * box on the map can be pushed. Assuming that the player is able to teleport,
+     * a box can always be pushed in either 2 or 4 directions. If you can push it
+     * in one direction, then the player must be able to access the point that is being
+     * pushed from, and if the box is pushable in that direction, it means that
+     * the space it is being pushed into is empty, which means that the box could
+     * be pushed from that direction as well.
+     * @return A map of points, indicating box locations, with a list of actions
+     * indicate which direction the box can successfuly be pushed from. Boxes which
+     * cannot be pushed are not included in the map.
+     */
+    public Map<Point, List<Action>> getBoxPushableDirections(){
+        Map<Point, List<Action>> pushableDirections = new HashMap<>();
+        for (Point p : mObjects.keySet()) {
+			if (get(p).type != Symbol.Type.Box) continue;
+            List<Action> possiblePushDirections = new ArrayList<>();
+			for (Action a : pushableTestDirections) {
+				Point neighbour = SokobanUtil.applyActionToPoint(a, p);
+                Point opposite = SokobanUtil.applyActionToPoint(SokobanUtil.inverseAction(a), p);
+                // If you can push the box in one direction, then you can push it in the opposite
+                // direction as well. Boxes can only be pushed in either 2 or 4 directions, assuming
+                // that the player is able to teleport.
+                if (get(neighbour).isWalkable && get(opposite).isWalkable)
+                    possiblePushDirections.addAll(Arrays.asList(a, SokobanUtil.inverseAction(a)));
+			}
+            pushableDirections.put(p, possiblePushDirections);
+		}
+        return pushableDirections;
+    }
 	
 	/** 
 	 * Basic implementation: checks only that the box is not blocked against walls. 
@@ -452,7 +497,7 @@ public class Board implements Expandable<Board, Action>{
         
         return expanded;
     }
-
+    
     /**
      * Checks whether the given object is equal to this Board. The position
      * of the player is ignored in the check.

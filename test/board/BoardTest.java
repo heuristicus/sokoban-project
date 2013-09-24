@@ -282,7 +282,7 @@ public class BoardTest {
      */
     @Test
     public void testIsBoxLockedAtPoint() {
-        Board tb = SokobanUtil.readMap(Paths.get(testMapDir,"boardTestLocked.map"));
+        Board tb = initBoard("boardTestLocked.map");
         
         // True cases - the box should be considered blocked
         // top left corner - completely walled in
@@ -313,51 +313,53 @@ public class BoardTest {
      */
     @Test
     public void testExpand() {
-        Board blocked = null, surrounded = null;
+        Board blocked = initBoard("boardTestExpandBlocked.map");
+        Board surrounded = initBoard("boardTestExpandSurrounded.map");
         // List of files containing expected expansion of blocked state
         String fileListBlocked[] = {"bs1.map", "bs2.map", "bs3.map"};
         // List of files containig expansion of surrounded state
         String fileListSurrounded[] = {"ss1.map", "ss2.map", "ss3.map", "ss4.map"};
         // The boards that are expected to be received upon expansion of the two states
-        ArrayList<Board> blockedSol = new ArrayList<>();
-        ArrayList<Board> surroundedSol = new ArrayList<>();
+        ArrayList<Board> blockedExpected = new ArrayList<>();
+        ArrayList<Board> surroundedExpected = new ArrayList<>();
         	
-        blocked = SokobanUtil.readMap(Paths.get(testMapDir,"boardTestExpandBlocked.map"));
-        surrounded = SokobanUtil.readMap(Paths.get(testMapDir,"boardTestExpandSurrounded.map"));
+        // Initialise the expected boards from file
         for (String fname : fileListBlocked) {
-            blockedSol.add(SokobanUtil.readMap(testMapDir + fname));
+            blockedExpected.add(initBoard(fname));
         }
         for (String fname : fileListSurrounded) {
-            surroundedSol.add(SokobanUtil.readMap(testMapDir + fname));
+            surroundedExpected.add(initBoard(fname));
         }
         
-        ArrayList<SearchNode<Board, SokobanUtil.Action>> bexp = blocked.expand(null);
-        ArrayList<SearchNode<Board, SokobanUtil.Action>> sexp = surrounded.expand(null);
+        // Get the results of the expansion of each board
+        ArrayList<SearchNode<Board, SokobanUtil.Action>> blockedResult = blocked.expand(null);
+        ArrayList<SearchNode<Board, SokobanUtil.Action>> surroundedResult = surrounded.expand(null);
         
-        assertEquals(blockedSol.size(), bexp.size());
-        assertEquals(surroundedSol.size(), sexp.size());
+        // The two resulting lists should be the same size as the expected lists
+        assertEquals(blockedExpected.size(), blockedResult.size());
+        assertEquals(surroundedExpected.size(), surroundedResult.size());
                 
-        System.out.println("Surrounded expansions :");
-        ArrayList<Board> bsol = new ArrayList<>();
-        ArrayList<Board> ssol = new ArrayList<>();
-        for (SearchNode<Board, SokobanUtil.Action> searchNode : sexp) {
-            ssol.add(searchNode.getNodeState());
+        // Create arraylists for comparison convenience by extracting the state
+        // from the returned nodes.
+        ArrayList<Board> blockedResultArray = new ArrayList<>();
+        ArrayList<Board> surroundedResultArray = new ArrayList<>();
+        for (SearchNode<Board, SokobanUtil.Action> searchNode : surroundedResult) {
+            surroundedResultArray.add(searchNode.getNodeState());
         }
-        System.out.println("Blocked expansions: ");
-        for (SearchNode<Board, SokobanUtil.Action> searchNode : bexp) {
-            bsol.add(searchNode.getNodeState());
+
+        for (SearchNode<Board, SokobanUtil.Action> searchNode : blockedResult) {
+            blockedResultArray.add(searchNode.getNodeState());
         }
         
         // The two lists are the same size - make sure they contain the same 
-        assertTrue(surroundedSol.containsAll(ssol));
-        assertTrue(blockedSol.containsAll(bsol));
+        assertTrue(surroundedExpected.containsAll(surroundedResultArray));
+        assertTrue(blockedExpected.containsAll(blockedResultArray));
     }
     
     @Test
     public void testEquals(){
-        Board b1 = null, b2 = null;
-        b1 = SokobanUtil.readMap(testMapDir + "boardTestEq1.map");
-        b2 = SokobanUtil.readMap(testMapDir + "boardTestEq2.map");
+        Board b1 = initBoard("boardTestEq1.map");
+        Board b2 = initBoard("boardTestEq2.map");
         
         assertTrue(b1.equals(b2));
         assertTrue(b2.equals(b1));
@@ -371,10 +373,9 @@ public class BoardTest {
     
     @Test
     public void testGetAccessiblePoints(){
-        Board accTest = null;
+        Board accTest = initBoard("boardTestAccessible.map");
         String pl = null, tr = null, bl = null, tl = null;
         try {
-            accTest = SokobanUtil.readMap(testMapDir + "boardTestAccessible.map");
             pl = SokobanUtil.readMapAsString(testMapDir + "boardTestAccessiblePL.map");
             tr = SokobanUtil.readMapAsString(testMapDir + "boardTestAccessibleTR.map");
             bl = SokobanUtil.readMapAsString(testMapDir + "boardTestAccessibleBL.map");
@@ -384,26 +385,59 @@ public class BoardTest {
         } catch (RuntimeException ex){ // the player isn't on one of the boards, but we don't care
             
         }
-
         
         List<Point> playerAccess = accTest.getAccessiblePoints(accTest.getPlayerPosition());
-
+        System.out.println(playerAccess.get(0));
+        assertEquals("Expected top left position did not match received", new Point(4,1), playerAccess.get(0));
         assertTrue(pl.equals(accTest.toStringMarked(playerAccess)));
         
 //        System.out.println("Player accessible points");
 //        System.out.println(accTest.toStringMarked(playerAccess));
         List<Point> topRight = accTest.getAccessiblePoints(new Point(10,3));
+        System.out.println(topRight.get(0));
+        assertEquals("Expected top left position did not match received", new Point(7,1), topRight.get(0));
         assertTrue(tr.equals(accTest.toStringMarked(topRight)));
 //        System.out.println("Top right block accessible");
 //        System.out.println(accTest.toStringMarked(topRight));
         List<Point> bottomLeft = accTest.getAccessiblePoints(new Point(1,5));
+        System.out.println(bottomLeft.get(0));
+        assertEquals("Expected top left position did not match received", new Point(1,4), bottomLeft.get(0));
         assertTrue(bl.equals(accTest.toStringMarked(bottomLeft)));
 //        System.out.println("Bottom left accessible");
 //        System.out.println(accTest.toStringMarked(bottomLeft));
         List<Point> topLeft = accTest.getAccessiblePoints(new Point(1,1));
+        System.out.println(topLeft.get(0));
+        assertEquals("Expected top left position did not match received", new Point(1,1), topLeft.get(0));
         assertTrue(tl.equals(accTest.toStringMarked(topLeft)));
 //        System.out.println("Top left accessible");
 //        System.out.println(accTest.toStringMarked(topLeft));
+    }
+    
+    @Test
+    public void testGetBoxPushableDirections(){
+        Board b = initBoard("boardTestPushable.map");
+        HashMap<Point, List<Action>> expected = new HashMap<>();
+        // point 1,1 in corner - not pushable
+//        expected.put(new Point(1,1), new ArrayList<Action>());
+        // point 9,1 in horizontal corridor - pushable left or right
+        expected.put(new Point(10,1), Arrays.asList(Action.LEFT, Action.RIGHT));
+        // point 7,3 in open space - pushable in all directions
+        expected.put(new Point(7,3), Arrays.asList(Action.LEFT, Action.RIGHT, Action.UP, Action.DOWN));
+        // Point 4,4 in vertical corridor - pushable up or down
+        expected.put(new Point(4,4), Arrays.asList(Action.UP, Action.DOWN));
+        // Point 11, 5 surrounded by 3 walls - not pushable
+//        expected.put(new Point(11,5), new ArrayList<Action>());
+        
+        Map<Point, List<Action>> result = b.getBoxPushableDirections();
+        
+        for (Point p : expected.keySet()) {
+            assertTrue("Result did not contain the expected box location " + p, result.containsKey(p));
+            List<Action> expectedList = expected.get(p);
+            List<Action> resultList = result.get(p);
+            assertEquals("Action lists for " + p + "were not the same size.", expectedList.size(), resultList.size());
+            assertTrue("The contents of the result action list did not match the expected list.", result.get(p).containsAll(expected.get(p)));
+        }
+        
     }
     
 }
