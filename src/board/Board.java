@@ -363,7 +363,6 @@ public class Board implements Expandable<Board, Action>{
      */
     public List<Point> getAccessiblePoints(Point p){
         Queue<Point> q = new LinkedList<>();
-        Board ref = new Board(this);
         q.add(p);
         List<Point> accessible = new ArrayList<>();
         accessible.add(p);
@@ -372,7 +371,7 @@ public class Board implements Expandable<Board, Action>{
         Point minPoint = p;
         while(!q.isEmpty()){
             Point next = q.remove();
-            if (ref.get(next).isWalkable){
+            if (this.get(next).isWalkable){
                 List<Point> neighbours = getFreeNeighbours(next);
                 for (Point point : neighbours) {
                     if (!accessible.contains(point)){
@@ -381,7 +380,7 @@ public class Board implements Expandable<Board, Action>{
                         // Modify the minimum point location if the current point
                         // is "lower" than the current minimum
                         minPoint = SokobanUtil.pointMin(minPoint, point);
-                        System.out.println("min point is: " + minPoint);
+//                        System.out.println("min point is: " + minPoint);
                     }
                 }
             }

@@ -103,7 +103,7 @@ public class SokobanUtil {
      * Returns the point of the given two points which is in the top left most position
      */
     public static Point pointMin(Point p1, Point p2){
-        System.out.println("comparing " + p1 + " with " + p2);
+//        System.out.println("comparing " + p1 + " with " + p2);
         if (p2.y > p1.y){
             return p1;
         } else if (p1.y > p2.y)
