@@ -66,9 +66,9 @@ public class Main {
             System.out.println("tt==board?" + (tt==board));
             System.out.println("tt.equals(board)?" + (tt.equals(board)));
             System.out.println("tt2.equals(board)?" + (tt2.equals(board)));
-            SearchNode<Board,Action> sb = new SearchNode<>(board, null, null);
-            SearchNode<Board,Action> st2 = new SearchNode<>(tt2, null, null);
-            SearchNode<Board,Action> st = new SearchNode<>(tt, null, null);
+            SearchNode sb = new SearchNode(board, null, null);
+            SearchNode st2 = new SearchNode(tt2, null, null);
+            SearchNode st = new SearchNode(tt, null, null);
             System.out.println("searchnode sb is:");
             System.out.println(sb);
             System.out.println("searchnode st is:");
@@ -114,7 +114,7 @@ public class Main {
         System.out.println("BFS finding solution for initial map");
         System.out.println(start);
         SearchMethod bfs = new BreadthFirstSearchNoDuplication();
-        ArrayList<Action> path = bfs.findPath(start, goal);
+        ArrayList<Action> path = bfs.findPath(start, goal, false);
 
         if (path != null){
             System.out.println("BFS completed, path length " + path.size());
@@ -136,7 +136,7 @@ public class Main {
         // Essentially does DFS!
         SearchMethod astar = new AStar(new ManhattanHeuristic());
         
-        ArrayList<Action> pathas = astar.findPath(startas, goalas);
+        ArrayList<Action> pathas = astar.findPath(startas, goalas, false);
 
         if (pathas != null){
             System.out.println("astar completed, path length " + pathas.size());

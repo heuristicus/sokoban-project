@@ -17,7 +17,6 @@ import java.util.Set;
 import pathfinding.BoxMovement;
 import search.AStar;
 import search.DiagonalDistanceHeuristic;
-import search.Expandable;
 import search.SearchMethod;
 import search.SearchNode;
 import utilities.SokobanUtil;
@@ -32,7 +31,7 @@ import exceptions.IllegalMoveException;
  * is not checked, neither is the fact that there is only one player, etc. The
  * dynamic map must be modified with care.
  */
-public class Board implements Expandable<Board, Action>{
+public class Board {
     
     private static final Action pushableTestDirections[] = {Action.UP, Action.LEFT};
 	private final Map<Point, Symbol> mObjects;
@@ -550,13 +549,12 @@ public class Board implements Expandable<Board, Action>{
 		return false;
 	}
 
-    @Override
-    public ArrayList<SearchNode<Board, Action>> expand(SearchNode<Board, Action> parent) {
-        ArrayList<SearchNode<Board, Action>> expanded = new ArrayList<>();
+    public ArrayList<SearchNode> expand(SearchNode parent) {
+        ArrayList<SearchNode> expanded = new ArrayList<>();
         
         for (Action a : Action.values()) {
             try {
-                expanded.add(new SearchNode<>(this.applyAction(a, false), parent, a, 1));
+                expanded.add(new SearchNode(this.applyAction(a, false), parent, a, 1));
             } catch (IllegalMoveException ex) {
 //                System.out.println(ex.getMessage());
             }
@@ -721,7 +719,7 @@ public class Board implements Expandable<Board, Action>{
     		
     		if (! currentBoard.equals(intermediateBoard)) { // the player moved in-between. 
     			// get the list of moves made.
-    			ArrayList<Action> foundPath = aStar.findPath(currentBoard, intermediateBoard);
+    			ArrayList<Action> foundPath = aStar.findPath(currentBoard, intermediateBoard, false);
     			
     			if (doubleCheck) {
     				currentBoard.applyActionChained(foundPath, true);

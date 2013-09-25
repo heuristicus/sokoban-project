@@ -59,7 +59,7 @@ public class SearchAlgorithmTest {
     
     @Test
     public void testAStar() {
-        ArrayList<Action> foundPath = aStar.findPath(testMapStart, testMapIntermediate1);
+        ArrayList<Action> foundPath = aStar.findPath(testMapStart, testMapIntermediate1, false);
         assertEquals(Arrays.asList(Action.UP, Action.LEFT, Action.UP), foundPath);
         
     }

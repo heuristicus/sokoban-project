@@ -36,14 +36,14 @@ public class AStar extends SearchMethod {
     }
     
     @Override
-    public ArrayList<Action> findPath(Board start, Board goal) {
+    public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
         // Store already visited nodes
-        HashSet<SearchNode<Board,Action>> closed = new HashSet<>();
+        HashSet<SearchNode> closed = new HashSet<>();
         // Store as yet unvisited nodes in a priority queue - we expand from the best
-        Queue<SearchNode<Board,Action>> open = new PriorityQueue<>();
+        Queue<SearchNode> open = new PriorityQueue<>();
         
         // Add the start state as a node with zero path cost
-        open.add(new SearchNode<>(start, null, null, 0, h.utility(start, goal)));
+        open.add(new SearchNode(start, null, null, 0, h.utility(start, goal)));
         
         while(!open.isEmpty()){
 //            System.out.println("open size: " + open.size() + " closed size: " + closed.size());
@@ -55,7 +55,7 @@ public class AStar extends SearchMethod {
 //            for (SearchNode<T, U> searchNode : closed) {
 //                System.out.println(searchNode);
 //            }
-            SearchNode<Board,Action> front = open.remove(); // The best node in the queue
+            SearchNode front = open.remove(); // The best node in the queue
             // If front is the goal, return the action sequence.
 //            System.out.println("Checking goal state");
             if (front.nodeState.equals(goal)){
@@ -70,17 +70,17 @@ public class AStar extends SearchMethod {
                 closed.add(front);
             }
             
-            ArrayList<SearchNode<Board,Action>> successors = front.expand();
-            for (SearchNode<Board,Action> successor : successors) {
+            ArrayList<SearchNode> successors = front.expand();
+            for (SearchNode successor : successors) {
 //                System.out.println("Examining successor of front node");
 //                System.out.println(successor);
                 // Look through the open list to see if the successor is
                 // already present
-                Iterator<SearchNode<Board,Action>> it = open.iterator();
+                Iterator<SearchNode> it = open.iterator();
 //                System.out.println("Checking open list to see if it contains the successor.");
                 boolean inOpen = false;
                 while(it.hasNext()){
-                    SearchNode<Board,Action> element = it.next();
+                    SearchNode element = it.next();
 //                    try {
 //                        Thread.sleep(1000);
 //                    } catch (InterruptedException ex) {

@@ -31,18 +31,18 @@ public class MultiGoalBreadthFirstSearch {
      */
     public static HashMap<Board, ArrayList<Action>> findPath(Board start, ArrayList<Board> goals) {
         // Queue for nodes not yet checked.
-        Queue<SearchNode<Board,Action>> open = new LinkedList<>();
+        Queue<SearchNode> open = new LinkedList<>();
         // List of nodes which have already been checked, independent of the action taken to reach the state.
-        HashSet<SearchNode<Board,Action>> closed = new HashSet<>();
+        HashSet<SearchNode> closed = new HashSet<>();
         HashMap<Board, ArrayList<Action>> goalNodes = new HashMap<>();
-        open.add(new SearchNode<>(start, null, null)); // Push the start node onto the queue
+        open.add(new SearchNode(start, null, null)); // Push the start node onto the queue
         // Keep going until the open list is empty - we have reached the limits of
         // the reachable area, or until the size of the goal list is equal to the size of
         // the hashmap containing the paths. If they are the same size, then that
         // means we have found a path to every goal, so we stop the search.
         while(!open.isEmpty() && goals.size() != goalNodes.size()){
             // Retrieve and remove the front of the queue
-            SearchNode<Board, Action> front = open.remove();
+            SearchNode front = open.remove();
             // If the front node is in the list of goals, we add the node state and
             // the list of actions to reach that state to the hashmap
             if(goals.contains(front.nodeState)){
@@ -52,9 +52,9 @@ public class MultiGoalBreadthFirstSearch {
                 // If it is already expanded, then just move onto the next loop.
                 if (!closed.contains(front)){
                     // The front node has not yet been expanded. Expand it
-                    ArrayList<SearchNode<Board,Action>> expanded = front.expand();
+                    ArrayList<SearchNode> expanded = front.expand();
                     // Go through the closed list again for each successor
-                    for (SearchNode<Board, Action> successor : expanded) {
+                    for (SearchNode successor : expanded) {
                         if (!closed.contains(successor)){
                             open.add(successor);
                         }

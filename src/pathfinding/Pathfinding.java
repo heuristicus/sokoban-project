@@ -30,14 +30,14 @@ public class Pathfinding {
     }
         
     /**
-     * Find a path between the start and goal states.
+     * Find a path between the start and goal states in the player motion space
      * @param start
      * @param goal
      * @return Arraylist of actions which need to be taken to get from the start
      * state to the goal.
      */
     public ArrayList<Action> pointToPointPath(Board start, Board goal){
-        return search.findPath(start, goal);
+        return search.findPath(start, goal, false);
     }
     
     /**

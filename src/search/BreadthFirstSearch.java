@@ -19,13 +19,13 @@ import utilities.SokobanUtil.Action;
 public class BreadthFirstSearch extends SearchMethod {
 
     @Override
-    public ArrayList<Action> findPath(Board start, Board goal) {
-        Queue<SearchNode<Board,Action>> list = new LinkedList<>();
+    public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
+        Queue<SearchNode> list = new LinkedList<>();
         if (start == null || goal == null)
             return null;
-        list.add(new SearchNode<>(start, null, null)); // Put the initial state onto the queue
+        list.add(new SearchNode(start, null, null)); // Put the initial state onto the queue
         while(!list.isEmpty()){
-            SearchNode<Board,Action> front = list.remove();
+            SearchNode front = list.remove();
             if(goal.equals(front.getNodeState())){ // Check if the popped node is the goal state
                 return front.actionUnwind(); // If so, return the list of actions taken to get to this point
             } else { // Front node is not the goal

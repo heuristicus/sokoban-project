@@ -4,7 +4,9 @@
  */
 package search;
 
+import board.Board;
 import java.util.ArrayList;
+import utilities.SokobanUtil.Action;
 
 
 // T is something which represents the state of the node, U is the set of actions
@@ -16,13 +18,13 @@ import java.util.ArrayList;
  *
  * @author michal
  */
-public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<SearchNode<T,U>>{
+public class SearchNode implements Comparable<SearchNode>{
 
     protected Float pathCost;
     protected Float estimatedCost;
-    protected T nodeState;
-    protected U generatingAction;
-    protected SearchNode<T,U> parent;
+    protected Board nodeState;
+    protected Action generatingAction;
+    protected SearchNode parent;
     
     /**
      * Initialise a SearchNode with the given node state, parent node and generating action.
@@ -33,7 +35,7 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
      * @param generatingAction The action which generated this state when applied to the
      * previous state. If this is the root node, this parameter should be null.
      */
-    public SearchNode(T nodeState, SearchNode<T,U> parent, U generatingAction) {
+    public SearchNode(Board nodeState, SearchNode parent, Action generatingAction) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
@@ -49,7 +51,7 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
      * previous state. If this is the root node, this parameter should be null.
      * @param cost The cost to get to this node !FROM THE START NODE!
      */
-     public SearchNode(T nodeState, SearchNode<T,U> parent, U generatingAction, float pathCost) {
+     public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, float pathCost) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
@@ -68,7 +70,7 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
      * calculated by adding a heuristic estimate of the distance to the goal from this node to the
      * pathCost
      */
-     public SearchNode(T nodeState, SearchNode<T,U> parent, U generatingAction, float pathCost, float estimatedCost) {
+     public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, float pathCost, float estimatedCost) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
@@ -81,17 +83,17 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
       * Get the path taken to reach the given node by following the parent nodes
       * until a null pointer is found - this indicates the root of the tree.
       */
-     public ArrayList<SearchNode<T,U>> nodeUnwind(){
+     public ArrayList<SearchNode> nodeUnwind(){
          if (this.parent == null){
              // Base case. If the parent is null we reach the initial state.
              // Construct a path vector and then return the empty vector.
-             ArrayList<SearchNode<T,U>> path = new ArrayList<>();
+             ArrayList<SearchNode> path = new ArrayList<>();
              path.add(this);
              return path;
          } else {
              // Recursive case. Get the unwound path from the parent and then
              // push the action to get to this node onto the path.
-             ArrayList<SearchNode<T,U>> path = this.parent.nodeUnwind();
+             ArrayList<SearchNode> path = this.parent.nodeUnwind();
              path.add(this);
              return path;
          }
@@ -101,27 +103,27 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
       * Get the path taken to reach the given node by following the parent nodes
       * until a null pointer is found - this indicates the root of the tree.
       */
-     public ArrayList<U> actionUnwind(){
+     public ArrayList<Action> actionUnwind(){
          if (this.parent == null){
              // Base case. If the parent is null we reach the initial state.
              // Construct a path vector and then return the empty vector.
-             ArrayList<U> path = new ArrayList<>();
+             ArrayList<Action> path = new ArrayList<>();
              return path;
          } else {
              // Recursive case. Get the unwound path from the parent and then
              // push the action to get to this node onto the path.
-             ArrayList<U> path = this.parent.actionUnwind();
+             ArrayList<Action> path = this.parent.actionUnwind();
              path.add(this.generatingAction);
              return path;
          }
      }
      
-     public ArrayList<SearchNode<T,U>> expand(){
+     public ArrayList<SearchNode> expand(){
          return this.nodeState.expand(this);
      }
      
 
-    public T getNodeState() {
+    public Board getNodeState() {
         return nodeState;
     }
 
@@ -149,7 +151,7 @@ public class SearchNode<T extends Expandable<T,U>,U> implements Comparable<Searc
     }
         
     @Override
-    public int compareTo(SearchNode<T,U> o) {
+    public int compareTo(SearchNode o) {
 //        System.out.println("compareto node called");
         if (this.estimatedCost == o.estimatedCost)
             return 0;

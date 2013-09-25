@@ -16,14 +16,14 @@ import utilities.SokobanUtil.Action;
 public class DepthFirstSearch extends SearchMethod {
     
     @Override
-    public ArrayList<Action> findPath(Board start, Board goal) {
-        Stack<SearchNode<Board,Action>> list = new Stack<>();
+    public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
+        Stack<SearchNode> list = new Stack<>();
         if (start == null || goal == null){
             return null;
         }
-        list.add(new SearchNode<>(start, null, null));
+        list.add(new SearchNode(start, null, null));
         while(!list.empty()){
-            SearchNode<Board,Action> top = list.pop(); // Look at the top node on the stack
+            SearchNode top = list.pop(); // Look at the top node on the stack
             if (goal.equals(top.nodeState)){ // Check if top is the goal
                 return top.actionUnwind(); // Goal, so backtrace the path to get to it
             } else { // Not the goal, expand the node and push onto the stack

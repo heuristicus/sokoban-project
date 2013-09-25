@@ -17,17 +17,17 @@ import utilities.SokobanUtil.Action;
 public class BreadthFirstSearchNoDuplication extends SearchMethod {
     
     @Override
-    public ArrayList<Action> findPath(Board start, Board goal) {
+    public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
             // Queue for nodes not yet checked.
-            Queue<SearchNode<Board,Action>> open = new LinkedList<>();
+            Queue<SearchNode> open = new LinkedList<>();
             // List of nodes which have already been checked, independent of the action taken to reach the state.
-            ArrayList<SearchNode<Board,Action>> closed = new ArrayList<>();
-            open.add(new SearchNode<>(start, null, null)); // Push the start node onto the queue
+            ArrayList<SearchNode> closed = new ArrayList<>();
+            open.add(new SearchNode(start, null, null)); // Push the start node onto the queue
             while(!open.isEmpty()){
                 // Retrieve and remove the front of the queue
 //                System.out.println("closed size: " + closed.size());
 //                System.out.println("open size: " + open.size());
-                SearchNode<Board,Action> front = open.remove();
+                SearchNode front = open.remove();
                 if(goal.equals(front.nodeState)){ // If the front node is the goal, return the path to it
                     return front.actionUnwind();
                 } else { // Not the goal, need to expand the node to look further
@@ -37,9 +37,9 @@ public class BreadthFirstSearchNoDuplication extends SearchMethod {
 //                        System.out.println("closed does not contain");
 //                        System.out.println(front);
                         // The front node has not yet been expanded. Expand it
-                        ArrayList<SearchNode<Board,Action>> expanded = front.expand();
+                        ArrayList<SearchNode> expanded = front.expand();
                         // Go through the closed list again for each successor
-                        for (SearchNode<Board, Action> successor : expanded) {
+                        for (SearchNode successor : expanded) {
                             if (!closed.contains(successor)){
                                 open.add(successor);
                             }

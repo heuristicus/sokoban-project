@@ -322,8 +322,8 @@ public class BoardTest {
         }
         
         // Get the results of the expansion of each board
-        ArrayList<SearchNode<Board, SokobanUtil.Action>> blockedResult = blocked.expand(null);
-        ArrayList<SearchNode<Board, SokobanUtil.Action>> surroundedResult = surrounded.expand(null);
+        ArrayList<SearchNode> blockedResult = blocked.expand(null);
+        ArrayList<SearchNode> surroundedResult = surrounded.expand(null);
         
         // The two resulting lists should be the same size as the expected lists
         assertEquals(blockedExpected.size(), blockedResult.size());
@@ -333,11 +333,11 @@ public class BoardTest {
         // from the returned nodes.
         ArrayList<Board> blockedResultArray = new ArrayList<>();
         ArrayList<Board> surroundedResultArray = new ArrayList<>();
-        for (SearchNode<Board, SokobanUtil.Action> searchNode : surroundedResult) {
+        for (SearchNode searchNode : surroundedResult) {
             surroundedResultArray.add(searchNode.getNodeState());
         }
 
-        for (SearchNode<Board, SokobanUtil.Action> searchNode : blockedResult) {
+        for (SearchNode searchNode : blockedResult) {
             blockedResultArray.add(searchNode.getNodeState());
         }
         
