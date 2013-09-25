@@ -66,9 +66,9 @@ public class Main {
             System.out.println("tt==board?" + (tt==board));
             System.out.println("tt.equals(board)?" + (tt.equals(board)));
             System.out.println("tt2.equals(board)?" + (tt2.equals(board)));
-            SearchNode sb = new SearchNode(board, null, null);
-            SearchNode st2 = new SearchNode(tt2, null, null);
-            SearchNode st = new SearchNode(tt, null, null);
+            SearchNode sb = new SearchNode(board, null, null, false);
+            SearchNode st2 = new SearchNode(tt2, null, null, false);
+            SearchNode st = new SearchNode(tt, null, null, false);
             System.out.println("searchnode sb is:");
             System.out.println(sb);
             System.out.println("searchnode st is:");

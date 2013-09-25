@@ -9,7 +9,7 @@ import board.Board;
 import board.Symbol;
 
 
-public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
+public class ManhattanClosestHeuristic implements Heuristic<Board>
 {
 	
 	public static Symbol[] START_SYMBOLS = {Symbol.Box, Symbol.BoxOnGoal};
@@ -19,7 +19,7 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 	/** Returns an optimistic estimation of the coast to go from state start to state goal.
 	 * 	Wrapper for the Map<Point,Symbol> version.
 	 */
-	public float utility(Board start, Board goal)
+	public float minMatchUtility(Board start, Board goal)
 	{	
 		/** Not sure about the heuristic interface, here is the Minimum Matching Algorithm and result**/
 		start.setAvailablePosition();
@@ -27,14 +27,14 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 		
 		List<Point> Goals = goal.getGoalPoints();
 		Map<Point, Symbol> startSet = start.getDynamicObjects();
-		List<List<Integer>> Cost = new ArrayList<List<Integer>>();			
-		List<Integer> DegreeOfOccupied = new ArrayList<Integer>(Goals.size());
+		List<List<Integer>> Cost = new ArrayList<>();			
+		List<Integer> DegreeOfOccupied = new ArrayList<>(Goals.size());
 		
 		/**Create a 2D array to store the cost of box to Goals**/
 		for (Point startPt : startSet.keySet()){
 			if (isStartSymbol(start.get(startPt)))
 			{
-				List<Integer> EstimateCost = new ArrayList<Integer>(Goals.size());
+				List<Integer> EstimateCost = new ArrayList<>(Goals.size());
 				for(Point goalPt : Goals){
 					/**If it is available position, calculate the Manhattan Heuristic**/
 					if(goal.availablePosition.get(Goals.indexOf(goalPt)).contains(startPt)){
@@ -49,7 +49,7 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 			}
 		}
 		/**Greedy Estimation, may overestimated but save Computational Time**/
-		List<Integer> FinalEstimateCost = new ArrayList<Integer>(Goals.size());
+		List<Integer> FinalEstimateCost = new ArrayList<>(Goals.size());
 		for (List<Integer> innerList : Cost) {
 		
 			int MinValue = Integer.MAX_VALUE;
@@ -67,6 +67,7 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 		    }
 			/**If no goal can fit, it is deadlock**/
 			if(MinValue == Integer.MAX_VALUE){
+                // TODO: handle deadlock in this situation?
 				System.out.println("It is deadlock");
 			}
 			FinalEstimateCost.set(MinIndex, MinValue);
@@ -75,17 +76,20 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 		
 		//FinalEstimateCost is an arraylist that stored the cost for each Box
 		/*************************************/
-		return utility(start.getDynamicObjects(), goal.getDynamicObjects());
+		return utility(start, goal);
 	}
 	
 	
 
-	@Override
+    @Override
 	/** Returns an optimistic estimation of the coast to go from state start to state goal.
 	 * 	
 	 */
-	public float utility(Map<Point, Symbol> start, Map<Point, Symbol> goal)
+	public float utility(Board begin, Board end)
 	{		
+        
+        Map<Point, Symbol> start = begin.getDynamicObjects();
+        Map<Point, Symbol> goal = end.getDynamicObjects();
 		float estimation = 0;
 		for (Point startPt : start.keySet())
 		{

@@ -549,18 +549,22 @@ public class Board {
 		return false;
 	}
 
-    public ArrayList<SearchNode> expand(SearchNode parent) {
+    public ArrayList<SearchNode> expandPlayerSpace(SearchNode parent) {
         ArrayList<SearchNode> expanded = new ArrayList<>();
         
         for (Action a : Action.values()) {
             try {
-                expanded.add(new SearchNode(this.applyAction(a, false), parent, a, 1));
+                expanded.add(new SearchNode(this.applyAction(a, false), parent, a, 1, false));
             } catch (IllegalMoveException ex) {
 //                System.out.println(ex.getMessage());
             }
         }
         
         return expanded;
+    }
+    
+    public ArrayList<SearchNode> expandBoardSpace(SearchNode parent){
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
     
     /**

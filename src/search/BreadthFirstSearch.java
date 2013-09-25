@@ -23,10 +23,11 @@ public class BreadthFirstSearch extends SearchMethod {
         Queue<SearchNode> list = new LinkedList<>();
         if (start == null || goal == null)
             return null;
-        list.add(new SearchNode(start, null, null)); // Put the initial state onto the queue
+        list.add(new SearchNode(start, null, null, boardSpace)); // Put the initial state onto the queue
+        SearchNode goalNode = new SearchNode(goal, null, null, boardSpace);
         while(!list.isEmpty()){
             SearchNode front = list.remove();
-            if(goal.equals(front.getNodeState())){ // Check if the popped node is the goal state
+            if(goalNode.equals(front)){ // Check if the popped node is the goal state
                 return front.actionUnwind(); // If so, return the list of actions taken to get to this point
             } else { // Front node is not the goal
                 list.addAll(front.expand()); // Expand the nodes to generate successors, and then add to the list
@@ -34,4 +35,5 @@ public class BreadthFirstSearch extends SearchMethod {
         }
         return null; // Tried searching, but the list ended up being empty - there was no path.
     }
+
 }	

@@ -22,13 +22,14 @@ public class BreadthFirstSearchNoDuplication extends SearchMethod {
             Queue<SearchNode> open = new LinkedList<>();
             // List of nodes which have already been checked, independent of the action taken to reach the state.
             ArrayList<SearchNode> closed = new ArrayList<>();
-            open.add(new SearchNode(start, null, null)); // Push the start node onto the queue
+            open.add(new SearchNode(start, null, null, boardSpace)); // Push the start node onto the queue
+            SearchNode goalNode = new SearchNode(goal, null, null, boardSpace);
             while(!open.isEmpty()){
                 // Retrieve and remove the front of the queue
 //                System.out.println("closed size: " + closed.size());
 //                System.out.println("open size: " + open.size());
                 SearchNode front = open.remove();
-                if(goal.equals(front.nodeState)){ // If the front node is the goal, return the path to it
+                if(goalNode.equals(front)){ // If the front node is the goal, return the path to it
                     return front.actionUnwind();
                 } else { // Not the goal, need to expand the node to look further
                     // Look through the closed list to see if the node has already been expanded.
@@ -52,7 +53,6 @@ public class BreadthFirstSearchNoDuplication extends SearchMethod {
                 }
             }
             // Only reach this point if the open list was empty - no goal was found.
-            System.out.println("Open list empty");
             return null;
         }
 }

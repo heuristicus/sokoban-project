@@ -36,8 +36,8 @@ public class Pathfinding {
      * @return Arraylist of actions which need to be taken to get from the start
      * state to the goal.
      */
-    public ArrayList<Action> pointToPointPath(Board start, Board goal){
-        return search.findPath(start, goal, false);
+    public ArrayList<Action> pointToPointPath(Board start, Board goal, boolean boardSpace){
+        return search.findPath(start, goal, boardSpace);
     }
     
     /**

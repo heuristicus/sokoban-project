@@ -302,7 +302,7 @@ public class BoardTest {
      * Test of expand method, of class Board.
      */
     @Test
-    public void testExpand() {
+    public void testExpandPlayerSpace() {
         Board blocked = TestUtil.initBoard("boardTestExpandBlocked.map");
         Board surrounded = TestUtil.initBoard("boardTestExpandSurrounded.map");
         // List of files containing expected expansion of blocked state
@@ -322,8 +322,8 @@ public class BoardTest {
         }
         
         // Get the results of the expansion of each board
-        ArrayList<SearchNode> blockedResult = blocked.expand(null);
-        ArrayList<SearchNode> surroundedResult = surrounded.expand(null);
+        ArrayList<SearchNode> blockedResult = blocked.expandPlayerSpace(null);
+        ArrayList<SearchNode> surroundedResult = surrounded.expandPlayerSpace(null);
         
         // The two resulting lists should be the same size as the expected lists
         assertEquals(blockedExpected.size(), blockedResult.size());

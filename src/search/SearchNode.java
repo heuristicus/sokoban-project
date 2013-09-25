@@ -25,6 +25,7 @@ public class SearchNode implements Comparable<SearchNode>{
     protected Board nodeState;
     protected Action generatingAction;
     protected SearchNode parent;
+    protected boolean boardSpaceExpansion;
     
     /**
      * Initialise a SearchNode with the given node state, parent node and generating action.
@@ -34,12 +35,16 @@ public class SearchNode implements Comparable<SearchNode>{
      * should be null.
      * @param generatingAction The action which generated this state when applied to the
      * previous state. If this is the root node, this parameter should be null.
+     * @param boardSpaceExpansion Defines whether this node stores a player motion space
+     * expansion or a board space expansion. This defines which method of the board class is used
+     * when the equals method of this class is called.
      */
-    public SearchNode(Board nodeState, SearchNode parent, Action generatingAction) {
+    public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
         pathCost = null;
+        this.boardSpaceExpansion = boardSpaceExpansion;
     }
     
     /**
@@ -50,12 +55,16 @@ public class SearchNode implements Comparable<SearchNode>{
      * @param generatingAction The action which generated this state when applied to the
      * previous state. If this is the root node, this parameter should be null.
      * @param cost The cost to get to this node !FROM THE START NODE!
+     * @param boardSpaceExpansion Defines whether this node stores a player motion space
+     * expansion or a board space expansion. This defines which method of the board class is used
+     * when the equals method of this class is called.
      */
-     public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, float pathCost) {
+     public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, float pathCost, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
         this.pathCost= pathCost;
+        this.boardSpaceExpansion = boardSpaceExpansion;
     }
     
          /**
@@ -69,13 +78,17 @@ public class SearchNode implements Comparable<SearchNode>{
      * @param estimatedCost The estimated cost to get from the start to the goal via this node,
      * calculated by adding a heuristic estimate of the distance to the goal from this node to the
      * pathCost
+     * @param boardSpaceExpansion Defines whether this node stores a player motion space
+     * expansion or a board space expansion. This defines which method of the board class is used
+     * when the equals method of this class is called.
      */
-     public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, float pathCost, float estimatedCost) {
+     public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, float pathCost, float estimatedCost, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
         this.pathCost= pathCost;
         this.estimatedCost = estimatedCost;
+        this.boardSpaceExpansion = boardSpaceExpansion;
     }
      
      
@@ -119,17 +132,21 @@ public class SearchNode implements Comparable<SearchNode>{
      }
      
      public ArrayList<SearchNode> expand(){
-         return this.nodeState.expand(this);
+         if (boardSpaceExpansion)
+             return this.nodeState.expandBoardSpace(this);
+         else
+             return this.nodeState.expandPlayerSpace(this);
+         
      }
      
-
     public Board getNodeState() {
         return nodeState;
     }
 
     /**
      * Nodes are equal if they contain the same state, checked using the equals
-     * method of type T
+     * method of the Board class. This compares the states paying attention to the
+     * exact location of the player
      * @param obj
      * @return True if the object received is a SearchNode, and the nodeState
      * which that node contains is equal to that which this node contains.
@@ -138,9 +155,11 @@ public class SearchNode implements Comparable<SearchNode>{
     public boolean equals(Object obj) {
         if (obj instanceof SearchNode){
             SearchNode node = (SearchNode)obj;
-            boolean ret = this.nodeState.equals(node.nodeState);
-//            System.out.println(ret == true ? "yep!" : "nope...");
-            return ret;
+            if (boardSpaceExpansion){
+                return this.nodeState.equalsIgnorePlayer(node.nodeState);
+            } else {
+                return this.nodeState.equals(node.nodeState);
+            }
         }
         return false;
     }

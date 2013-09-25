@@ -18,6 +18,7 @@ import org.junit.Test;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Board;
+import utilities.TestUtil;
 
 /**
  *
@@ -25,20 +26,26 @@ import board.Board;
  */
 public class SearchAlgorithmTest {
     
-    SearchMethod aStar;
+    SearchMethod aStarPlayerPath;
+    SearchMethod aStarBoxPath;
     SearchMethod noDupBFS;
     SearchMethod BFS;
     Board testMapStart;
     Board testMapGoal;
     Board testMapIntermediate1;
+    Board testMapBoardSpaceStart;
+    Board testMapBoardSpaceGoal;
         
     public SearchAlgorithmTest() {
-        aStar = new AStar(new DiagonalDistanceHeuristic());
+        aStarPlayerPath = new AStar(new DiagonalDistanceHeuristic());
+        aStarBoxPath = new AStar(new ManhattanClosestHeuristic());
         noDupBFS = new BreadthFirstSearchNoDuplication();
         BFS = new BreadthFirstSearch();
-        testMapStart = SokobanUtil.readMap("./maps/test/searchTestStart.map");
-        testMapGoal = SokobanUtil.readMap("./maps/test/searchTestGoal.map");
-        testMapIntermediate1 = SokobanUtil.readMap("./maps/test/searchTestIntermediate1.map");
+        testMapStart = TestUtil.initBoard("searchTestStart.map");
+        testMapGoal = TestUtil.initBoard("searchTestGoal.map");
+        testMapIntermediate1 = TestUtil.initBoard("searchTestIntermediate1.map");
+        testMapBoardSpaceStart = TestUtil.initBoard("boardTestBoardSpaceStart.map");
+        testMapBoardSpaceGoal = TestUtil.initBoard("boardTestBoardSpaceGoal.map");
     }
     
     @BeforeClass
@@ -59,8 +66,10 @@ public class SearchAlgorithmTest {
     
     @Test
     public void testAStar() {
-        ArrayList<Action> foundPath = aStar.findPath(testMapStart, testMapIntermediate1, false);
+        ArrayList<Action> foundPath = aStarPlayerPath.findPath(testMapStart, testMapIntermediate1, false);
         assertEquals(Arrays.asList(Action.UP, Action.LEFT, Action.UP), foundPath);
+        ArrayList<Action> path2 = aStarBoxPath.findPath(testMapBoardSpaceStart, testMapBoardSpaceGoal, true);
+        assertEquals(Arrays.asList(Action.RIGHT, Action.RIGHT, Action.RIGHT), path2);
         
     }
     

@@ -34,19 +34,23 @@ public class MultiGoalBreadthFirstSearch {
         Queue<SearchNode> open = new LinkedList<>();
         // List of nodes which have already been checked, independent of the action taken to reach the state.
         HashSet<SearchNode> closed = new HashSet<>();
-        HashMap<Board, ArrayList<Action>> goalNodes = new HashMap<>();
-        open.add(new SearchNode(start, null, null)); // Push the start node onto the queue
+        HashMap<Board, ArrayList<Action>> goalSolution = new HashMap<>();
+        open.add(new SearchNode(start, null, null, false)); // Push the start node onto the queue
+        ArrayList<SearchNode> goalNodes = new ArrayList<>();
+        for (Board board : goals) {
+            goalNodes.add(new SearchNode(board, null, null, false));
+        }
         // Keep going until the open list is empty - we have reached the limits of
         // the reachable area, or until the size of the goal list is equal to the size of
         // the hashmap containing the paths. If they are the same size, then that
         // means we have found a path to every goal, so we stop the search.
-        while(!open.isEmpty() && goals.size() != goalNodes.size()){
+        while(!open.isEmpty() && goals.size() != goalSolution.size()){
             // Retrieve and remove the front of the queue
             SearchNode front = open.remove();
             // If the front node is in the list of goals, we add the node state and
             // the list of actions to reach that state to the hashmap
-            if(goals.contains(front.nodeState)){
-                goalNodes.put(front.nodeState, front.actionUnwind());
+            if(goalNodes.contains(front)){
+                goalSolution.put(front.nodeState, front.actionUnwind());
             } else { // Not the goal, need to expand the node to look further
                 // Look through the closed list to see if the node has already been expanded.
                 // If it is already expanded, then just move onto the next loop.
@@ -64,6 +68,6 @@ public class MultiGoalBreadthFirstSearch {
                 }
             }
         }
-        return goalNodes;
+        return goalSolution;
     }
 }

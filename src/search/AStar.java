@@ -38,13 +38,13 @@ public class AStar extends SearchMethod {
     @Override
     public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
         // Store already visited nodes
-        HashSet<SearchNode> closed = new HashSet<>();
+        HashSet<SearchNode> closed = new HashSet();
         // Store as yet unvisited nodes in a priority queue - we expand from the best
         Queue<SearchNode> open = new PriorityQueue<>();
         
         // Add the start state as a node with zero path cost
-        open.add(new SearchNode(start, null, null, 0, h.utility(start, goal)));
-        
+        open.add(new SearchNode(start, null, null, 0, h.utility(start, goal), boardSpace));
+        SearchNode goalNode = new SearchNode(goal, null, null, boardSpace);
         while(!open.isEmpty()){
 //            System.out.println("open size: " + open.size() + " closed size: " + closed.size());
 //            System.out.println("OPEN LIST =============");
@@ -58,7 +58,7 @@ public class AStar extends SearchMethod {
             SearchNode front = open.remove(); // The best node in the queue
             // If front is the goal, return the action sequence.
 //            System.out.println("Checking goal state");
-            if (front.nodeState.equals(goal)){
+            if (front.equals(goalNode)){
                 return front.actionUnwind();
             }
             

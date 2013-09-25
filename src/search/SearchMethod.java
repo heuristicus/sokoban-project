@@ -17,7 +17,8 @@ public abstract class SearchMethod
     
     /**
      * Find the path between two board states. The implementation
-     * is defined by classes extending this interface.
+     * is defined by classes extending this class. Should find the path
+     * between two states.
      * @param start The state of the board from which to start searching.
      * @param goal The state of the board which should be found
      * @param boardSpace Determines whether to search in the board space or the 
@@ -28,5 +29,5 @@ public abstract class SearchMethod
      * @return A path from the start state to the goal state, in reverse order.
      */
     public abstract ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace);
-    
+
 }
