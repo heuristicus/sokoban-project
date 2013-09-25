@@ -747,4 +747,67 @@ public class Board implements Expandable<Board, Action>{
     	return completeActionList;
     }
     
+    /**
+     * Returns a list of Boards that are the results of the possible moves regarding the player and the crates position.
+     * A new state means that a box has been moved and that the player position has changed.
+     * Checks if the box is reachable, and if the move is valid.
+     * @return List of boards that can be resulting from this state.
+     */
+    public LinkedList<Board> generateChildStates()
+    {  	
+    	LinkedList<Board> result = new LinkedList<Board>();
+    	
+    	//initialise openList with playerPosition.
+    	//Visitable positions will go through openList and end up in closedList (used to avoid
+    	LinkedList<Point> openList = new LinkedList<Point>();
+    	LinkedList<Point> closedList = new LinkedList<Point>();
+    	openList.add(playerPosition);
+    	
+    	
+    	while (!openList.isEmpty())
+    	{
+    		Point center = openList.removeFirst();
+    		closedList.add(center);
+    		
+    		Point[] neighbours = new Point[4];
+    		
+    		neighbours[0] = new Point(center.x-1, center.y-1);
+    		neighbours[1] = new Point(center.x-1, center.y+1);
+    		neighbours[2] = new Point(center.x+1, center.y-1);
+    		neighbours[3] = new Point(center.x+1, center.y+1);
+    		
+    		for (Point neighbour : neighbours)
+    		{
+    			Symbol nSymb = this.get(neighbour);
+	    		if (nSymb == Symbol.Empty || nSymb == Symbol.Goal)
+	    		{
+	    			//adding open neighbour only if not visited and not already in openList
+	    			if (!openList.contains(neighbour) && closedList.contains(neighbour))
+	    			{
+	        			openList.add(neighbour);
+	    			}
+	    		}
+	    		else if (nSymb == Symbol.Box || nSymb == Symbol.BoxOnGoal)
+	    		{
+	    			//check if push is possible
+	    			int dirX = neighbour.x - center.x;
+	    			int dirY = neighbour.y - center.y;
+	    			Point endLocation = new Point(neighbour.x + dirX, neighbour.y + dirY);
+	    			if (this.get(endLocation) == Symbol.Empty || this.get(endLocation) == Symbol.Goal)
+	    			{
+	    				//Generating new Board
+	    				HashMap<Point, Symbol> copyDynMap = new HashMap<Point, Symbol>(mObjects);
+	    				copyDynMap.remove(neighbour);
+	    				copyDynMap.put(endLocation, Symbol.Box);
+	    				
+	    				Point newPlayerPosition = new Point(neighbour);	//player ends up at the previous position of the crate
+	    				Board newBoard = new Board(copyDynMap, newPlayerPosition);
+	    				result.add(newBoard);
+	    			}
+	    		}
+    		}
+    	}
+    	return result;
+    }
+    
 }
