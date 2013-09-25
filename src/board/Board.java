@@ -47,7 +47,7 @@ public class Board implements Expandable<Board, Action>{
         this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
 	}
 	
-	protected Board(Board original) {
+	public Board(Board original) {
 		this.mObjects = new HashMap<>(original.mObjects);
 		this.playerPosition = original.playerPosition;
         this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
@@ -640,32 +640,20 @@ public class Board implements Expandable<Board, Action>{
     }
 
     /**
-     * @return A solved board which has boxes on every goal and the player in
-     * some unspecified position.
+     * 
+     * Gets the first empty point on this board.
+     * @return The first empty point on the board, or null if there are no such 
+     * points.
      */
-    public Board getSolvedBoard() {
-        Board solved = new Board(this);
-        throw new UnsupportedOperationException("Not implemented yet");
-//        List<Point> goalList = solved.getGoalPoints();
-//        if (goalList.size() != mObjects.size() - 1)
-//            throw new RuntimeException("The number of goals and boxes did not match while constructing a solved board.");
-//        for (Point p : mObjects.keySet()) {
-//            if (get(p) == Symbol.Player){
-//                // Ignore the player position
-//                continue;
-//            } else if (get(p) == Symbol.PlayerOnGoal) {
-//                moveElement(p, p);
-//            } else if (get(p) == Symbol.BoxOnGoal){
-//                // If this is a box on a goal, the goal is filled, so remove it
-//                // from the goal list and continue.
-//                goalList.remove(p);
-//                continue;
-//            }
-//                
-//            moveElement(p, goalList.remove(0));
-//        }
-//        
-//        return solved;
+    public Point getFirstEmpty(){
+        Symbol[][] boardState = StaticBoard.getInstance().grid;
+        for (int y = 0; y < boardState.length; y++) {
+            for (int x = 0; x < boardState[y].length; x++) {
+                if (boardState[y][x] == Symbol.Empty)
+                    return new Point(y,x);
+            }
+        }
+        return null;
     }
     
     /** 

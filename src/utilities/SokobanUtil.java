@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 
 import board.Board;
 import board.Symbol;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -111,6 +114,54 @@ public class SokobanUtil {
         else {
             return p2.x >= p1.x ? p1 : p2;
         }
+    }
+    
+    /**
+     * @return A solved board which has boxes on every goal and the player in
+     * some unspecified position.
+     */
+    public static Board getSolvedBoard(Board b) {
+        Board solved = new Board(b);
+        List<Point> goalList = new ArrayList<>(solved.getGoalPoints());
+        if (goalList.size() != solved.getDynamicObjects().size() - 1)
+            throw new RuntimeException("The number of goals and boxes did not match while constructing a solved board.");
+        // Map to store the pairs of points - cannot modify the mObjects set while
+        // going through it.
+        HashMap<Point, Point> pointMap = new HashMap<>();
+        if (solved.get(solved.getPlayerPosition()) == Symbol.PlayerOnGoal){
+            solved.moveElement(solved.getPlayerPosition(), solved.getFirstEmpty());
+        }
+        for (Point p : solved.getDynamicObjects().keySet()) {
+            if (goalList.isEmpty())
+                break;
+            System.out.println(p);
+            Symbol pointSymbol = solved.get(p);
+            if (pointSymbol == Symbol.Player){
+                // Ignore the player position
+//                System.out.println("player, ignoring");
+                continue;
+            } else if (pointSymbol == Symbol.BoxOnGoal){
+                // If this is a box on a goal, the goal is filled, so remove it
+                // from the goal list and continue.
+//                System.out.println("this object is a box on a goal.");
+                goalList.remove(p);
+                continue;
+            }
+            Point goal;
+            int i = -1;
+            // go through the goal list until we find one that is unoccupied.
+            while(solved.get((goal = goalList.get(++i))) == Symbol.BoxOnGoal);
+            // remove the unoccupied goal from the list
+            goalList.remove(i);
+//            System.out.println("putting box at " + p + " onto goal at " + goal);
+            // Move the box we are looking at onto the empty goal position.
+            pointMap.put(p, goal);
+        }
+        for (Point point : pointMap.keySet()) {
+            solved.moveElement(point, pointMap.get(point));
+        }
+        
+        return solved;
     }
 
 }

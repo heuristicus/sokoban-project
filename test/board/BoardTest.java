@@ -36,6 +36,7 @@ import exceptions.IllegalMoveException;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
+import utilities.TestUtil;
 
 /**
  *
@@ -48,21 +49,6 @@ public class BoardTest {
     public static final Map<String, String> inlineMaps = new HashMap<>();
     
     public BoardTest() {
-    }
-    
-    public Board initBoard(String mapName) {
-    	Path path = Paths.get(testMapDir, mapName);
-    	try {
-			return Board.read( Files.newBufferedReader(path, Charset.defaultCharset()));
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail("File not found: " + path.toAbsolutePath());
-			return null;
-		}
-    }
-    
-    public Board initBoardFromString(String map) {
-    	return Board.read(new BufferedReader(new StringReader(map)));
     }
     
     @BeforeClass
@@ -101,7 +87,7 @@ public class BoardTest {
     @Test
     public void testRead() throws IOException {
     	final String TEST_FILE = "readTest1.map";
-        Board board = initBoard(TEST_FILE);
+        Board board = TestUtil.initBoard(TEST_FILE);
         String referenceMap = new String(Files.readAllBytes(Paths.get(testMapDir, TEST_FILE)));
         assertEquals(referenceMap, board.toString());
     }
@@ -112,7 +98,7 @@ public class BoardTest {
     @Test
     public void testRead2() throws IOException {
     	final String TEST_FILE = "readTest2.map";
-        Board board = initBoard(TEST_FILE);
+        Board board = TestUtil.initBoard(TEST_FILE);
         assertEquals("Wrong player position", new Point(1,2), board.getPlayerPosition());
         Map<Point, Symbol> dynMap = new HashMap<>();
         dynMap.put(new Point(1,2), Symbol.PlayerOnGoal);
@@ -132,7 +118,7 @@ public class BoardTest {
     public void testReadStatic() throws IOException {
     	final String INPUT_TEST_FILE = "readTest1.map";
     	final String OUTPUT_TEST_FILE = "readTest1Static.map";
-        initBoard(INPUT_TEST_FILE);
+        TestUtil.initBoard(INPUT_TEST_FILE);
         String referenceMap = new String(Files.readAllBytes(Paths.get(testMapDir, OUTPUT_TEST_FILE)));
         assertEquals(referenceMap, StaticBoard.getInstance().toString());
     }
@@ -142,7 +128,7 @@ public class BoardTest {
      */
     @Test
     public void testMoveElement() {
-        Board board = initBoard("readTest1.map");
+        Board board = TestUtil.initBoard("readTest1.map");
         boolean result;
         Point from, to;
         
@@ -202,7 +188,7 @@ public class BoardTest {
      */
     @Test
     public void testApplyAction() throws Exception {
-    	Board board = initBoardFromString(inlineMaps.get("MAP_00"));
+    	Board board = TestUtil.initBoardFromString(BoardTest.inlineMaps.get("MAP_00"));
         Board result = board.applyAction(Action.UP, false);
         assertFalse(board.equals(result));
         assertEquals(Symbol.Empty, board.get(new Point(4,3)));
@@ -218,7 +204,7 @@ public class BoardTest {
      */
     @Test
     public void testApplyActionChained() throws Exception {
-    	Board board = initBoardFromString(inlineMaps.get("MAP_00"));
+    	Board board = TestUtil.initBoardFromString(BoardTest.inlineMaps.get("MAP_00"));
         Board result = board.applyActionChained(Arrays.asList(Action.UP, Action.RIGHT, Action.RIGHT, Action.UP, Action.UP, Action.LEFT, Action.DOWN, Action.LEFT, Action.LEFT, Action.UP, Action.LEFT, Action.LEFT, Action.DOWN, Action.RIGHT, Action.RIGHT, Action.RIGHT, Action.RIGHT, Action.LEFT, Action.DOWN, Action.DOWN, Action.RIGHT, Action.UP, Action.RIGHT, Action.UP, Action.DOWN, Action.LEFT, Action.LEFT, Action.UP, Action.RIGHT), true);
         assertEquals(result.toString(), inlineMaps.get("MAP_00_RESULT"));
     }
@@ -228,7 +214,7 @@ public class BoardTest {
      */
     @Test
     public void testGetFreeNeighbours() {
-        Board board = initBoard("freeNeighboursTest.map");
+        Board board = TestUtil.initBoard("freeNeighboursTest.map");
         List<Point> expected, result;
 
         // Box in top left corner
@@ -252,7 +238,7 @@ public class BoardTest {
      */
     @Test
     public void testGetMapBoxAccessPoints() {
-        Board board = initBoard("readTest1.map");
+        Board board = TestUtil.initBoard("readTest1.map");
         Map<Point, List<Point>> expResult = new HashMap<>();
         expResult.put(new Point(1,1), Arrays.asList(new Point(2,1), new Point(1,2)));
         expResult.put(new Point(3,1), Arrays.asList(new Point(2,1), new Point(3,2), new Point(4,1)));
@@ -271,7 +257,7 @@ public class BoardTest {
      */
     @Test
     public void testGetBoxAccessPoints() {
-    	Board board = initBoard("readTest1.map");
+    	Board board = TestUtil.initBoard("readTest1.map");
         Set<Point> expResult = new HashSet<>(Arrays.asList(
         		new Point(2,1), new Point(1,2), new Point(3,2), new Point(4,1)));
         Set<Point> result = board.getBoxAccessPoints();
@@ -284,7 +270,7 @@ public class BoardTest {
      */
     @Test
     public void testIsBoxLockedAtPoint() {
-        Board tb = initBoard("boardTestLocked.map");
+        Board tb = TestUtil.initBoard("boardTestLocked.map");
         
         // True cases - the box should be considered blocked
         // top left corner - completely walled in
@@ -315,8 +301,8 @@ public class BoardTest {
      */
     @Test
     public void testExpand() {
-        Board blocked = initBoard("boardTestExpandBlocked.map");
-        Board surrounded = initBoard("boardTestExpandSurrounded.map");
+        Board blocked = TestUtil.initBoard("boardTestExpandBlocked.map");
+        Board surrounded = TestUtil.initBoard("boardTestExpandSurrounded.map");
         // List of files containing expected expansion of blocked state
         String fileListBlocked[] = {"bs1.map", "bs2.map", "bs3.map"};
         // List of files containig expansion of surrounded state
@@ -327,10 +313,10 @@ public class BoardTest {
         	
         // Initialise the expected boards from file
         for (String fname : fileListBlocked) {
-            blockedExpected.add(initBoard(fname));
+            blockedExpected.add(TestUtil.initBoard(fname));
         }
         for (String fname : fileListSurrounded) {
-            surroundedExpected.add(initBoard(fname));
+            surroundedExpected.add(TestUtil.initBoard(fname));
         }
         
         // Get the results of the expansion of each board
@@ -360,8 +346,8 @@ public class BoardTest {
     
     @Test
     public void testEquals(){
-        Board b1 = initBoard("boardTestEq1.map");
-        Board b2 = initBoard("boardTestEq2.map");
+        Board b1 = TestUtil.initBoard("boardTestEq1.map");
+        Board b2 = TestUtil.initBoard("boardTestEq2.map");
         
         assertTrue(b1.equals(b2));
         assertTrue(b2.equals(b1));
@@ -377,9 +363,9 @@ public class BoardTest {
     public void testPrepareNextBoxMove() throws IllegalMoveException {
     	final String INPUT_TEST_FILE = "searchTestStart.map";
     	final String OUTPUT_TEST_FILE = "searchTestIntermediate1.map";
-        Board start = initBoard(INPUT_TEST_FILE);
+        Board start = TestUtil.initBoard(INPUT_TEST_FILE);
         start.prepareNextBoxMove(Action.RIGHT, new Point(4,2), true);
-        assertEquals(start, initBoard(OUTPUT_TEST_FILE));
+        assertEquals(start, TestUtil.initBoard(OUTPUT_TEST_FILE));
         
     }
     
@@ -387,8 +373,8 @@ public class BoardTest {
     public void testBuildFullPath() throws IllegalMoveException {
     	final String INPUT_TEST_FILE = "searchTestStart.map";
     	final String OUTPUT_TEST_FILE = "searchTestGoal.map";
-        Board board = initBoard(INPUT_TEST_FILE);
-        Board expectedResult = initBoard(OUTPUT_TEST_FILE);
+        Board board = TestUtil.initBoard(INPUT_TEST_FILE);
+        Board expectedResult = TestUtil.initBoard(OUTPUT_TEST_FILE);
         List<BoxMovement> boxActions = Arrays.asList(
         		new BoxMovement(Action.RIGHT, new Point(4,2)),
         		new BoxMovement(Action.RIGHT, new Point(5,2)),
@@ -412,7 +398,7 @@ public class BoardTest {
     
     @Test
     public void testGetAccessiblePoints(){
-        Board accTest = initBoard("boardTestAccessible.map");
+        Board accTest = TestUtil.initBoard("boardTestAccessible.map");
         String pl = null, tr = null, bl = null, tl = null;
         try {
             pl = SokobanUtil.readMapAsString(testMapDir + "boardTestAccessiblePL.map");
@@ -426,26 +412,22 @@ public class BoardTest {
         }
         
         List<Point> playerAccess = accTest.getAccessiblePoints(accTest.getPlayerPosition());
-        System.out.println(playerAccess.get(0));
         assertEquals("Expected top left position did not match received", new Point(4,1), playerAccess.get(0));
         assertTrue(pl.equals(accTest.toStringMarked(playerAccess)));
         
 //        System.out.println("Player accessible points");
 //        System.out.println(accTest.toStringMarked(playerAccess));
         List<Point> topRight = accTest.getAccessiblePoints(new Point(10,3));
-        System.out.println(topRight.get(0));
         assertEquals("Expected top left position did not match received", new Point(7,1), topRight.get(0));
         assertTrue(tr.equals(accTest.toStringMarked(topRight)));
 //        System.out.println("Top right block accessible");
 //        System.out.println(accTest.toStringMarked(topRight));
         List<Point> bottomLeft = accTest.getAccessiblePoints(new Point(1,5));
-        System.out.println(bottomLeft.get(0));
         assertEquals("Expected top left position did not match received", new Point(1,4), bottomLeft.get(0));
         assertTrue(bl.equals(accTest.toStringMarked(bottomLeft)));
 //        System.out.println("Bottom left accessible");
 //        System.out.println(accTest.toStringMarked(bottomLeft));
         List<Point> topLeft = accTest.getAccessiblePoints(new Point(1,1));
-        System.out.println(topLeft.get(0));
         assertEquals("Expected top left position did not match received", new Point(1,1), topLeft.get(0));
         assertTrue(tl.equals(accTest.toStringMarked(topLeft)));
 //        System.out.println("Top left accessible");
@@ -454,7 +436,7 @@ public class BoardTest {
     
     @Test
     public void testGetBoxPushableDirections(){
-        Board b = initBoard("boardTestPushable.map");
+        Board b = TestUtil.initBoard("boardTestPushable.map");
         HashMap<Point, List<Action>> expected = new HashMap<>();
         // point 1,1 in corner - not pushable
 //        expected.put(new Point(1,1), new ArrayList<Action>());
