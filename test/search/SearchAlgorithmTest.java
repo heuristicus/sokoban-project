@@ -25,17 +25,17 @@ import board.Board;
  */
 public class SearchAlgorithmTest {
     
-    SearchMethod<Board, Action> aStar;
-    SearchMethod<Board, Action> noDupBFS;
-    SearchMethod<Board, Action> BFS;
+    SearchMethod aStar;
+    SearchMethod noDupBFS;
+    SearchMethod BFS;
     Board testMapStart;
     Board testMapGoal;
     Board testMapIntermediate1;
         
     public SearchAlgorithmTest() {
-        aStar = new AStar<>(new DiagonalDistanceHeuristic());
-        noDupBFS = new BreadthFirstSearchNoDuplication<>();
-        BFS = new BreadthFirstSearch<>();
+        aStar = new AStar(new DiagonalDistanceHeuristic());
+        noDupBFS = new BreadthFirstSearchNoDuplication();
+        BFS = new BreadthFirstSearch();
         testMapStart = SokobanUtil.readMap("./maps/test/searchTestStart.map");
         testMapGoal = SokobanUtil.readMap("./maps/test/searchTestGoal.map");
         testMapIntermediate1 = SokobanUtil.readMap("./maps/test/searchTestIntermediate1.map");

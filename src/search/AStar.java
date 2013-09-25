@@ -4,11 +4,13 @@
  */
 package search;
 
+import board.Board;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import utilities.SokobanUtil.Action;
 
 
 /**
@@ -21,24 +23,24 @@ import java.util.Queue;
  * @param <U> A type (usually an enum) which specifies the actions that can be
  * applied to the T type
  */
-public class AStar<T extends Expandable<T, U>, U> extends SearchMethod<T, U>{
+public class AStar extends SearchMethod {
 
-    Heuristic<T> h;
+    Heuristic<Board> h;
     
     /**
      * Basic constructor
      * @param h The heuristic to use for state evaluation
      */
-    public AStar(Heuristic<T> h){
+    public AStar(Heuristic<Board> h){
         this.h = h;
     }
     
     @Override
-    public ArrayList<U> findPath(T start, T goal) {
+    public ArrayList<Action> findPath(Board start, Board goal) {
         // Store already visited nodes
-        HashSet<SearchNode<T,U>> closed = new HashSet<>();
+        HashSet<SearchNode<Board,Action>> closed = new HashSet<>();
         // Store as yet unvisited nodes in a priority queue - we expand from the best
-        Queue<SearchNode<T,U>> open = new PriorityQueue<>();
+        Queue<SearchNode<Board,Action>> open = new PriorityQueue<>();
         
         // Add the start state as a node with zero path cost
         open.add(new SearchNode<>(start, null, null, 0, h.utility(start, goal)));
@@ -53,7 +55,7 @@ public class AStar<T extends Expandable<T, U>, U> extends SearchMethod<T, U>{
 //            for (SearchNode<T, U> searchNode : closed) {
 //                System.out.println(searchNode);
 //            }
-            SearchNode<T,U> front = open.remove(); // The best node in the queue
+            SearchNode<Board,Action> front = open.remove(); // The best node in the queue
             // If front is the goal, return the action sequence.
 //            System.out.println("Checking goal state");
             if (front.nodeState.equals(goal)){
@@ -68,17 +70,17 @@ public class AStar<T extends Expandable<T, U>, U> extends SearchMethod<T, U>{
                 closed.add(front);
             }
             
-            ArrayList<SearchNode<T,U>> successors = front.expand();
-            for (SearchNode<T, U> successor : successors) {
+            ArrayList<SearchNode<Board,Action>> successors = front.expand();
+            for (SearchNode<Board,Action> successor : successors) {
 //                System.out.println("Examining successor of front node");
 //                System.out.println(successor);
                 // Look through the open list to see if the successor is
                 // already present
-                Iterator<SearchNode<T,U>> it = open.iterator();
+                Iterator<SearchNode<Board,Action>> it = open.iterator();
 //                System.out.println("Checking open list to see if it contains the successor.");
                 boolean inOpen = false;
                 while(it.hasNext()){
-                    SearchNode<T,U> element = it.next();
+                    SearchNode<Board,Action> element = it.next();
 //                    try {
 //                        Thread.sleep(1000);
 //                    } catch (InterruptedException ex) {

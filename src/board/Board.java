@@ -713,7 +713,7 @@ public class Board implements Expandable<Board, Action>{
     	boolean doubleCheck = true; // Double check mode: actually execute all the steps before adding them to the list.
     	
     	
-    	SearchMethod<Board, Action> aStar = new AStar<>(new DiagonalDistanceHeuristic());
+    	SearchMethod aStar = new AStar(new DiagonalDistanceHeuristic());
     	List<Action> completeActionList = new ArrayList<>();
     	for (BoxMovement bm : boxActions) { // loop through all the box actions
     		// Get the board state after that action.

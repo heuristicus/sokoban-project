@@ -18,14 +18,14 @@ import board.Board;
  */
 public class Pathfinding {
 
-    SearchMethod<Board, Action> search;
+    SearchMethod search;
     
     /**
      * Creates a pathfinding object which uses the given search method for all
      * searches.
      * @param search A search method which can find a path between two points.
      */
-    public Pathfinding(SearchMethod<Board, Action> search) {
+    public Pathfinding(SearchMethod search) {
         this.search = search;
     }
         

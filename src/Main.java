@@ -113,7 +113,7 @@ public class Main {
         
         System.out.println("BFS finding solution for initial map");
         System.out.println(start);
-        SearchMethod<Board,Action> bfs = new BreadthFirstSearchNoDuplication<>();
+        SearchMethod bfs = new BreadthFirstSearchNoDuplication();
         ArrayList<Action> path = bfs.findPath(start, goal);
 
         if (path != null){
@@ -134,7 +134,7 @@ public class Main {
         System.out.println(startas);
         
         // Essentially does DFS!
-        SearchMethod<Board,Action> astar = new AStar<>(new ManhattanHeuristic());
+        SearchMethod astar = new AStar(new ManhattanHeuristic());
         
         ArrayList<Action> pathas = astar.findPath(startas, goalas);
 

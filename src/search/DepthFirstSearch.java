@@ -4,26 +4,26 @@
  */
 package search;
 
+import board.Board;
 import java.util.ArrayList;
 import java.util.Stack;
+import utilities.SokobanUtil.Action;
 
 /**
  *
  * @author michal
- * @param <T> 
- * @param <U> 
  */
-public class DepthFirstSearch<T extends Expandable<T,U>, U> extends SearchMethod<T,U> {
+public class DepthFirstSearch extends SearchMethod {
     
     @Override
-    public ArrayList<U> findPath(T start, T goal) {
-        Stack<SearchNode<T,U>> list = new Stack<>();
+    public ArrayList<Action> findPath(Board start, Board goal) {
+        Stack<SearchNode<Board,Action>> list = new Stack<>();
         if (start == null || goal == null){
             return null;
         }
         list.add(new SearchNode<>(start, null, null));
         while(!list.empty()){
-            SearchNode<T,U> top = list.pop(); // Look at the top node on the stack
+            SearchNode<Board,Action> top = list.pop(); // Look at the top node on the stack
             if (goal.equals(top.nodeState)){ // Check if top is the goal
                 return top.actionUnwind(); // Goal, so backtrace the path to get to it
             } else { // Not the goal, expand the node and push onto the stack

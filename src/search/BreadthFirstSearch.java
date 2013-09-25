@@ -4,28 +4,28 @@
  */
 package search;
 
+import board.Board;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import utilities.SokobanUtil.Action;
 
 
 
 /**
  * 
  * @author michal
- * @param <T>
- * @param <U> 
  */
-public class BreadthFirstSearch<T extends Expandable<T,U>, U> extends SearchMethod<T,U> {
+public class BreadthFirstSearch extends SearchMethod {
 
     @Override
-    public ArrayList<U> findPath(T start, T goal) {
-        Queue<SearchNode<T,U>> list = new LinkedList<>();
+    public ArrayList<Action> findPath(Board start, Board goal) {
+        Queue<SearchNode<Board,Action>> list = new LinkedList<>();
         if (start == null || goal == null)
             return null;
         list.add(new SearchNode<>(start, null, null)); // Put the initial state onto the queue
         while(!list.isEmpty()){
-            SearchNode<T,U> front = list.remove();
+            SearchNode<Board,Action> front = list.remove();
             if(goal.equals(front.getNodeState())){ // Check if the popped node is the goal state
                 return front.actionUnwind(); // If so, return the list of actions taken to get to this point
             } else { // Front node is not the goal
