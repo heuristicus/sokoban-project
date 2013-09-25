@@ -48,8 +48,8 @@ public class Board implements Expandable<Board, Action>{
 	}
 	
 	public Board(Board original) {
-		this.mObjects = new HashMap<>(original.mObjects);
-		this.playerPosition = original.playerPosition;
+		this.mObjects = new HashMap<>(original.mObjects);		//TODO is a shallow copy enough?
+		this.playerPosition = new Point(original.playerPosition);
         this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
 	}
 
