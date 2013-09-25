@@ -33,6 +33,8 @@ import org.junit.Test;
 
 import pathfinding.BoxMovement;
 import exceptions.IllegalMoveException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
@@ -349,14 +351,45 @@ public class BoardTest {
         Board b1 = TestUtil.initBoard("boardTestEq1.map");
         Board b2 = TestUtil.initBoard("boardTestEq2.map");
         
-        assertTrue(b1.equals(b2));
-        assertTrue(b2.equals(b1));
+        assertFalse(b1.equals(b2));
+        assertFalse(b2.equals(b1));
         Board b3 = new Board(b1);
         b3.moveElement(new Point(2,3), new Point(2,4));
         System.out.println(b1);
         System.out.println(b3);
         assertFalse(b1.equals(b3));
         assertFalse(b2.equals(b3));
+        assertTrue(b1.equals(b1));
+        assertTrue(b2.equals(b2));
+        assertTrue(b3.equals(b3));
+    }
+    
+    @Test
+    public void testEqualsIgnorePlayer(){
+        Board b1 = TestUtil.initBoard("boardTestEqFill1.map");
+        Board b2 = TestUtil.initBoard("boardTestEqFill2.map");
+        Board b3 = TestUtil.initBoard("boardTestEqFill3.map");
+        Board b4 = TestUtil.initBoard("boardTestEqFill4.map");
+        Board b5 = TestUtil.initBoard("boardTestEqFill5.map");
+        
+        Board b1a = null;
+        try {
+            b1a = b1.applyAction(Action.UP, false);
+        } catch (IllegalMoveException ex) {
+        }
+        
+        System.out.println(b1.getAccessiblePoints(b1.getPlayerPosition()).get(0));
+        System.out.println(b1a.getAccessiblePoints(b1a.getPlayerPosition()).get(0));
+        System.out.println(b1.toStringMarked(b1.getAccessiblePoints(b1.getPlayerPosition())));
+        System.out.println(b1a.toStringMarked(b1a.getAccessiblePoints(b1a.getPlayerPosition())));
+        System.out.println(b2.toStringMarked(b2.getAccessiblePoints(b2.getPlayerPosition())));
+        
+        assertFalse(b1.equalsIgnorePlayer(b2));
+        assertTrue(b1.equalsIgnorePlayer(b1a));
+        assertFalse(b1.equalsIgnorePlayer(b3));
+        assertFalse(b2.equalsIgnorePlayer(b3));
+        assertFalse(b1.equalsIgnorePlayer(b4));
+        assertTrue(b4.equalsIgnorePlayer(b5));
     }
     
     @Test
@@ -393,7 +426,7 @@ public class BoardTest {
         		Action.RIGHT, Action.RIGHT, Action.RIGHT), actions);
         
         // TODO: equals still doesn't properly ignore the player's position
-        assertEquals(expectedResult, board);
+        assertTrue(expectedResult.equalsIgnorePlayer(board));
     }
     
     @Test

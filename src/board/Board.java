@@ -579,25 +579,17 @@ public class Board implements Expandable<Board, Action>{
         if (obj instanceof Board){
             Board comp = (Board)obj;
             
-//            System.out.println("Checking whether board");
-//            System.out.println(comp.toString());
-//            System.out.println("is equal to this:");
-//            System.out.println(this.toString());
-            
             Map<Point, Symbol> compObjects = comp.getDynamicObjects();
             Map<Point, Symbol> thisObjects = this.getDynamicObjects();
             // If one of the dynamic maps has more objects than the other, they
             // cannot be the same.
             if (compObjects.size() != thisObjects.size()){
-//                System.out.println("The number of dynamic objects are different - the map cannot be the same. Returning false.");
                 return false;
             }
             
             for (Point p : thisObjects.keySet()) {
                 Symbol thisSymbol = thisObjects.get(p);
-                // Ignore the player in the check
-//                if (thisSymbol == Symbol.Player || thisSymbol == Symbol.PlayerOnGoal)
-//                    continue;
+
                 // Get the symbol at the point on this board
                 Symbol compSymbol = compObjects.get(p);
                 if (compSymbol != null && thisSymbol == compSymbol)
@@ -606,17 +598,67 @@ public class Board implements Expandable<Board, Action>{
                 // If the dynamic map of the compared board does not contain the
                 // point we are looking at, or the symbols do not match, then
                 // the boards are not equal.
-//                System.out.println("The dynamic map of the compared object did not contain a point in the dynamic map of this object. Returning false.");
                 return false;
             }
             
             // If we get through the whole keySet without returning, then they
             // contain the same keys
-//            System.out.println("All keys match! Returning true.");
             return true;
         }
         // obj is not an instance of Board.
-//        System.out.println("Not a board. Returning false.");
+        return false;
+    }
+    
+    /**
+     * Checks the equality of this and another object. This method ignores the 
+     * exact position of the player and instead takes into account only the player's
+     * reachable area. The player is represented by the the top left most position
+     * in this area. If both boards have the same for this position and all the
+     * boxes are also in the same position, the boards are considered equal.
+     * @param obj An object to which to compare this board.
+     * @return Whether the two objects are equivalent.
+     */
+    public boolean equalsIgnorePlayer(Object obj){
+        if (obj instanceof Board){
+            Board comp = (Board)obj;
+            System.out.println("comparing ignore player");
+            // The top left positions accessible to the player must be the same
+            // if the boards are to be equal.
+            if (!this.topLeftPosition.equals(comp.topLeftPosition))
+                return false;
+            System.out.println("Top left positions match");
+            Map<Point, Symbol> compObjects = comp.getDynamicObjects();
+            Map<Point, Symbol> thisObjects = this.getDynamicObjects();
+            // If one of the dynamic maps has more objects than the other, they
+            // cannot be the same.
+            if (compObjects.size() != thisObjects.size()){
+                return false;
+            }
+            System.out.println("Dynamic map sizes match");
+            for (Point p : thisObjects.keySet()) {
+                Symbol thisSymbol = thisObjects.get(p);
+                // Ignore the player in the check
+                if (thisSymbol == Symbol.Player || thisSymbol == Symbol.PlayerOnGoal)
+                    continue;
+                System.out.println("symbol is not player");
+                // Get the symbol at the point on this board
+                Symbol compSymbol = compObjects.get(p);
+                if (compSymbol != null && thisSymbol == compSymbol)
+                    continue; // The symbols at the two points match
+                System.out.println("symbols at point do not match");
+                // If the dynamic map of the compared board does not contain the
+                // point we are looking at, or the symbols do not match, then
+                // the boards are not equal.
+                return false;
+            }
+            System.out.println("all keys matched.");
+            // If we get through the whole keySet without returning, then they
+            // contain the same keys
+            return true;
+        }
+        
+        System.out.println("non-board object");
+        // obj is not an instance of Board.
         return false;
     }
     
