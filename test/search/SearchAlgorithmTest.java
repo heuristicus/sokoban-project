@@ -49,7 +49,6 @@ public class SearchAlgorithmTest {
         aStarPlayerPath = new AStar(new DiagonalDistanceHeuristic());
         aStarBoxPath = new AStar(new ManhattanClosestHeuristic());
         noDupBFS = new BFSNoDuplication();
-        BFS = new BreadthFirstSearch();
         testMapStart = TestUtil.initBoard("searchTestStart.map");
         testMapGoal = TestUtil.initBoard("searchTestGoal.map");
         testMapIntermediate1 = TestUtil.initBoard("searchTestIntermediate1.map");
