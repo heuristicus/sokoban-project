@@ -36,7 +36,7 @@ public class Board {
     private static final Action pushableTestDirections[] = {Action.UP, Action.LEFT};
 	private final Map<Point, Symbol> mObjects;
 	private Point playerPosition;
-	public List<List<Point>> availablePosition;
+	public List<List<Point>> availablePosition  = new ArrayList<List<Point>>();
     // Top left most position accessible from the player position.
     private Point topLeftPosition;
 
@@ -301,40 +301,27 @@ public class Board {
 			newBoard = new Board(this);
 		}
 
-		
-
+		System.out.println(a.toString());
+		System.out.println(Goal.toString());
 		Point destination = SokobanUtil.applyActionToPoint(a, Goal);
 		Symbol destObject = newBoard.get(destination);
-		if((!destObject.isWalkable)||(!(newBoard.get(SokobanUtil.applyActionToPoint(a, destination)).isWalkable))){
+		System.out.println(destObject.toString());
+		if (((!destObject.equals(Symbol.BoxOnGoal)) && (!destObject.isWalkable))) {
+			System.out.println("Cannot be reached");
 			throw new IllegalMoveException("Cannot be reached");
-		}else{
+		} else {
+			Point onestepmore = SokobanUtil.applyActionToPoint(a, destination);
+			Symbol onestepmoreObject = newBoard.get(onestepmore);
+			if (((!onestepmoreObject.equals(Symbol.BoxOnGoal)) && (!onestepmoreObject.isWalkable))) {
+				System.out.println("Cannot be reached as deadlock");
+				throw new IllegalMoveException("Cannot be reached");
+			}
+
 			newBoard.moveElement(Goal, destination);
 		}
 
 		return newBoard;
-	}
-	/**
-	 * Applies a series of actions to the board
-	 * 
-	 * @param aList
-	 *            A list of actions to apply
-	 * @param destructive
-	 *            If true, modify the board state, otherwise use a clone.
-	 * @return A board with all actions in the actionList applied.
-	 */
-	public Board applyActionChained(List<Action> actionList,
-			boolean destructive) throws IllegalMoveException {
-		Board newBoard = destructive ? this : new Board(this);
-
-		for (Action action : actionList) {
-			// Don't care about modifying board state anymore, so use the
-			// destructive method
-			newBoard.applyAction(action, true);
-		}
-
-		return newBoard;
-	}
-	
+	}	
 	public Board reverseAction(Action a, boolean destructive) throws IllegalMoveException {
 		Board newBoard = destructive ? this : new Board(this);
 
