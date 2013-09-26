@@ -554,12 +554,14 @@ public class Board {
     
     public ArrayList<SearchNode> expandBoardSpace(SearchNode parent){
         ArrayList<BoardAction> actions = new ArrayList<BoardAction>();
-        ArrayList<Board> boards = generateChildStates(actions);
+        ArrayList<Integer> costs = new ArrayList<Integer>();
+        
+        ArrayList<Board> boards = generateChildStates(actions,costs);
         
     	ArrayList<SearchNode> nodes = new ArrayList<SearchNode>();
     	for (int i=0 ; i<boards.size() ; i++)
     	{
-    		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), true));
+    		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), costs.get(i), true));
     	}
     	return nodes;
     }
@@ -754,29 +756,44 @@ public class Board {
      * Checks if the box is reachable, and if the move is valid.
      * @return List of boards that can be resulting from this state.
      * @param rRelatedBoxMovements if not null, will be filled with the BoxMovements that led to the child states.
+     * @param rRelatedCosts if not null, will be filled with the cost (player moves count) to reach each child state.
      */
-    public ArrayList<Board> generateChildStates(ArrayList<BoardAction> rRelatedBoxMovements)
+    public ArrayList<Board> generateChildStates(ArrayList<BoardAction> rRelatedBoxMovements, ArrayList<Integer> rRelatedCosts)
     {  	
+    	class PointAndCost
+    	{
+    		Point point;
+    		int cost;
+    		public PointAndCost(Point point, int cost)
+    		{
+    			this.point = point;
+    			this.cost = cost;
+    		}
+    	}
+    	
+    	
     	ArrayList<Board> result = new ArrayList<Board>();
     	
     	//initialise openList with playerPosition.
     	//Visitable positions will go through openList and end up in closedList (used to avoid
-    	LinkedList<Point> openList = new LinkedList<Point>();
-    	LinkedList<Point> closedList = new LinkedList<Point>();
-    	openList.add(playerPosition);
+    	LinkedList<PointAndCost> openList = new LinkedList<PointAndCost>();
+    	LinkedList<PointAndCost> closedList = new LinkedList<PointAndCost>();
+    	
+    	PointAndCost start = new PointAndCost(playerPosition, 0);
+    	openList.add(start);
     	
     	
     	while (!openList.isEmpty())
     	{
-    		Point center = openList.removeFirst();
+    		PointAndCost center = openList.removeFirst();
     		closedList.add(center);
     		
     		Point[] neighbours = new Point[4];
     		
-    		neighbours[0] = new Point(center.x-1, center.y-1);
-    		neighbours[1] = new Point(center.x-1, center.y+1);
-    		neighbours[2] = new Point(center.x+1, center.y-1);
-    		neighbours[3] = new Point(center.x+1, center.y+1);
+    		neighbours[0] = new Point(center.point.x-1, center.point.y-1);
+    		neighbours[1] = new Point(center.point.x-1, center.point.y+1);
+    		neighbours[2] = new Point(center.point.x+1, center.point.y-1);
+    		neighbours[3] = new Point(center.point.x+1, center.point.y+1);
     		
     		for (Point neighbour : neighbours)
     		{
@@ -786,14 +803,15 @@ public class Board {
 	    			//adding open neighbour only if not visited and not already in openList
 	    			if (!openList.contains(neighbour) && closedList.contains(neighbour))
 	    			{
-	        			openList.add(neighbour);
+	    				PointAndCost newPointAndCost = new PointAndCost(neighbour, center.cost+1);
+	        			openList.addLast(newPointAndCost);
 	    			}
 	    		}
 	    		else if (nSymb == Symbol.Box || nSymb == Symbol.BoxOnGoal)
 	    		{
 	    			//check if push is possible
-	    			int dirX = neighbour.x - center.x;
-	    			int dirY = neighbour.y - center.y;
+	    			int dirX = neighbour.x - center.point.x;
+	    			int dirY = neighbour.y - center.point.y;
 	    			Point endLocation = new Point(neighbour.x + dirX, neighbour.y + dirY);
 	    			if (this.get(endLocation) == Symbol.Empty || this.get(endLocation) == Symbol.Goal)
 	    			{
@@ -817,6 +835,11 @@ public class Board {
 	    						action = Action.UP;
 	    					BoardAction move = new BoardAction(action, neighbour);
 	    					rRelatedBoxMovements.add(move);
+	    				}
+	    				
+	    				if(rRelatedCosts != null)
+	    				{
+	    					rRelatedCosts.add(new Integer(center.cost+1));
 	    				}
 	    			}
 	    		}
