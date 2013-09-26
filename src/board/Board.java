@@ -749,13 +749,25 @@ public class Board {
     	return completeActionList;
     }
     
+    
+    /**
+     * empty method that WILL generate all possible BoardStates :)
+     * @return
+     */
+    public LinkedList<Board> generateChildStates()
+    {
+    	return new LinkedList<Board>();
+    }
+    
+    
+    
     /**
      * Returns a list of Boards that are the results of the possible moves regarding the player and the crates position.
      * A new state means that a box has been moved and that the player position has changed.
      * Checks if the box is reachable, and if the move is valid.
      * @return List of boards that can be resulting from this state.
      */
-    public LinkedList<Board> generateChildStates()
+    private LinkedList<Board> generateChildStatesAux()
     {  	
     	LinkedList<Board> result = new LinkedList<Board>();
     	
