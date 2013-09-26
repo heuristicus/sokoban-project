@@ -8,7 +8,7 @@ import board.Board;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import utilities.SokobanUtil.Action;
+import pathfinding.BoardAction;
 
 
 
@@ -19,7 +19,7 @@ import utilities.SokobanUtil.Action;
 public class BreadthFirstSearch extends SearchMethod {
 
     @Override
-    public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
+    public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
         Queue<SearchNode> list = new LinkedList<>();
         if (start == null || goal == null)
             return null;

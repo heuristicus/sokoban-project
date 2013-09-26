@@ -6,7 +6,7 @@ package search;
 
 import board.Board;
 import java.util.ArrayList;
-import utilities.SokobanUtil.Action;
+import pathfinding.BoardAction;
 
 
 // T is something which represents the state of the node, U is the set of actions
@@ -23,7 +23,7 @@ public class SearchNode implements Comparable<SearchNode>{
     protected Float pathCost;
     protected Float estimatedCost;
     protected Board nodeState;
-    protected Action generatingAction;
+    protected BoardAction generatingAction;
     protected SearchNode parent;
     protected boolean boardSpaceExpansion;
     
@@ -39,7 +39,7 @@ public class SearchNode implements Comparable<SearchNode>{
      * expansion or a board space expansion. This defines which method of the board class is used
      * when the equals method of this class is called.
      */
-    public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, boolean boardSpaceExpansion) {
+    public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
@@ -59,7 +59,7 @@ public class SearchNode implements Comparable<SearchNode>{
      * expansion or a board space expansion. This defines which method of the board class is used
      * when the equals method of this class is called.
      */
-     public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, float pathCost, boolean boardSpaceExpansion) {
+     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, float pathCost, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
@@ -82,7 +82,7 @@ public class SearchNode implements Comparable<SearchNode>{
      * expansion or a board space expansion. This defines which method of the board class is used
      * when the equals method of this class is called.
      */
-     public SearchNode(Board nodeState, SearchNode parent, Action generatingAction, float pathCost, float estimatedCost, boolean boardSpaceExpansion) {
+     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, float pathCost, float estimatedCost, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
@@ -116,16 +116,16 @@ public class SearchNode implements Comparable<SearchNode>{
       * Get the path taken to reach the given node by following the parent nodes
       * until a null pointer is found - this indicates the root of the tree.
       */
-     public ArrayList<Action> actionUnwind(){
+     public ArrayList<BoardAction> actionUnwind(){
          if (this.parent == null){
              // Base case. If the parent is null we reach the initial state.
              // Construct a path vector and then return the empty vector.
-             ArrayList<Action> path = new ArrayList<>();
+             ArrayList<BoardAction> path = new ArrayList<>();
              return path;
          } else {
              // Recursive case. Get the unwound path from the parent and then
              // push the action to get to this node onto the path.
-             ArrayList<Action> path = this.parent.actionUnwind();
+             ArrayList<BoardAction> path = this.parent.actionUnwind();
              path.add(this.generatingAction);
              return path;
          }

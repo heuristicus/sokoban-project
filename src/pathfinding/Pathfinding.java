@@ -36,7 +36,7 @@ public class Pathfinding {
      * @return Arraylist of actions which need to be taken to get from the start
      * state to the goal.
      */
-    public ArrayList<Action> pointToPointPath(Board start, Board goal, boolean boardSpace){
+    public ArrayList<BoardAction> pointToPointPath(Board start, Board goal, boolean boardSpace){
         return search.findPath(start, goal, boardSpace);
     }
     
@@ -48,7 +48,7 @@ public class Pathfinding {
      * get from the start state to a given goal state. Goal states which were not
      * reachable are not included in the hashmap.
      */
-    public static HashMap<Board, ArrayList<Action>> pointToMultiPointPath(Board start, ArrayList<Board> goals){
+    public static HashMap<Board, ArrayList<BoardAction>> pointToMultiPointPath(Board start, ArrayList<Board> goals){
         return MultiGoalBFS.findPath(start, goals);
     }
     

@@ -16,11 +16,10 @@ import utilities.SokobanUtil.Action;
 import board.Board;
 import board.StaticBoard;
 import exceptions.IllegalMoveException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import pathfinding.BoardAction;
 import search.AStar;
 import search.ManhattanClosestHeuristic;
-import search.ManhattanHeuristic;
+import search.MinMatchingHeuristic;
 
 
 public class Main {
@@ -34,9 +33,9 @@ public class Main {
 //        System.out.println(start);
         SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
         Board goal = SokobanUtil.getSolvedBoard(start);
-        ArrayList<Action> pathas = astar.findPath(start, goal, false);
+        ArrayList<BoardAction> pathas = astar.findPath(start, goal, false);
 
-        System.out.print(SokobanUtil.actionListAsString(pathas));
+        System.out.print(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
 //        Board solved = null;
 //        try {
 //            solved = start.applyActionChained(pathas, false);
@@ -119,11 +118,11 @@ public class Main {
         System.out.println("BFS finding solution for initial map");
         System.out.println(start);
         SearchMethod bfs = new BFSNoDuplication();
-        ArrayList<Action> path = bfs.findPath(start, goal, false);
+        ArrayList<BoardAction> path = bfs.findPath(start, goal, false);
 
         if (path != null){
             System.out.println("BFS completed, path length " + path.size());
-            System.out.println(SokobanUtil.actionListAsString(path));
+            System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(path)));
         } else {
             System.out.println("BFS could not find path.");
         }
@@ -138,11 +137,11 @@ public class Main {
         // Essentially does DFS!
         SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
         
-        ArrayList<Action> pathas = astar.findPath(startas, goalas, false);
+        ArrayList<BoardAction> pathas = astar.findPath(startas, goalas, false);
 
         if (pathas != null){
             System.out.println("astar completed, path length " + pathas.size());
-            System.out.println(SokobanUtil.actionListAsString(pathas));
+            System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
         } else {
             System.out.println("astar could not find path.");
         }

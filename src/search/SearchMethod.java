@@ -2,7 +2,7 @@ package search;
 
 import board.Board;
 import java.util.ArrayList;
-import utilities.SokobanUtil.Action;
+import pathfinding.BoardAction;
 
 
 // T is an object which is used to represent the state. U should represent the set of actions which can be taken
@@ -28,6 +28,6 @@ public abstract class SearchMethod
      * to teleport, and so the individual motions of the player are considered.
      * @return A path from the start state to the goal state, in reverse order.
      */
-    public abstract ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace);
+    public abstract ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace);
 
 }

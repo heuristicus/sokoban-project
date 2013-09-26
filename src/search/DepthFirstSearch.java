@@ -7,7 +7,7 @@ package search;
 import board.Board;
 import java.util.ArrayList;
 import java.util.Stack;
-import utilities.SokobanUtil.Action;
+import pathfinding.BoardAction;
 
 /**
  *
@@ -16,7 +16,7 @@ import utilities.SokobanUtil.Action;
 public class DepthFirstSearch extends SearchMethod {
     
     @Override
-    public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
+    public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
         Stack<SearchNode> list = new Stack<>();
         if (start == null || goal == null){
             return null;
