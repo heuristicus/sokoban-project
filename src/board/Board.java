@@ -800,12 +800,10 @@ public class Board {
 	    			if (this.get(endLocation) == Symbol.Empty || this.get(endLocation) == Symbol.Goal)
 	    			{
 	    				//Generating new Board
-	    				HashMap<Point, Symbol> copyDynMap = new HashMap<Point, Symbol>(mObjects);
-	    				copyDynMap.remove(neighbour);
-	    				copyDynMap.put(endLocation, Symbol.Box);
+	    				Board newBoard = new Board(this);
+	    				newBoard.moveElement(neighbour, endLocation); //moving crate
+	    				newBoard.moveElement(playerPosition, neighbour); //moving player
 	    				
-	    				Point newPlayerPosition = new Point(neighbour);	//player ends up at the previous position of the crate
-	    				Board newBoard = new Board(copyDynMap, newPlayerPosition);
 	    				result.add(newBoard);
 	    			}
 	    		}
