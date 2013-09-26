@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import utilities.SokobanUtil.Action;
+import pathfinding.BoardAction;
 
 
 /**
@@ -36,7 +36,7 @@ public class AStar extends SearchMethod {
     }
     
     @Override
-    public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
+    public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
         // Store already visited nodes
         HashSet<SearchNode> closed = new HashSet();
         // Store as yet unvisited nodes in a priority queue - we expand from the best

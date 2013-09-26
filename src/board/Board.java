@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import pathfinding.BoxMovement;
+import pathfinding.BoardAction;
 import search.AStar;
 import search.DiagonalDistanceHeuristic;
 import search.SearchMethod;
@@ -265,13 +265,15 @@ public class Board {
 
 		Point destination = SokobanUtil.applyActionToPoint(a, player);
 		Symbol destObject = newBoard.get(destination);
+        System.out.println(newBoard);
+        System.out.println("dest object " + destObject);
 		if (destObject.type == Type.Box) {
 			Point boxDestination = SokobanUtil.applyActionToPoint(a,
 					destination);
 			Symbol boxDest = newBoard.get(boxDestination);
             // If the destination is not walkable or it puts the board into a locked
             // state, then we don't want to do this action
-			if (!boxDest.isWalkable) {// || (boxDest != Symbol.Goal && isBoxLockedAtPoint(boxDestination))) {
+			if (!boxDest.isWalkable || (boxDest != Symbol.Goal && isBoxLockedAtPoint(boxDestination))) {
 				throw new IllegalMoveException("Direction " + SokobanUtil.actionToString(a) 
                         + " is a box, but the box would become locked or there is a wall "
                         + "blocking it from being pushed.");
@@ -554,7 +556,7 @@ public class Board {
         
         for (Action a : Action.values()) {
             try {
-                expanded.add(new SearchNode(this.applyAction(a, false), parent, a, 1, false));
+                expanded.add(new SearchNode(this.applyAction(a, false), parent, new BoardAction(a, playerPosition), 1, false));
             } catch (IllegalMoveException ex) {
 //                System.out.println(ex.getMessage());
             }
@@ -713,7 +715,7 @@ public class Board {
      * movements between the boxes. 
      * @throws IllegalMoveException 
      */
-    public List<Action> generateFullActionList(List<BoxMovement> boxActions) 
+    public List<Action> generateFullActionList(List<BoardAction> boxActions) 
     		throws IllegalMoveException {
     	
     	Board intermediateBoard;
@@ -724,24 +726,24 @@ public class Board {
     	
     	SearchMethod aStar = new AStar(new DiagonalDistanceHeuristic());
     	List<Action> completeActionList = new ArrayList<>();
-    	for (BoxMovement bm : boxActions) { // loop through all the box actions
+    	for (BoardAction bm : boxActions) { // loop through all the box actions
     		// Get the board state after that action.
     		intermediateBoard = currentBoard.prepareNextBoxMove(bm.action, bm.position, false);
     		
     		if (! currentBoard.equals(intermediateBoard)) { // the player moved in-between. 
     			// get the list of moves made.
-    			ArrayList<Action> foundPath = aStar.findPath(currentBoard, intermediateBoard, false);
+    			ArrayList<BoardAction> foundPath = aStar.findPath(currentBoard, intermediateBoard, false);
     			
     			if (doubleCheck) {
-    				currentBoard.applyActionChained(foundPath, true);
+    				currentBoard.applyActionChained(BoardAction.convertToActionList(foundPath), true);
     				if (! currentBoard.equals(intermediateBoard)) 
     					throw new RuntimeException("The intermediate path obtained is not valid.");
     				
     			}
     			
-    			completeActionList.addAll(foundPath);
+    			completeActionList.addAll(BoardAction.convertToActionList(foundPath));
     		}
-    		    		
+            
     		// Now push the box
     		if (doubleCheck) {
     			currentBoard.applyAction(bm.action, true);

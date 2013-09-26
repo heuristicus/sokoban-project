@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import pathfinding.BoxMovement;
+import pathfinding.BoardAction;
 import exceptions.IllegalMoveException;
 import search.SearchNode;
 import utilities.SokobanUtil;
@@ -402,13 +402,13 @@ public class BoardTest {
     	final String OUTPUT_TEST_FILE = "searchTestGoal.map";
         Board board = TestUtil.initBoard(INPUT_TEST_FILE);
         Board expectedResult = TestUtil.initBoard(OUTPUT_TEST_FILE);
-        List<BoxMovement> boxActions = Arrays.asList(
-        		new BoxMovement(Action.RIGHT, new Point(4,2)),
-        		new BoxMovement(Action.RIGHT, new Point(5,2)),
-        		new BoxMovement(Action.RIGHT, new Point(2,1)),
-        		new BoxMovement(Action.RIGHT, new Point(3,1)),
-        		new BoxMovement(Action.RIGHT, new Point(4,1)),
-        		new BoxMovement(Action.RIGHT, new Point(5,1))
+        List<BoardAction> boxActions = Arrays.asList(
+        		new BoardAction(Action.RIGHT, new Point(4,2)),
+        		new BoardAction(Action.RIGHT, new Point(5,2)),
+        		new BoardAction(Action.RIGHT, new Point(2,1)),
+        		new BoardAction(Action.RIGHT, new Point(3,1)),
+        		new BoardAction(Action.RIGHT, new Point(4,1)),
+        		new BoardAction(Action.RIGHT, new Point(5,1))
         		);
         
         List<Action> actions = board.generateFullActionList(boxActions);

@@ -10,8 +10,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import utilities.SokobanUtil.Action;
 import board.Board;
+import pathfinding.BoardAction;
 
 /**
  *
@@ -29,12 +29,12 @@ public class MultiGoalBFS {
      * and the value is a list of the actions taken to get to that goal state from the
      * start. Goals that are not contained in the hashmap were not reachable.
      */
-    public static HashMap<Board, ArrayList<Action>> findPath(Board start, ArrayList<Board> goals) {
+    public static HashMap<Board, ArrayList<BoardAction>> findPath(Board start, ArrayList<Board> goals) {
         // Queue for nodes not yet checked.
         Queue<SearchNode> open = new LinkedList<>();
         // List of nodes which have already been checked, independent of the action taken to reach the state.
         HashSet<SearchNode> closed = new HashSet<>();
-        HashMap<Board, ArrayList<Action>> goalSolution = new HashMap<>();
+        HashMap<Board, ArrayList<BoardAction>> goalSolution = new HashMap<>();
         open.add(new SearchNode(start, null, null, false)); // Push the start node onto the queue
         ArrayList<SearchNode> goalNodes = new ArrayList<>();
         for (Board board : goals) {

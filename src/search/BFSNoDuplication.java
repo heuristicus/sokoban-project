@@ -8,7 +8,7 @@ import board.Board;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import utilities.SokobanUtil.Action;
+import pathfinding.BoardAction;
 
 /**
  *
@@ -17,7 +17,7 @@ import utilities.SokobanUtil.Action;
 public class BFSNoDuplication extends SearchMethod {
     
     @Override
-    public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
+    public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
             // Queue for nodes not yet checked.
             Queue<SearchNode> open = new LinkedList<>();
             // List of nodes which have already been checked, independent of the action taken to reach the state.
