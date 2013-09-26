@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import search.BreadthFirstSearchNoDuplication;
+import search.BFSNoDuplication;
 import search.SearchMethod;
 import search.SearchNode;
 import utilities.SokobanUtil;
@@ -16,7 +16,10 @@ import utilities.SokobanUtil.Action;
 import board.Board;
 import board.StaticBoard;
 import exceptions.IllegalMoveException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import search.AStar;
+import search.ManhattanClosestHeuristic;
 import search.ManhattanHeuristic;
 
 
@@ -26,20 +29,22 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
-//    	Board board = Board.read(new BufferedReader(new InputStreamReader(System.in)));
-//        // Essentially does DFS!
-//        SearchMethod<Board,Action> astar = new AStar<>(new ManhattanHeuristic());
-//        
-//        ArrayList<Action> pathas = astar.findPath(board, board.getSolvedBoard());
-//
-//        StringBuilder sb = new StringBuilder();
-//        if (pathas != null){
-//            for (Action action : pathas) {
-//                sb.append(SokobanUtil.actionToString(action));
-//            }
+    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
+//        System.out.println("Starting board:");
+//        System.out.println(start);
+        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
+        Board goal = SokobanUtil.getSolvedBoard(start);
+        ArrayList<Action> pathas = astar.findPath(start, goal, false);
+
+        System.out.print(SokobanUtil.actionListAsString(pathas));
+//        Board solved = null;
+//        try {
+//            solved = start.applyActionChained(pathas, false);
+//        } catch (IllegalMoveException ex) {
 //        }
-//        System.out.println(sb.toString());
-		mainTest();
+//        System.out.println("Solved board:");
+//        System.out.println(solved);
+        //		mainTest();
 	}
     
     public static void mainTest() throws IOException{
@@ -113,15 +118,12 @@ public class Main {
         
         System.out.println("BFS finding solution for initial map");
         System.out.println(start);
-        SearchMethod bfs = new BreadthFirstSearchNoDuplication();
+        SearchMethod bfs = new BFSNoDuplication();
         ArrayList<Action> path = bfs.findPath(start, goal, false);
 
         if (path != null){
             System.out.println("BFS completed, path length " + path.size());
-            for (Action action : path) {
-                System.out.print(SokobanUtil.actionToString(action));
-            }
-            System.out.println("");
+            System.out.println(SokobanUtil.actionListAsString(path));
         } else {
             System.out.println("BFS could not find path.");
         }
@@ -134,16 +136,13 @@ public class Main {
         System.out.println(startas);
         
         // Essentially does DFS!
-        SearchMethod astar = new AStar(new ManhattanHeuristic());
+        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
         
         ArrayList<Action> pathas = astar.findPath(startas, goalas, false);
 
         if (pathas != null){
             System.out.println("astar completed, path length " + pathas.size());
-            for (Action action : pathas) {
-                System.out.print(SokobanUtil.actionToString(action));
-            }
-            System.out.println("");
+            System.out.println(SokobanUtil.actionListAsString(pathas));
         } else {
             System.out.println("astar could not find path.");
         }

@@ -10,12 +10,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.awt.Point;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +29,6 @@ import org.junit.Test;
 
 import pathfinding.BoxMovement;
 import exceptions.IllegalMoveException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
@@ -384,12 +378,12 @@ public class BoardTest {
         System.out.println(b1a.toStringMarked(b1a.getAccessiblePoints(b1a.getPlayerPosition())));
         System.out.println(b2.toStringMarked(b2.getAccessiblePoints(b2.getPlayerPosition())));
         
-        assertFalse(b1.equalsIgnorePlayer(b2));
-        assertTrue(b1.equalsIgnorePlayer(b1a));
-        assertFalse(b1.equalsIgnorePlayer(b3));
-        assertFalse(b2.equalsIgnorePlayer(b3));
-        assertFalse(b1.equalsIgnorePlayer(b4));
-        assertTrue(b4.equalsIgnorePlayer(b5));
+        assertFalse(b1.equalsPlayerFill(b2));
+        assertTrue(b1.equalsPlayerFill(b1a));
+        assertFalse(b1.equalsPlayerFill(b3));
+        assertFalse(b2.equalsPlayerFill(b3));
+        assertFalse(b1.equalsPlayerFill(b4));
+        assertTrue(b4.equalsPlayerFill(b5));
     }
     
     @Test
@@ -426,7 +420,7 @@ public class BoardTest {
         		Action.RIGHT, Action.RIGHT, Action.RIGHT), actions);
         
         // TODO: equals still doesn't properly ignore the player's position
-        assertTrue(expectedResult.equalsIgnorePlayer(board));
+        assertTrue(expectedResult.equalsPlayerFill(board));
     }
     
     @Test

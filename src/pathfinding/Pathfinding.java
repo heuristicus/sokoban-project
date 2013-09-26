@@ -7,7 +7,7 @@ package pathfinding;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import search.MultiGoalBreadthFirstSearch;
+import search.MultiGoalBFS;
 import search.SearchMethod;
 import utilities.SokobanUtil.Action;
 import board.Board;
@@ -49,7 +49,7 @@ public class Pathfinding {
      * reachable are not included in the hashmap.
      */
     public static HashMap<Board, ArrayList<Action>> pointToMultiPointPath(Board start, ArrayList<Board> goals){
-        return MultiGoalBreadthFirstSearch.findPath(start, goals);
+        return MultiGoalBFS.findPath(start, goals);
     }
     
 }

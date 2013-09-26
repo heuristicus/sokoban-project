@@ -18,7 +18,15 @@ import org.junit.Test;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Board;
+import board.BoardTest;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utilities.TestUtil;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -39,7 +47,7 @@ public class SearchAlgorithmTest {
     public SearchAlgorithmTest() {
         aStarPlayerPath = new AStar(new DiagonalDistanceHeuristic());
         aStarBoxPath = new AStar(new ManhattanClosestHeuristic());
-        noDupBFS = new BreadthFirstSearchNoDuplication();
+        noDupBFS = new BFSNoDuplication();
         BFS = new BreadthFirstSearch();
         testMapStart = TestUtil.initBoard("searchTestStart.map");
         testMapGoal = TestUtil.initBoard("searchTestGoal.map");
@@ -70,22 +78,43 @@ public class SearchAlgorithmTest {
         assertEquals(Arrays.asList(Action.UP, Action.LEFT, Action.UP), foundPath);
         ArrayList<Action> path2 = aStarBoxPath.findPath(testMapBoardSpaceStart, testMapBoardSpaceGoal, true);
         assertEquals(Arrays.asList(Action.RIGHT, Action.RIGHT, Action.RIGHT), path2);
-        
     }
     
     @Test
-    public void testMultiGoalBreadthFirstSearch(){
+    public void testFullFunctionality(){
+        Board start = null;
+        try {
+            start = Board.read(new BufferedReader(new InputStreamReader(new FileInputStream(BoardTest.testMapDir + "fullTest.map"))));
+        } catch (FileNotFoundException ex) {
+            fail("Could not find test map.");
+        }
+        System.out.println("start map");
+        System.out.println(start);
+        Board goal = SokobanUtil.getSolvedBoard(start);
+        System.out.println("goal map");
+        System.out.println(goal);
         
+        SearchMethod as = new AStar(new ManhattanClosestHeuristic());
+        SearchMethod bfs = new BFSNoDuplication();
+//        ArrayList<Action> actions = as.findPath(start, goal, false);
+//        ArrayList<Action> actions = bfs.findPath(start, goal, false);
+//        SokobanUtil.actionListAsString(actions);
     }
     
     @Test
     public void testBreadthFirstSearch(){
-//        ArrayList<Action> foundPath = BFS.findPath(testMapStart, testMapGoal);
+//        ArrayList<Action> foundPath = BFS.findPath(testMapStart, testMapGoal, false);
+//        System.out.println(SokobanUtil.actionListAsString(foundPath));
     }
     
     @Test
     public void testBreadthFirstSearchNoDuplication(){
-//        ArrayList<Action> findPath = noDupBFS.findPath(testMapStart, testMapGoal);
+//        Board start = TestUtil.initBoard("searchTestStart.map");
+//        Board goal = TestUtil.initBoard("searchTestGoal.map");
+        System.out.println(testMapStart);
+        System.out.println(testMapGoal);
+        ArrayList<Action> findPath = noDupBFS.findPath(testMapStart, testMapGoal, false);
+        System.out.println(SokobanUtil.actionListAsString(findPath));
     }
     
 }

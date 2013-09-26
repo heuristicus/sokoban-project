@@ -17,7 +17,7 @@ import board.Board;
  *
  * @author michal
  */
-public class MultiGoalBreadthFirstSearch {
+public class MultiGoalBFS {
     
     /**
      * Find a path from the start state to all of the goals in the provided

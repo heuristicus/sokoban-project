@@ -134,7 +134,7 @@ public class SokobanUtil {
         for (Point p : solved.getDynamicObjects().keySet()) {
             if (goalList.isEmpty())
                 break;
-            System.out.println(p);
+//            System.out.println(p);
             Symbol pointSymbol = solved.get(p);
             if (pointSymbol == Symbol.Player){
                 // Ignore the player position
@@ -162,6 +162,15 @@ public class SokobanUtil {
         }
         
         return solved;
+    }
+    
+    public static String actionListAsString(List<Action> aList){
+        StringBuilder sb = new StringBuilder();
+        for (Action action : aList) {
+            sb.append(actionToString(action));
+        }
+        sb.append('\n');
+        return sb.toString();
     }
 
 }

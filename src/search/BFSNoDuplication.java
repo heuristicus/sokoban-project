@@ -14,7 +14,7 @@ import utilities.SokobanUtil.Action;
  *
  * @author michal
  */
-public class BreadthFirstSearchNoDuplication extends SearchMethod {
+public class BFSNoDuplication extends SearchMethod {
     
     @Override
     public ArrayList<Action> findPath(Board start, Board goal, boolean boardSpace) {
