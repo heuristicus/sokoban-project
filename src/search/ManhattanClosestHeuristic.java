@@ -9,7 +9,7 @@ import board.Board;
 import board.Symbol;
 
 
-public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
+public class ManhattanClosestHeuristic implements Heuristic<Board>
 {
 	
 	public static Symbol[] START_SYMBOLS = {Symbol.Box, Symbol.BoxOnGoal};
@@ -21,7 +21,6 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 	 */
 	public float utility(Board start, Board goal)
 	{	
-		/** Not sure about the heuristic interface, here is the Minimum Matching Algorithm and result**/
 		start.setAvailablePosition();
 		goal.setAvailablePosition();
 		
@@ -68,6 +67,7 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 			/**If no goal can fit, it is deadlock**/
 			if(MinValue == Integer.MAX_VALUE){
 				System.out.println("It is deadlock");
+				return (float)Integer.MAX_VALUE;
 			}
 			FinalEstimateCost.set(MinIndex, MinValue);
 			DegreeOfOccupied.set(MinIndex, DegreeOfOccupied.get(MinIndex)-1);
@@ -75,37 +75,20 @@ public class ManhattanClosestHeuristic implements Heuristic<Map<Point, Symbol>>
 		
 		//FinalEstimateCost is an arraylist that stored the cost for each Box
 		/*************************************/
-		return utility(start.getDynamicObjects(), goal.getDynamicObjects());
+		
+		/**return the minimum value of the List, so that the agent will keep push same box**/
+		int minValue = Integer.MAX_VALUE;
+		for(int i = 0 ; i < FinalEstimateCost.size(); i++){
+			int temp = FinalEstimateCost.get(i);
+			if(minValue<temp){
+				minValue = temp;
+			}
+		}
+		return minValue;
 	}
 	
 	
 
-	@Override
-	/** Returns an optimistic estimation of the coast to go from state start to state goal.
-	 * 	
-	 */
-	public float utility(Map<Point, Symbol> start, Map<Point, Symbol> goal)
-	{		
-		float estimation = 0;
-		for (Point startPt : start.keySet())
-		{
-			if (isStartSymbol(start.get(startPt)))
-			{
-				float bestDistance = Float.POSITIVE_INFINITY;
-				for (Point goalPt : goal.keySet())
-				{
-					if (isGoalSymbol(goal.get(goalPt)))
-					{
-						
-						float MHdistance = Math.abs(startPt.x - goalPt.x) + Math.abs(startPt.y - goalPt.y);
-						bestDistance = Math.min(bestDistance, MHdistance);
-					}
-				}
-				estimation += bestDistance;
-			}
-		}
-		return estimation;
-	}
 	
 	private boolean isStartSymbol(Symbol sym)
 	{
