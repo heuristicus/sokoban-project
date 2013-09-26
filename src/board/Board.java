@@ -750,16 +750,6 @@ public class Board {
     }
     
     
-    /**
-     * empty method that WILL generate all possible BoardStates :)
-     * @return
-     */
-    public LinkedList<Board> generateChildStates()
-    {
-    	return new LinkedList<Board>();
-    }
-    
-    
     
     /**
      * Returns a list of Boards that are the results of the possible moves regarding the player and the crates position.
@@ -767,7 +757,7 @@ public class Board {
      * Checks if the box is reachable, and if the move is valid.
      * @return List of boards that can be resulting from this state.
      */
-    private LinkedList<Board> generateChildStatesAux()
+    public LinkedList<Board> generateChildStates()
     {  	
     	LinkedList<Board> result = new LinkedList<Board>();
     	
