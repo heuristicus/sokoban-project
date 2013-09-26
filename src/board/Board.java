@@ -566,14 +566,15 @@ public class Board {
     }
     
     public ArrayList<SearchNode> expandBoardSpace(SearchNode parent){
-        throw new UnsupportedOperationException("Not implemented yet.");
+        ArrayList<BoardAction> actions = new ArrayList<BoardAction>();
+        ArrayList<Board> boards = generateChildStates(actions);
         
-//    	LinkedList<Board> boards = generateChildStates(null);
-//    	ArrayList<SearchNode> nodes = new ArrayList<SearchNode>();
-//    	for (Board b : boards)
-//    	{
-//    		boards.add(new SearchNode())
-//    	}
+    	ArrayList<SearchNode> nodes = new ArrayList<SearchNode>();
+    	for (int i=0 ; i<boards.size() ; i++)
+    	{
+    		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), true));
+    	}
+    	return nodes;
     }
     
     /**
@@ -767,9 +768,9 @@ public class Board {
      * @return List of boards that can be resulting from this state.
      * @param rRelatedBoxMovements if not null, will be filled with the BoxMovements that led to the child states.
      */
-    public LinkedList<Board> generateChildStates(LinkedList<BoxMovement> rRelatedBoxMovements)
+    public ArrayList<Board> generateChildStates(ArrayList<BoardAction> rRelatedBoxMovements)
     {  	
-    	LinkedList<Board> result = new LinkedList<Board>();
+    	ArrayList<Board> result = new ArrayList<Board>();
     	
     	//initialise openList with playerPosition.
     	//Visitable positions will go through openList and end up in closedList (used to avoid
@@ -813,7 +814,7 @@ public class Board {
 	    				Board newBoard = new Board(this);
 	    				newBoard.moveElement(neighbour, endLocation); //moving crate
 	    				newBoard.moveElement(playerPosition, neighbour); //moving player
-	    				result.addLast(newBoard);
+	    				result.add(newBoard);
 	    				
 	    				//Generating BoxMovement
 	    				if (rRelatedBoxMovements != null)
@@ -827,8 +828,8 @@ public class Board {
 	    						action = Action.DOWN;
 	    					else	//if (dirY<0)
 	    						action = Action.UP;
-	    					BoxMovement move = new BoxMovement(action, neighbour);
-	    					rRelatedBoxMovements.addLast(move);
+	    					BoardAction move = new BoardAction(action, neighbour);
+	    					rRelatedBoxMovements.add(move);
 	    				}
 	    			}
 	    		}
