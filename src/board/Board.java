@@ -565,6 +565,13 @@ public class Board {
     
     public ArrayList<SearchNode> expandBoardSpace(SearchNode parent){
         throw new UnsupportedOperationException("Not implemented yet.");
+        
+//    	LinkedList<Board> boards = generateChildStates(null);
+//    	ArrayList<SearchNode> nodes = new ArrayList<SearchNode>();
+//    	for (Board b : boards)
+//    	{
+//    		boards.add(new SearchNode())
+//    	}
     }
     
     /**
@@ -756,8 +763,9 @@ public class Board {
      * A new state means that a box has been moved and that the player position has changed.
      * Checks if the box is reachable, and if the move is valid.
      * @return List of boards that can be resulting from this state.
+     * @param rRelatedBoxMovements if not null, will be filled with the BoxMovements that led to the child states.
      */
-    public LinkedList<Board> generateChildStates()
+    public LinkedList<Board> generateChildStates(LinkedList<BoxMovement> rRelatedBoxMovements)
     {  	
     	LinkedList<Board> result = new LinkedList<Board>();
     	
@@ -803,8 +811,23 @@ public class Board {
 	    				Board newBoard = new Board(this);
 	    				newBoard.moveElement(neighbour, endLocation); //moving crate
 	    				newBoard.moveElement(playerPosition, neighbour); //moving player
+	    				result.addLast(newBoard);
 	    				
-	    				result.add(newBoard);
+	    				//Generating BoxMovement
+	    				if (rRelatedBoxMovements != null)
+	    				{
+	    					Action action;
+	    					if (dirX>0)
+	    						action = Action.RIGHT;
+	    					else if (dirX<0)
+	    						action = Action.LEFT;
+	    					else if (dirY>0)
+	    						action = Action.DOWN;
+	    					else	//if (dirY<0)
+	    						action = Action.UP;
+	    					BoxMovement move = new BoxMovement(action, neighbour);
+	    					rRelatedBoxMovements.addLast(move);
+	    				}
 	    			}
 	    		}
     		}
