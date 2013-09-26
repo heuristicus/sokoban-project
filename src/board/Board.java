@@ -749,6 +749,8 @@ public class Board {
     	return completeActionList;
     }
     
+    
+    
     /**
      * Returns a list of Boards that are the results of the possible moves regarding the player and the crates position.
      * A new state means that a box has been moved and that the player position has changed.
