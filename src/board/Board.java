@@ -291,7 +291,7 @@ public class Board {
 
 		return newBoard;
 	}
-
+    
 	public Board applyPullAction(Action a, boolean destructive, Point Goal)
 			throws IllegalMoveException {
 		Board newBoard;
@@ -321,7 +321,30 @@ public class Board {
 		}
 
 		return newBoard;
-	}	
+    }
+    
+    /**
+	 * Applies a series of actions to the board
+	 * 
+	 * @param aList
+	 *            A list of actions to apply
+	 * @param destructive
+	 *            If true, modify the board state, otherwise use a clone.
+	 * @return A board with all actions in the actionList applied.
+	 */
+	public Board applyActionChained(List<Action> actionList,
+			boolean destructive) throws IllegalMoveException {
+		Board newBoard = destructive ? this : new Board(this);
+
+		for (Action action : actionList) {
+			// Don't care about modifying board state anymore, so use the
+			// destructive method
+			newBoard.applyAction(action, true);
+		}
+
+		return newBoard;
+	}    
+    
 	public Board reverseAction(Action a, boolean destructive) throws IllegalMoveException {
 		Board newBoard = destructive ? this : new Board(this);
 
