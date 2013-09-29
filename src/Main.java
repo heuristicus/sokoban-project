@@ -136,11 +136,11 @@ public class Main {
 		} catch (IOException e)
 		{
 		}
-		System.out.println("-start map-");
-		System.out.println(start.toString());
+//		System.out.println("-start map-");
+//		System.out.println(start.toString());
 		
 		ArrayList<Board> childs = start.generateChildStates(null,null);
-		System.out.println("child count: " + childs.size());
+//		System.out.println("child count: " + childs.size());
 		
 		int notExpected = 0;
 		for (Board b : childs)
