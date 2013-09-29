@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import search.BFSNoDuplication;
 import search.SearchMethod;
@@ -87,7 +88,73 @@ public class Main {
         }
         
 
-
+        //Expand Board test
+        Board start=null;
+		HashSet<String> expected = new HashSet<String>();
+		expected.add(	"########\n"+
+						"#.     #\n"+
+						"#$   ###\n"+
+						"#    @$#\n"+
+						"#   *###\n"+
+						"#      #\n"+
+						"########");
+		
+		expected.add(	"########\n"+
+						"#.     #\n"+
+						"#$   ###\n"+
+						"#    $ #\n"+
+						"#   +###\n"+
+						"#   $  #\n"+
+						"########");
+		
+		expected.add(	"########\n"+
+						"#.     #\n"+
+						"#$   ###\n"+
+						"#   $$ #\n"+
+						"#   +###\n"+
+						"#      #\n"+
+						"########");
+		
+		expected.add(	"########\n"+
+						"#*     #\n"+
+						"#@   ###\n"+
+						"#    $ #\n"+
+						"#   *###\n"+
+						"#      #\n"+
+						"########");
+		
+		expected.add(	"########\n"+
+						"#.     #\n"+
+						"#@   ###\n"+
+						"#$   $ #\n"+
+						"#   *###\n"+
+						"#      #\n"+
+						"########");
+		try
+		{
+			start = Board.read(Files.newBufferedReader(Paths.get("./maps/test/boardTestExpandBoard.map"), Charset.defaultCharset()));
+		} catch (IOException e)
+		{
+		}
+		System.out.println("-start map-");
+		System.out.println(start.toString());
+		
+		ArrayList<Board> childs = start.generateChildStates(null,null);
+		System.out.println("child count: " + childs.size());
+		
+		int notExpected = 0;
+		for (Board b : childs)
+		{
+			if (!expected.remove(b.toString()))
+			{
+				notExpected++;
+			}
+		}
+		
+		System.out.println("Board Expansion done");
+		System.out.println("ERRORS: " + (expected.size() + notExpected));
+	
+		//Expand Board test END
         
 		
 		System.out.println("Free neighbours of (4,2): ");
