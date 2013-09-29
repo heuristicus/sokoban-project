@@ -797,7 +797,7 @@ public class Board {
     	{
     		WeightedPoint center = openList.removeFirst();
     		closedList.add(center);
-    		System.out.println("center x:"+center.point.x + " y:" + center.point.y);
+//    		System.out.println("center x:"+center.point.x + " y:" + center.point.y);
     		
     		WeightedPoint[] neighbours = new WeightedPoint[4];
     		
