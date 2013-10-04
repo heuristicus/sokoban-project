@@ -29,14 +29,14 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
-    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
+//    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
 //        System.out.println("Starting board:");
 //        System.out.println(start);
-        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
-        Board goal = SokobanUtil.getSolvedBoard(start);
-        ArrayList<BoardAction> pathas = astar.findPath(start, goal, false);
-
-        System.out.print(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
+//        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
+//        Board goal = SokobanUtil.getSolvedBoard(start);
+//        ArrayList<BoardAction> pathas = astar.findPath(start, goal, false);
+//
+//        System.out.print(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
 //        Board solved = null;
 //        try {
 //            solved = start.applyActionChained(pathas, false);
@@ -44,8 +44,50 @@ public class Main {
 //        }
 //        System.out.println("Solved board:");
 //        System.out.println(solved);
-        //		mainTest();
+//        		mainTest();
+//        profile();
+        boardExpand();
 	}
+    
+    public static void boardExpand() throws IOException{
+        Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
+        Board goalas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
+        
+        System.out.println("astar finding solution for initial map");
+        System.out.println(startas);
+        
+        // Essentially does DFS!
+        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
+        
+        ArrayList<BoardAction> pathas = astar.findPath(startas, goalas, true);
+
+        if (pathas != null){
+            System.out.println("astar completed, path length " + pathas.size());
+            System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
+        } else {
+            System.out.println("astar could not find path.");
+        }
+    }
+    
+    public static void profile() throws IOException {
+        Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
+        Board goalas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
+        
+        System.out.println("astar finding solution for initial map");
+        System.out.println(startas);
+        
+        // Essentially does DFS!
+        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
+        
+        ArrayList<BoardAction> pathas = astar.findPath(startas, goalas, false);
+
+        if (pathas != null){
+            System.out.println("astar completed, path length " + pathas.size());
+            System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
+        } else {
+            System.out.println("astar could not find path.");
+        }
+    }
     
     public static void mainTest() throws IOException{
     	Board board = Board.read(new BufferedReader(new InputStreamReader(System.in)));
@@ -179,7 +221,7 @@ public class Main {
 		Board newBoard = null;
 
 		// Can throw IOException, but that is not recoverable inside the method. So throw it anyway.
-        Board start = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
+        start = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
         Board goal = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
         
         System.out.println("BFS finding solution for initial map");

@@ -265,8 +265,8 @@ public class Board {
 
 		Point destination = SokobanUtil.applyActionToPoint(a, player);
 		Symbol destObject = newBoard.get(destination);
-        System.out.println(newBoard);
-        System.out.println("dest object " + destObject);
+//		System.out.println(newBoard);
+//		System.out.println("dest object " + destObject);
 		if (destObject.type == Type.Box) {
 			Point boxDestination = SokobanUtil.applyActionToPoint(a,
 					destination);
@@ -291,6 +291,28 @@ public class Board {
 
 		return newBoard;
 	}
+    
+    /**
+	 * Applies a series of actions to the board
+	 * 
+	 * @param aList
+	 *            A list of actions to apply
+	 * @param destructive
+	 *            If true, modify the board state, otherwise use a clone.
+	 * @return A board with all actions in the actionList applied.
+	 */
+	public Board applyActionChained(List<Action> actionList,
+			boolean destructive) throws IllegalMoveException {
+		Board newBoard = destructive ? this : new Board(this);
+
+		for (Action action : actionList) {
+			// Don't care about modifying board state anymore, so use the
+			// destructive method
+			newBoard.applyAction(action, true);
+		}
+
+		return newBoard;
+	}    
 
 	public Board applyPullAction(Action a, boolean destructive, Point Goal)
 			throws IllegalMoveException {
@@ -360,59 +382,61 @@ public class Board {
 
 		return newBoard;
 	}
-    
-    /**
-     * Gets the points on this board which are accessible from the given point.
-     * This is done using something like a flood fill.
-     * @param p The point for which to find accessible points
-     * @return The points which are accessible from the given point. Accessible
-     * points are those which are walkable. The top left most point in the accessible
-     * area will be the first element of the list.
-     */
-    public List<Point> getAccessiblePoints(Point p){
-        Queue<Point> q = new LinkedList<>();
-        q.add(p);
-        List<Point> accessible = new ArrayList<>();
-        accessible.add(p);
-        // Track the minimum values of point positions so that we can see which
-        // point is the top left of the flood filled region
-        Point minPoint = p;
-        while(!q.isEmpty()){
-            Point next = q.remove();
-            if (this.get(next).isWalkable){
-                List<Point> neighbours = getFreeNeighbours(next);
-                for (Point point : neighbours) {
-                    if (!accessible.contains(point)){
-                        accessible.add(point);
-                        q.add(point);
-                        // Modify the minimum point location if the current point
-                        // is "lower" than the current minimum
-                        minPoint = SokobanUtil.pointMin(minPoint, point);
-//                        System.out.println("min point is: " + minPoint);
-                    }
-                }
-            }
-        }
-        
-        // Move the point with the minimum value to the beginning of the list.
-        accessible.remove(minPoint);
-        accessible.add(0, minPoint);
-        
-        
-        return accessible;
-    }
 
-	//Get the reachable point from one point by pulling
-    public List<Point> getAccessiblePointsfromGoal(Point p){
-        Queue<Point> q = new LinkedList<>();
-        q.add(p);
-        List<Point> accessible = new ArrayList<>();
-        accessible.add(p);
-        while(!q.isEmpty()){
-            Point next = q.remove();
-            for(Action a : Action.values()){
-            	try {
-					applyPullAction(a,true,next);
+	/**
+	 * Gets the points on this board which are accessible from the given point.
+	 * This is done using something like a flood fill.
+	 * 
+	 * @param p
+	 *            The point for which to find accessible points
+	 * @return The points which are accessible from the given point. Accessible
+	 *         points are those which are walkable. The top left most point in
+	 *         the accessible area will be the first element of the list.
+	 */
+	public List<Point> getAccessiblePoints(Point p) {
+		Queue<Point> q = new LinkedList<>();
+		q.add(p);
+		List<Point> accessible = new ArrayList<>();
+		accessible.add(p);
+		// Track the minimum values of point positions so that we can see which
+		// point is the top left of the flood filled region
+		Point minPoint = p;
+		while (!q.isEmpty()) {
+			Point next = q.remove();
+			if (this.get(next).isWalkable) {
+				List<Point> neighbours = getFreeNeighbours(next);
+				for (Point point : neighbours) {
+					if (!accessible.contains(point)) {
+						accessible.add(point);
+						q.add(point);
+						// Modify the minimum point location if the current
+						// point
+						// is "lower" than the current minimum
+						minPoint = SokobanUtil.pointMin(minPoint, point);
+						// System.out.println("min point is: " + minPoint);
+					}
+				}
+			}
+		}
+
+		// Move the point with the minimum value to the beginning of the list.
+		accessible.remove(minPoint);
+		accessible.add(0, minPoint);
+
+		return accessible;
+	}
+    
+	// Get the reachable point from one point by pulling
+	public List<Point> getAccessiblePointsfromGoal(Point p) {
+		Queue<Point> q = new LinkedList<>();
+		q.add(p);
+		List<Point> accessible = new ArrayList<>();
+		accessible.add(p);
+		while (!q.isEmpty()) {
+			Point next = q.remove();
+			for (Action a : Action.values()) {
+				try {
+					applyPullAction(a, true, next);
 					Point ReachPoint = SokobanUtil.applyActionToPoint(a, next);
 					System.out.print("Reach:" + ReachPoint.toString());
 					
@@ -471,44 +495,68 @@ public class Board {
 		}
 		return freeNeighbours;
 	}
+
+	/**
+	 * Gets a map of points to actions which indicate the directions in which
+	 * each box on the map can be pushed. Assuming that the player is able to
+	 * teleport, a box can always be pushed in either 2 or 4 directions. If you
+	 * can push it in one direction, then the player must be able to access the
+	 * point that is being pushed from, and if the box is pushable in that
+	 * direction, it means that the space it is being pushed into is empty,
+	 * which means that the box could be pushed from that direction as well.
+	 * 
+	 * @return A map of points, indicating box locations, with a list of actions
+	 *         indicate which direction the box can successfuly be pushed from.
+	 *         Boxes which cannot be pushed are not included in the map.
+	 */
+	public Map<Point, List<Action>> getBoxPushableDirections() {
+		Map<Point, List<Action>> pushableDirections = new HashMap<>();
+		for (Point p : mObjects.keySet()) {
+			if (get(p).type != Symbol.Type.Box)
+				continue;
+			List<Action> possiblePushDirections = getSingleBoxPushableDirections(p);
+			pushableDirections.put(p, possiblePushDirections);
+		}
+		return pushableDirections;
+	}
     
     /**
-     * Gets a map of points to actions which indicate the directions in which each
-     * box on the map can be pushed. Assuming that the player is able to teleport,
-     * a box can always be pushed in either 2 or 4 directions. If you can push it
-     * in one direction, then the player must be able to access the point that is being
-     * pushed from, and if the box is pushable in that direction, it means that
-     * the space it is being pushed into is empty, which means that the box could
-     * be pushed from that direction as well.
-     * @return A map of points, indicating box locations, with a list of actions
-     * indicate which direction the box can successfuly be pushed from. Boxes which
-     * cannot be pushed are not included in the map.
+     * Gets a list of actions which can be applied to a box at the given point.
+     * @param p A point, which should contain a box symbol.
+     * @return A list of actions which can be applied to the box at the point
+     * in question.
      */
-    public Map<Point, List<Action>> getBoxPushableDirections(){
-        Map<Point, List<Action>> pushableDirections = new HashMap<>();
-        for (Point p : mObjects.keySet()) {
-			if (get(p).type != Symbol.Type.Box) continue;
-            List<Action> possiblePushDirections = new ArrayList<>();
-			for (Action a : pushableTestDirections) {
-				Point neighbour = SokobanUtil.applyActionToPoint(a, p);
-                Point opposite = SokobanUtil.applyActionToPoint(SokobanUtil.inverseAction(a), p);
-                // If you can push the box in one direction, then you can push it in the opposite
-                // direction as well. Boxes can only be pushed in either 2 or 4 directions, assuming
-                // that the player is able to teleport.
-                if (get(neighbour).isWalkable && get(opposite).isWalkable)
-                    possiblePushDirections.addAll(Arrays.asList(a, SokobanUtil.inverseAction(a)));
-			}
-            pushableDirections.put(p, possiblePushDirections);
-		}
-        return pushableDirections;
+    public List<Action> getSingleBoxPushableDirections(Point p){
+        Symbol pSymb = get(p);
+        if (pSymb != Symbol.Box || pSymb != Symbol.BoxOnGoal){
+            throw new IllegalArgumentException("The point provided must contain a box.");
+        }
+        List<Action> possiblePushDirections = new ArrayList<>();
+        for (Action a : pushableTestDirections) {
+            Point neighbour = SokobanUtil.applyActionToPoint(a, p);
+            Point opposite = SokobanUtil.applyActionToPoint(
+                    SokobanUtil.inverseAction(a), p);
+            // If you can push the box in one direction, then you can push
+            // it in the opposite
+            // direction as well. Boxes can only be pushed in either 2 or 4
+            // directions, assuming
+            // that the player is able to teleport.
+            if (get(neighbour).isWalkable && get(opposite).isWalkable){
+                possiblePushDirections.add(a);
+                possiblePushDirections.add(SokobanUtil.inverseAction(a));
+            }
+        }
+        
+        return possiblePushDirections;
     }
-	
-	/** 
-	 * Basic implementation: checks only that the box is not blocked against walls. 
-	 * Boxes are not considered to be blocking, and assumes that the player can get 
-	 * to the free neighbours 
-	 * Also, a box can be considered locked even on a goal (maybe you locked the wrong box there?)
-	 * You can test that it is on a goad before running this method (no point doing it the other way)
+
+	/**
+	 * Basic implementation: checks only that the box is not blocked against
+	 * walls. Boxes are not considered to be blocking, and assumes that the
+	 * player can get to the free neighbours Also, a box can be considered
+	 * locked even on a goal (maybe you locked the wrong box there?) You can
+	 * test that it is on a goad before running this method (no point doing it
+	 * the other way)
 	 */
 	public boolean isBoxLockedAtPoint(Point p) {
 		// A box is locked when it can't be pushed anymore. It happens when two adjacent 

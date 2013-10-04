@@ -132,10 +132,11 @@ public class SearchNode implements Comparable<SearchNode>{
      }
      
      public ArrayList<SearchNode> expand(){
-         if (boardSpaceExpansion)
+         if (boardSpaceExpansion){
              return this.nodeState.expandBoardSpace(this);
-         else
+         } else {
              return this.nodeState.expandPlayerSpace(this);
+         }
          
      }
      

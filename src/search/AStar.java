@@ -48,11 +48,11 @@ public class AStar extends SearchMethod {
         while(!open.isEmpty()){
 //            System.out.println("open size: " + open.size() + " closed size: " + closed.size());
 //            System.out.println("OPEN LIST =============");
-//            for (SearchNode<T, U> searchNode : open) {
+//            for (SearchNode searchNode : open) {
 //                System.out.println(searchNode);
 //            }
 //            System.out.println("CLOSED LIST ===========");
-//            for (SearchNode<T, U> searchNode : closed) {
+//            for (SearchNode searchNode : closed) {
 //                System.out.println(searchNode);
 //            }
             SearchNode front = open.remove(); // The best node in the queue
@@ -71,6 +71,7 @@ public class AStar extends SearchMethod {
             }
             
             ArrayList<SearchNode> successors = front.expand();
+//            System.out.println("Number of successor states: " + successors.size());
             for (SearchNode successor : successors) {
 //                System.out.println("Examining successor of front node");
 //                System.out.println(successor);
