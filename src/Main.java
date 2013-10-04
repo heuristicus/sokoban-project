@@ -33,6 +33,7 @@ public class Main {
 	public static boolean USE_BOARD_EXPANSION = false;
 	
 	public static void main(String[] args) throws IOException {
+//		printExpandedBoards();
     	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
 //        System.out.println("Starting board:");
 //        System.out.println(start);
@@ -88,6 +89,23 @@ public class Main {
         } else {
             System.out.println("astar could not find path.");
         }
+    }
+    
+    public static void printExpandedBoards()
+    {
+    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
+
+		ArrayList<BoardAction> actions = new ArrayList<>();
+		ArrayList<Board> childs = start.generateChildStates(actions,null);
+
+		for (int i=0 ; i< childs.size(); i++)
+		{
+			BoardAction action = actions.get(i);
+			System.out.println("action point " +action.position.toString());
+			System.out.println("action direction " +action.action.toString());
+			System.out.println(childs.get(i).toString());
+			
+		}
     }
     
     public static void profile() throws IOException {
