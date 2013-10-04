@@ -122,7 +122,7 @@ public class Board {
 	public static Board read(BufferedReader br) {
 
 		// Step 1: read the input.
-		List<String> tmpStrMap = new ArrayList<>();
+		List<String> tmpStrMap = new ArrayList<String>();
 		String line;
 		try {
 			while (br.ready()) {
@@ -140,8 +140,8 @@ public class Board {
 		// To have the number of lines and initialize the array, it must be done
 		// in two steps.
 		Symbol[][] staticMap = new Symbol[tmpStrMap.size()][];
-		Map<Point, Symbol> dynamicMap = new HashMap<>();
-		List<Point> goals = new ArrayList<>();
+		Map<Point, Symbol> dynamicMap = new HashMap<Point, Symbol>();
+		List<Point> goals = new ArrayList<Point>();
 		Point playerPosition = null;
 
 		for (int y = 0; y < tmpStrMap.size(); ++y) {
@@ -394,9 +394,9 @@ public class Board {
 	 *         the accessible area will be the first element of the list.
 	 */
 	public List<Point> getAccessiblePoints(Point p) {
-		Queue<Point> q = new LinkedList<>();
+		Queue<Point> q = new LinkedList<Point>();
 		q.add(p);
-		List<Point> accessible = new ArrayList<>();
+		List<Point> accessible = new ArrayList<Point>();
 		accessible.add(p);
 		// Track the minimum values of point positions so that we can see which
 		// point is the top left of the flood filled region
@@ -458,7 +458,7 @@ public class Board {
 	 * No check is done on whether the point is a box, a wall or anything else.
 	 */
 	public List<Point> getFreeNeighbours(Point p) {
-		List<Point> freeNeighbours = new ArrayList<>();
+		List<Point> freeNeighbours = new ArrayList<Point>();
 		for (Action a : Action.values()) {
 			Point neighbour = SokobanUtil.applyActionToPoint(a, p);
 			if (get(neighbour).isWalkable) {

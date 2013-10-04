@@ -50,8 +50,8 @@ public class Main {
 	}
     
     public static void boardExpand() throws IOException{
-        Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
-        Board goalas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
+        Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/fullTest.map"), Charset.defaultCharset()));
+        Board goalas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/fullTestGoal.map"), Charset.defaultCharset()));
         
         System.out.println("astar finding solution for initial map");
         System.out.println(startas);

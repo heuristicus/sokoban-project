@@ -63,7 +63,7 @@ public class AStar extends SearchMethod {
             }
             
 //            System.out.println("Checking if closed contains the front node");
-//            System.out.println(front);
+            System.out.println(front);
             // Add the parent to the closed list - we do not need to expand it more than once
             if (!closed.contains(front)){ // #TODO Is this check really necessary?
 //                System.out.println("closed does not contain the front node. adding.");
@@ -74,7 +74,7 @@ public class AStar extends SearchMethod {
 //            System.out.println("Number of successor states: " + successors.size());
             for (SearchNode successor : successors) {
 //                System.out.println("Examining successor of front node");
-//                System.out.println(successor);
+                System.out.println(successor);
                 // Look through the open list to see if the successor is
                 // already present
                 Iterator<SearchNode> it = open.iterator();
