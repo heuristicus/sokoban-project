@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import search.BFSNoDuplication;
 import search.SearchMethod;
@@ -28,15 +29,35 @@ public class Main {
 	/**
 	 * @param args
 	 */
+	
+	public static boolean USE_BOARD_EXPANSION = false;
+	
 	public static void main(String[] args) throws IOException {
-//    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
+    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
 //        System.out.println("Starting board:");
 //        System.out.println(start);
-//        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
-//        Board goal = SokobanUtil.getSolvedBoard(start);
-//        ArrayList<BoardAction> pathas = astar.findPath(start, goal, false);
-//
-//        System.out.print(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
+        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
+        Board goal = SokobanUtil.getSolvedBoard(start);
+        ArrayList<BoardAction> pathas = astar.findPath(start, goal, USE_BOARD_EXPANSION);
+        
+        if (USE_BOARD_EXPANSION)
+        {
+        	List<Action> pathWithMoves = null;
+            try
+    		{
+    			pathWithMoves = start.generateFullActionList(pathas);
+    		}
+    		catch (IllegalMoveException e)
+    		{
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+            System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
+        }else
+        {
+        	System.out.print(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
+        }
+              
 //        Board solved = null;
 //        try {
 //            solved = start.applyActionChained(pathas, false);
@@ -46,7 +67,7 @@ public class Main {
 //        System.out.println(solved);
 //        		mainTest();
 //        profile();
-        boardExpand();
+//        boardExpand();
 	}
     
     public static void boardExpand() throws IOException{
@@ -87,6 +108,7 @@ public class Main {
         } else {
             System.out.println("astar could not find path.");
         }
+        
     }
     
     public static void mainTest() throws IOException{
