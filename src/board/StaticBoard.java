@@ -84,7 +84,9 @@ public class StaticBoard {
 		for (Action a : Action.values()) {
 			WeightedPoint neighbour = new WeightedPoint(SokobanUtil.applyActionToPoint(a, p.point), p.cost + 1);
 			if (get(neighbour.point).isWalkable) {
-				freeNeighbours.add(neighbour);
+				WeightedPoint farneighbour = new WeightedPoint(SokobanUtil.applyActionToPoint(a, neighbour.point), neighbour.cost + 1);
+				if (get(farneighbour.point).isWalkable)
+				{freeNeighbours.add(neighbour);}
 			}
 		}
 		return freeNeighbours;
