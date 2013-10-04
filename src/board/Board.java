@@ -23,6 +23,7 @@ import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
+import utilities.WeightedPoint;
 
 /**
  * Dynamic representation of the world.
@@ -39,23 +40,19 @@ public class Board {
 	public List<List<Point>> availablePosition  = new ArrayList<List<Point>>();
     // Top left most position accessible from the player position.
     private Point topLeftPosition;
+    private boolean topLeftEvaluationNeeded = true;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
 		this.playerPosition = playerPosition;
-        this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
+		topLeftEvaluationNeeded = true;
 	}
 	
 	public Board(Board original) {
 		this.mObjects = new HashMap<>(original.mObjects);		//TODO is a shallow copy enough?
 		this.playerPosition = new Point(original.playerPosition);
-        this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
-	}
-
-	/** Dummy board used to call whatever method*/
-	public Board() {
-		this.mObjects = new HashMap<>();
-		this.playerPosition = new Point(0,0);
+        this.topLeftPosition = original.topLeftPosition;
+        topLeftEvaluationNeeded = original.topLeftEvaluationNeeded;
 	}
 
 	public Map<Point, Symbol> getDynamicObjects() {
@@ -83,10 +80,7 @@ public class Board {
 		return StaticBoard.getInstance().goals;
 	}
 
-    public Point getTopLeftPosition() {
-        return topLeftPosition;
-    }
-    
+	
 	/** @return Ascii art representation of the board (static + dynamic) */
 	@Override
 	public String toString() {
@@ -128,7 +122,7 @@ public class Board {
 	public static Board read(BufferedReader br) {
 
 		// Step 1: read the input.
-		List<String> tmpStrMap = new ArrayList<>();
+		List<String> tmpStrMap = new ArrayList<String>();
 		String line;
 		try {
 			while (br.ready()) {
@@ -146,8 +140,8 @@ public class Board {
 		// To have the number of lines and initialize the array, it must be done
 		// in two steps.
 		Symbol[][] staticMap = new Symbol[tmpStrMap.size()][];
-		Map<Point, Symbol> dynamicMap = new HashMap<>();
-		List<Point> goals = new ArrayList<>();
+		Map<Point, Symbol> dynamicMap = new HashMap<Point, Symbol>();
+		List<Point> goals = new ArrayList<Point>();
 		Point playerPosition = null;
 
 		for (int y = 0; y < tmpStrMap.size(); ++y) {
@@ -239,7 +233,7 @@ public class Board {
 			if (element == Symbol.Type.Player) {
 				playerPosition = to;
 			}
-
+			topLeftEvaluationNeeded = true;
 			return true;
 		}
 
@@ -271,8 +265,8 @@ public class Board {
 
 		Point destination = SokobanUtil.applyActionToPoint(a, player);
 		Symbol destObject = newBoard.get(destination);
-        System.out.println(newBoard);
-        System.out.println("dest object " + destObject);
+//		System.out.println(newBoard);
+//		System.out.println("dest object " + destObject);
 		if (destObject.type == Type.Box) {
 			Point boxDestination = SokobanUtil.applyActionToPoint(a,
 					destination);
@@ -298,6 +292,28 @@ public class Board {
 		return newBoard;
 	}
     
+    /**
+	 * Applies a series of actions to the board
+	 * 
+	 * @param aList
+	 *            A list of actions to apply
+	 * @param destructive
+	 *            If true, modify the board state, otherwise use a clone.
+	 * @return A board with all actions in the actionList applied.
+	 */
+	public Board applyActionChained(List<Action> actionList,
+			boolean destructive) throws IllegalMoveException {
+		Board newBoard = destructive ? this : new Board(this);
+
+		for (Action action : actionList) {
+			// Don't care about modifying board state anymore, so use the
+			// destructive method
+			newBoard.applyAction(action, true);
+		}
+
+		return newBoard;
+	}    
+
 	public Board applyPullAction(Action a, boolean destructive, Point Goal)
 			throws IllegalMoveException {
 		Board newBoard;
@@ -327,30 +343,7 @@ public class Board {
 		}
 
 		return newBoard;
-    }
-    
-    /**
-	 * Applies a series of actions to the board
-	 * 
-	 * @param aList
-	 *            A list of actions to apply
-	 * @param destructive
-	 *            If true, modify the board state, otherwise use a clone.
-	 * @return A board with all actions in the actionList applied.
-	 */
-	public Board applyActionChained(List<Action> actionList,
-			boolean destructive) throws IllegalMoveException {
-		Board newBoard = destructive ? this : new Board(this);
-
-		for (Action action : actionList) {
-			// Don't care about modifying board state anymore, so use the
-			// destructive method
-			newBoard.applyAction(action, true);
-		}
-
-		return newBoard;
-	}    
-    
+	}	
 	public Board reverseAction(Action a, boolean destructive) throws IllegalMoveException {
 		Board newBoard = destructive ? this : new Board(this);
 
@@ -389,59 +382,61 @@ public class Board {
 
 		return newBoard;
 	}
-    
-    /**
-     * Gets the points on this board which are accessible from the given point.
-     * This is done using something like a flood fill.
-     * @param p The point for which to find accessible points
-     * @return The points which are accessible from the given point. Accessible
-     * points are those which are walkable. The top left most point in the accessible
-     * area will be the first element of the list.
-     */
-    public List<Point> getAccessiblePoints(Point p){
-        Queue<Point> q = new LinkedList<>();
-        q.add(p);
-        List<Point> accessible = new ArrayList<>();
-        accessible.add(p);
-        // Track the minimum values of point positions so that we can see which
-        // point is the top left of the flood filled region
-        Point minPoint = p;
-        while(!q.isEmpty()){
-            Point next = q.remove();
-            if (this.get(next).isWalkable){
-                List<Point> neighbours = getFreeNeighbours(next);
-                for (Point point : neighbours) {
-                    if (!accessible.contains(point)){
-                        accessible.add(point);
-                        q.add(point);
-                        // Modify the minimum point location if the current point
-                        // is "lower" than the current minimum
-                        minPoint = SokobanUtil.pointMin(minPoint, point);
-//                        System.out.println("min point is: " + minPoint);
-                    }
-                }
-            }
-        }
-        
-        // Move the point with the minimum value to the beginning of the list.
-        accessible.remove(minPoint);
-        accessible.add(0, minPoint);
-        
-        
-        return accessible;
-    }
 
-	//Get the reachable point from one point by pulling
-    public List<Point> getAccessiblePointsfromGoal(Point p){
-        Queue<Point> q = new LinkedList<>();
-        q.add(p);
-        List<Point> accessible = new ArrayList<>();
-        accessible.add(p);
-        while(!q.isEmpty()){
-            Point next = q.remove();
-            for(Action a : Action.values()){
-            	try {
-					applyPullAction(a,true,next);
+	/**
+	 * Gets the points on this board which are accessible from the given point.
+	 * This is done using something like a flood fill.
+	 * 
+	 * @param p
+	 *            The point for which to find accessible points
+	 * @return The points which are accessible from the given point. Accessible
+	 *         points are those which are walkable. The top left most point in
+	 *         the accessible area will be the first element of the list.
+	 */
+	public List<Point> getAccessiblePoints(Point p) {
+		Queue<Point> q = new LinkedList<Point>();
+		q.add(p);
+		List<Point> accessible = new ArrayList<Point>();
+		accessible.add(p);
+		// Track the minimum values of point positions so that we can see which
+		// point is the top left of the flood filled region
+		Point minPoint = p;
+		while (!q.isEmpty()) {
+			Point next = q.remove();
+			if (this.get(next).isWalkable) {
+				List<Point> neighbours = getFreeNeighbours(next);
+				for (Point point : neighbours) {
+					if (!accessible.contains(point)) {
+						accessible.add(point);
+						q.add(point);
+						// Modify the minimum point location if the current
+						// point
+						// is "lower" than the current minimum
+						minPoint = SokobanUtil.pointMin(minPoint, point);
+						// System.out.println("min point is: " + minPoint);
+					}
+				}
+			}
+		}
+
+		// Move the point with the minimum value to the beginning of the list.
+		accessible.remove(minPoint);
+		accessible.add(0, minPoint);
+
+		return accessible;
+	}
+    
+	// Get the reachable point from one point by pulling
+	public List<Point> getAccessiblePointsfromGoal(Point p) {
+		Queue<Point> q = new LinkedList<>();
+		q.add(p);
+		List<Point> accessible = new ArrayList<>();
+		accessible.add(p);
+		while (!q.isEmpty()) {
+			Point next = q.remove();
+			for (Action a : Action.values()) {
+				try {
+					applyPullAction(a, true, next);
 					Point ReachPoint = SokobanUtil.applyActionToPoint(a, next);
 					System.out.print("Reach:" + ReachPoint.toString());
 					
@@ -463,7 +458,7 @@ public class Board {
 	 * No check is done on whether the point is a box, a wall or anything else.
 	 */
 	public List<Point> getFreeNeighbours(Point p) {
-		List<Point> freeNeighbours = new ArrayList<>();
+		List<Point> freeNeighbours = new ArrayList<Point>();
 		for (Action a : Action.values()) {
 			Point neighbour = SokobanUtil.applyActionToPoint(a, p);
 			if (get(neighbour).isWalkable) {
@@ -500,44 +495,68 @@ public class Board {
 		}
 		return freeNeighbours;
 	}
+
+	/**
+	 * Gets a map of points to actions which indicate the directions in which
+	 * each box on the map can be pushed. Assuming that the player is able to
+	 * teleport, a box can always be pushed in either 2 or 4 directions. If you
+	 * can push it in one direction, then the player must be able to access the
+	 * point that is being pushed from, and if the box is pushable in that
+	 * direction, it means that the space it is being pushed into is empty,
+	 * which means that the box could be pushed from that direction as well.
+	 * 
+	 * @return A map of points, indicating box locations, with a list of actions
+	 *         indicate which direction the box can successfuly be pushed from.
+	 *         Boxes which cannot be pushed are not included in the map.
+	 */
+	public Map<Point, List<Action>> getBoxPushableDirections() {
+		Map<Point, List<Action>> pushableDirections = new HashMap<>();
+		for (Point p : mObjects.keySet()) {
+			if (get(p).type != Symbol.Type.Box)
+				continue;
+			List<Action> possiblePushDirections = getSingleBoxPushableDirections(p);
+			pushableDirections.put(p, possiblePushDirections);
+		}
+		return pushableDirections;
+	}
     
     /**
-     * Gets a map of points to actions which indicate the directions in which each
-     * box on the map can be pushed. Assuming that the player is able to teleport,
-     * a box can always be pushed in either 2 or 4 directions. If you can push it
-     * in one direction, then the player must be able to access the point that is being
-     * pushed from, and if the box is pushable in that direction, it means that
-     * the space it is being pushed into is empty, which means that the box could
-     * be pushed from that direction as well.
-     * @return A map of points, indicating box locations, with a list of actions
-     * indicate which direction the box can successfuly be pushed from. Boxes which
-     * cannot be pushed are not included in the map.
+     * Gets a list of actions which can be applied to a box at the given point.
+     * @param p A point, which should contain a box symbol.
+     * @return A list of actions which can be applied to the box at the point
+     * in question.
      */
-    public Map<Point, List<Action>> getBoxPushableDirections(){
-        Map<Point, List<Action>> pushableDirections = new HashMap<>();
-        for (Point p : mObjects.keySet()) {
-			if (get(p).type != Symbol.Type.Box) continue;
-            List<Action> possiblePushDirections = new ArrayList<>();
-			for (Action a : pushableTestDirections) {
-				Point neighbour = SokobanUtil.applyActionToPoint(a, p);
-                Point opposite = SokobanUtil.applyActionToPoint(SokobanUtil.inverseAction(a), p);
-                // If you can push the box in one direction, then you can push it in the opposite
-                // direction as well. Boxes can only be pushed in either 2 or 4 directions, assuming
-                // that the player is able to teleport.
-                if (get(neighbour).isWalkable && get(opposite).isWalkable)
-                    possiblePushDirections.addAll(Arrays.asList(a, SokobanUtil.inverseAction(a)));
-			}
-            pushableDirections.put(p, possiblePushDirections);
-		}
-        return pushableDirections;
+    public List<Action> getSingleBoxPushableDirections(Point p){
+        Symbol pSymb = get(p);
+        if (pSymb != Symbol.Box || pSymb != Symbol.BoxOnGoal){
+            throw new IllegalArgumentException("The point provided must contain a box.");
+        }
+        List<Action> possiblePushDirections = new ArrayList<>();
+        for (Action a : pushableTestDirections) {
+            Point neighbour = SokobanUtil.applyActionToPoint(a, p);
+            Point opposite = SokobanUtil.applyActionToPoint(
+                    SokobanUtil.inverseAction(a), p);
+            // If you can push the box in one direction, then you can push
+            // it in the opposite
+            // direction as well. Boxes can only be pushed in either 2 or 4
+            // directions, assuming
+            // that the player is able to teleport.
+            if (get(neighbour).isWalkable && get(opposite).isWalkable){
+                possiblePushDirections.add(a);
+                possiblePushDirections.add(SokobanUtil.inverseAction(a));
+            }
+        }
+        
+        return possiblePushDirections;
     }
-	
-	/** 
-	 * Basic implementation: checks only that the box is not blocked against walls. 
-	 * Boxes are not considered to be blocking, and assumes that the player can get 
-	 * to the free neighbours 
-	 * Also, a box can be considered locked even on a goal (maybe you locked the wrong box there?)
-	 * You can test that it is on a goad before running this method (no point doing it the other way)
+
+	/**
+	 * Basic implementation: checks only that the box is not blocked against
+	 * walls. Boxes are not considered to be blocking, and assumes that the
+	 * player can get to the free neighbours Also, a box can be considered
+	 * locked even on a goal (maybe you locked the wrong box there?) You can
+	 * test that it is on a goad before running this method (no point doing it
+	 * the other way)
 	 */
 	public boolean isBoxLockedAtPoint(Point p) {
 		// A box is locked when it can't be pushed anymore. It happens when two adjacent 
@@ -593,6 +612,17 @@ public class Board {
     		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), costs.get(i), true));
     	}
     	return nodes;
+    }
+    
+    
+    public Point getTopLeftPosition()
+    {
+    	if (topLeftEvaluationNeeded)
+    	{
+    		this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
+    		topLeftEvaluationNeeded = false;
+    	}
+    	return topLeftPosition;
     }
     
     /**
@@ -654,7 +684,7 @@ public class Board {
 //            System.out.println("comparing ignore player");
             // The top left positions accessible to the player must be the same
             // if the boards are to be equal.
-            if (!this.topLeftPosition.equals(comp.topLeftPosition))
+            if (!this.getTopLeftPosition().equals(comp.getTopLeftPosition()))
                 return false;
 //            System.out.println("Top left positions match");
             Map<Point, Symbol> compObjects = comp.getDynamicObjects();
@@ -789,65 +819,57 @@ public class Board {
      */
     public ArrayList<Board> generateChildStates(ArrayList<BoardAction> rRelatedBoxMovements, ArrayList<Integer> rRelatedCosts)
     {  	
-    	class PointAndCost
-    	{
-    		Point point;
-    		int cost;
-    		public PointAndCost(Point point, int cost)
-    		{
-    			this.point = point;
-    			this.cost = cost;
-    		}
-    	}
+    	ArrayList<Board> result = new ArrayList<>();
+
+    	//Visitable positions will go through openList and end up in closedList.
+    	LinkedList<WeightedPoint> openList = new LinkedList<>();
+    	LinkedList<WeightedPoint> closedList = new LinkedList<>();
     	
-    	
-    	ArrayList<Board> result = new ArrayList<Board>();
     	
     	//initialise openList with playerPosition.
-    	//Visitable positions will go through openList and end up in closedList (used to avoid
-    	LinkedList<PointAndCost> openList = new LinkedList<PointAndCost>();
-    	LinkedList<PointAndCost> closedList = new LinkedList<PointAndCost>();
-    	
-    	PointAndCost start = new PointAndCost(playerPosition, 0);
+    	WeightedPoint start = new WeightedPoint(playerPosition, 0);
     	openList.add(start);
     	
     	
     	while (!openList.isEmpty())
     	{
-    		PointAndCost center = openList.removeFirst();
+    		WeightedPoint center = openList.removeFirst();
     		closedList.add(center);
+//    		System.out.println("center x:"+center.point.x + " y:" + center.point.y);
     		
-    		Point[] neighbours = new Point[4];
+    		WeightedPoint[] neighbours = new WeightedPoint[4];
     		
-    		neighbours[0] = new Point(center.point.x-1, center.point.y-1);
-    		neighbours[1] = new Point(center.point.x-1, center.point.y+1);
-    		neighbours[2] = new Point(center.point.x+1, center.point.y-1);
-    		neighbours[3] = new Point(center.point.x+1, center.point.y+1);
+    		neighbours[0] = new WeightedPoint(center.point.x, center.point.y-1, center.cost+1);	//UP
+    		neighbours[1] = new WeightedPoint(center.point.x, center.point.y+1, center.cost+1);	//DOWN
+    		neighbours[2] = new WeightedPoint(center.point.x-1, center.point.y, center.cost+1);	//LEFT
+    		neighbours[3] = new WeightedPoint(center.point.x+1, center.point.y, center.cost+1);	//RIGHT
     		
-    		for (Point neighbour : neighbours)
+    		for (WeightedPoint neighbour : neighbours)
     		{
-    			Symbol nSymb = this.get(neighbour);
-	    		if (nSymb == Symbol.Empty || nSymb == Symbol.Goal)
+    			Symbol nSymb = this.get(neighbour.point);
+//    			System.out.println("at x:"+ neighbour.point.x + " y:" + neighbour.point.y +"symbol: "+ "'"+ nSymb +"'");
+	    		if (nSymb != Symbol.Wall && nSymb.type != Symbol.Type.Box)
 	    		{
 	    			//adding open neighbour only if not visited and not already in openList
-	    			if (!openList.contains(neighbour) && closedList.contains(neighbour))
+	    			if (!openList.contains(neighbour) && !closedList.contains(neighbour))
 	    			{
-	    				PointAndCost newPointAndCost = new PointAndCost(neighbour, center.cost+1);
-	        			openList.addLast(newPointAndCost);
+	        			openList.addLast(neighbour);
 	    			}
 	    		}
-	    		else if (nSymb == Symbol.Box || nSymb == Symbol.BoxOnGoal)
+	    		else if (nSymb.type == Symbol.Type.Box)
 	    		{
 	    			//check if push is possible
-	    			int dirX = neighbour.x - center.point.x;
-	    			int dirY = neighbour.y - center.point.y;
-	    			Point endLocation = new Point(neighbour.x + dirX, neighbour.y + dirY);
-	    			if (this.get(endLocation) == Symbol.Empty || this.get(endLocation) == Symbol.Goal)
+	    			int dirX = neighbour.point.x - center.point.x;
+	    			int dirY = neighbour.point.y - center.point.y;
+	    			Point endLocation = new Point(neighbour.point.x + dirX, neighbour.point.y + dirY);
+	    			if (this.get(endLocation) != Symbol.Wall && this.get(endLocation).type != Symbol.Type.Box)
 	    			{
 	    				//Generating new Board
 	    				Board newBoard = new Board(this);
-	    				newBoard.moveElement(neighbour, endLocation); //moving crate
-	    				newBoard.moveElement(playerPosition, neighbour); //moving player
+	    				
+	    				newBoard.moveElement(playerPosition, center.point); //moving player to pushing point
+	    				newBoard.moveElement(neighbour.point, endLocation); //moving crate
+	    				newBoard.moveElement(center.point, neighbour.point);//moving player to it's end location
 	    				result.add(newBoard);
 	    				
 	    				//Generating BoxMovement
@@ -862,7 +884,7 @@ public class Board {
 	    						action = Action.DOWN;
 	    					else	//if (dirY<0)
 	    						action = Action.UP;
-	    					BoardAction move = new BoardAction(action, neighbour);
+	    					BoardAction move = new BoardAction(action, neighbour.point);
 	    					rRelatedBoxMovements.add(move);
 	    				}
 	    				
