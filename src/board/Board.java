@@ -312,13 +312,13 @@ public class Board {
 		Point destination = SokobanUtil.applyActionToPoint(a, Goal);
 		Symbol destObject = newBoard.get(destination);
 		System.out.println(destObject.toString());
-		if (((!destObject.equals(Symbol.BoxOnGoal)) && (!destObject.isWalkable))) {
+		if (destObject.equals(Symbol.Wall)) {
 			System.out.println("Cannot be reached");
 			throw new IllegalMoveException("Cannot be reached");
 		} else {
 			Point onestepmore = SokobanUtil.applyActionToPoint(a, destination);
 			Symbol onestepmoreObject = newBoard.get(onestepmore);
-			if (((!onestepmoreObject.equals(Symbol.BoxOnGoal)) && (!onestepmoreObject.isWalkable))) {
+			if (onestepmoreObject.equals(Symbol.Wall)) {
 				System.out.println("Cannot be reached as deadlock");
 				throw new IllegalMoveException("Cannot be reached");
 			}
