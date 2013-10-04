@@ -30,7 +30,7 @@ public class Main {
 	 * @param args
 	 */
 	
-	public static boolean USE_BOARD_EXPANSION = false;
+	public static boolean USE_BOARD_EXPANSION = true;
 	
 	public static void main(String[] args) throws IOException {
 //		printExpandedBoards();
@@ -94,7 +94,9 @@ public class Main {
     public static void printExpandedBoards()
     {
     	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
-
+    	System.out.println("BASE MAP");
+    	System.out.println(start.toString());
+    	
 		ArrayList<BoardAction> actions = new ArrayList<>();
 		ArrayList<Board> childs = start.generateChildStates(actions,null);
 

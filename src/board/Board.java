@@ -39,17 +39,19 @@ public class Board {
 	public List<List<Point>> availablePosition  = new ArrayList<List<Point>>();
     // Top left most position accessible from the player position.
     private Point topLeftPosition;
+    private boolean topLeftEvaluationNeeded = true;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
 		this.playerPosition = playerPosition;
-        this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
+		topLeftEvaluationNeeded = true;
 	}
 	
 	public Board(Board original) {
 		this.mObjects = new HashMap<>(original.mObjects);		//TODO is a shallow copy enough?
 		this.playerPosition = new Point(original.playerPosition);
-        this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
+        this.topLeftPosition = original.topLeftPosition;
+        topLeftEvaluationNeeded = original.topLeftEvaluationNeeded;
 	}
 
 	public Map<Point, Symbol> getDynamicObjects() {
@@ -77,10 +79,7 @@ public class Board {
 		return StaticBoard.getInstance().goals;
 	}
 
-    public Point getTopLeftPosition() {
-        return topLeftPosition;
-    }
-    
+	
 	/** @return Ascii art representation of the board (static + dynamic) */
 	@Override
 	public String toString() {
@@ -233,7 +232,7 @@ public class Board {
 			if (element == Symbol.Type.Player) {
 				playerPosition = to;
 			}
-
+			topLeftEvaluationNeeded = true;
 			return true;
 		}
 
@@ -614,6 +613,17 @@ public class Board {
     	return nodes;
     }
     
+    
+    public Point getTopLeftPosition()
+    {
+    	if (topLeftEvaluationNeeded)
+    	{
+    		this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
+    		topLeftEvaluationNeeded = false;
+    	}
+    	return topLeftPosition;
+    }
+    
     /**
      * Checks whether the given object is equal to this Board. The position
      * of the player is ignored in the check.
@@ -673,7 +683,7 @@ public class Board {
 //            System.out.println("comparing ignore player");
             // The top left positions accessible to the player must be the same
             // if the boards are to be equal.
-            if (!this.topLeftPosition.equals(comp.topLeftPosition))
+            if (!this.getTopLeftPosition().equals(comp.getTopLeftPosition()))
                 return false;
 //            System.out.println("Top left positions match");
             Map<Point, Symbol> compObjects = comp.getDynamicObjects();
