@@ -18,7 +18,7 @@ public class StaticBoard {
 	/** Deprecated, use costMap.getKeySet() instead) */
 	@Deprecated
 	public final List<Point> goals;
-	public static Map<Point, Map<Point, Integer>> costMap;
+	public final Map<Point, Map<Point, Integer>> costMap;
 	
 	public static void init(Symbol[][] grid, List<Point> goals) {
 		INSTANCE = new StaticBoard(grid, goals);
