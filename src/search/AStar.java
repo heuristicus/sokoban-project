@@ -56,14 +56,20 @@ public class AStar extends SearchMethod {
 //                System.out.println(searchNode);
 //            }
             SearchNode front = open.remove(); // The best node in the queue
+//            System.out.println("Checking if closed contains the front node");
+//            System.out.println(front);
             // If front is the goal, return the action sequence.
 //            System.out.println("Checking goal state");
             if (front.equals(goalNode)){
+//                System.out.println("Found the goal!");
+//                System.out.println("Front:");
+//                System.out.println(front);
+//                System.out.println("Goal:");
+//                System.out.println(goalNode);
                 return front.actionUnwind();
             }
             
-//            System.out.println("Checking if closed contains the front node");
-//            System.out.println(front);
+
             // Add the parent to the closed list - we do not need to expand it more than once
             if (!closed.contains(front)){ // #TODO Is this check really necessary?
 //                System.out.println("closed does not contain the front node. adding.");

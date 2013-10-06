@@ -39,11 +39,13 @@ public class Main {
 //        System.out.println(start);
         SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
         Board goal = SokobanUtil.getSolvedBoard(start);
+        System.out.println(goal);
         ArrayList<BoardAction> pathas = astar.findPath(start, goal, USE_BOARD_EXPANSION);
-        
+        System.out.println("Box movements:");
+        System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
+        List<Action> pathWithMoves = null;
         if (USE_BOARD_EXPANSION)
         {
-        	List<Action> pathWithMoves = null;
             try
     		{
     			pathWithMoves = start.generateFullActionList(pathas);
@@ -53,12 +55,14 @@ public class Main {
     			// TODO Auto-generated catch block
     			e.printStackTrace();
     		}
-            System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
         }else
         {
-        	System.out.print(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
+            pathWithMoves = BoardAction.convertToActionList(pathas);
         }
-              
+        
+        System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
+        
+        
 //        Board solved = null;
 //        try {
 //            solved = start.applyActionChained(pathas, false);
