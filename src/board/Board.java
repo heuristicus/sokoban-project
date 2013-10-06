@@ -511,8 +511,11 @@ public class Board {
 	 */
 	public Map<Point, List<Action>> getBoxPushableDirections() {
 		Map<Point, List<Action>> pushableDirections = new HashMap<>();
+        System.out.println(this);
 		for (Point p : mObjects.keySet()) {
-			if (get(p).type != Symbol.Type.Box)
+            Symbol thisPos = get(p);
+            System.out.println("Checking point " + p);
+            if (thisPos == Symbol.Player || thisPos == Symbol.PlayerOnGoal)
 				continue;
 			List<Action> possiblePushDirections = getSingleBoxPushableDirections(p);
 			pushableDirections.put(p, possiblePushDirections);
@@ -528,7 +531,8 @@ public class Board {
      */
     public List<Action> getSingleBoxPushableDirections(Point p){
         Symbol pSymb = get(p);
-        if (pSymb != Symbol.Box || pSymb != Symbol.BoxOnGoal){
+        
+        if (pSymb != Symbol.Box && pSymb != Symbol.BoxOnGoal){
             throw new IllegalArgumentException("The point provided must contain a box.");
         }
         List<Action> possiblePushDirections = new ArrayList<>();
