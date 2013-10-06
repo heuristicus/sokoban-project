@@ -511,10 +511,8 @@ public class Board {
 	 */
 	public Map<Point, List<Action>> getBoxPushableDirections() {
 		Map<Point, List<Action>> pushableDirections = new HashMap<>();
-        System.out.println(this);
 		for (Point p : mObjects.keySet()) {
             Symbol thisPos = get(p);
-            System.out.println("Checking point " + p);
             if (thisPos == Symbol.Player || thisPos == Symbol.PlayerOnGoal)
 				continue;
 			List<Action> possiblePushDirections = getSingleBoxPushableDirections(p);

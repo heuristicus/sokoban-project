@@ -45,7 +45,14 @@ public class SokobanUtilTest {
      */
     @Test
     public void testPointMin() {
-        fail("The test case is a prototype.");
+        // Point with the lowest distance to 0,0 is the smallest. Distance should be calculated
+        // by adding x and y coordinates for both points, since it is a discrete space.
+        // 0,0 should be the minimum point in any case (assuming non-negative map coordinates)
+        assertEquals(new Point(0,0), SokobanUtil.pointMin(new Point(0, 0), new Point(0,1)));
+        assertEquals(new Point(20,1), SokobanUtil.pointMin(new Point(500, 0), new Point(20, 1)));
+        // Points with the lowest y value should be returned if the distances are the same.
+        assertEquals(new Point(10, 0), SokobanUtil.pointMin(new Point(10, 0), new Point(9, 1)));
+        assertEquals(new Point(8, 1), SokobanUtil.pointMin(new Point(10, 0), new Point(8, 1)));
     }
 
     /**

@@ -103,17 +103,31 @@ public class SokobanUtil {
     }
     
     /*
-     * Returns the point of the given two points which is in the top left most position
+     * Returns the point of the given two points which is in the top left most position.
+     * The top left most point is decided based on the distance to the point 0,0. The
+     * space is assumed to be discrete with all coordinates non-negative. Distance
+     * is calculated by summing the x and y coordinates of the points. If the sum
+     * is equal, the point with the smallest y coordinate is returned.
      */
     public static Point pointMin(Point p1, Point p2){
-//        System.out.println("comparing " + p1 + " with " + p2);
-        if (p2.y > p1.y){
+        if (p1.equals(p2))
             return p1;
-        } else if (p1.y > p2.y)
+        
+        int p1sum = p1.x + p1.y;
+        int p2sum = p2.x + p2.y;
+        
+        if (p1sum < p2sum)
+            return p1;
+        else if (p2sum < p1sum)
             return p2;
-        else {
-            return p2.x >= p1.x ? p1 : p2;
-        }
+        // Below here the sums are equal
+        else if (p1.y < p2.y)
+            return p1;
+        else 
+            // p2.y < p1.y. There is no p1.y = p2.y because we checked equality at
+            // the start, and the only way for two points with one equal coordinate
+            // to be equal is for them both to have the other coordinate equal as well.
+            return p2;
     }
     
     /**
