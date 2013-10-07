@@ -36,8 +36,8 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 //		printExpandedBoards();
     	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
-//        System.out.println("Starting board:");
-//        System.out.println(start);
+        System.out.println("Starting board:");
+        System.out.println(start);
         SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
 //        SearchMethod IDA = new IDAStar(new ManhattanClosestHeuristic());
         Board goal = SokobanUtil.getSolvedBoard(start);

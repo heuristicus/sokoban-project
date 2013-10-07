@@ -611,6 +611,8 @@ public class Board {
     	ArrayList<SearchNode> nodes = new ArrayList<>();
     	for (int i=0 ; i<boards.size() ; i++)
     	{
+            System.out.println("successor " + i);
+            System.out.println(boards.get(i));
     		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), costs.get(i), true));
     	}
     	return nodes;
@@ -864,12 +866,11 @@ public class Board {
 	    			int dirX = neighbour.point.x - center.point.x;
 	    			int dirY = neighbour.point.y - center.point.y;
 	    			Point endLocation = new Point(neighbour.point.x + dirX, neighbour.point.y + dirY);
-                    Symbol endType = this.get(endLocation);
-                    if (endType != Symbol.Wall 
-                            && endType != Symbol.Box
-                            // Do not consider boards which create locked states, unless they
-                            // are boxes on goals.
-                            && (!isBoxLockedAtPoint(endLocation) || endType == Symbol.BoxOnGoal)) 
+                    Symbol endSym = this.get(endLocation);
+                    if (endSym != Symbol.Wall // cannot push into walls or other boxes
+                            && endSym.type != Symbol.Type.Box
+                            // Don't push boxes onto locked points, unless the point is a goal
+                            && (!isBoxLockedAtPoint(endLocation) || endSym == Symbol.Goal))
 	    			{
 	    				//Generating new Board
 	    				Board newBoard = new Board(this);
