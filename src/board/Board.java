@@ -587,7 +587,7 @@ public class Board {
 		if (sumX % 2 != 0 || sumY %2 != 0 ) return true;
 		return false;
 	}
-
+    
     public ArrayList<SearchNode> expandPlayerSpace(SearchNode parent) {
         ArrayList<SearchNode> expanded = new ArrayList<>();
         
@@ -603,12 +603,12 @@ public class Board {
     }
     
     public ArrayList<SearchNode> expandBoardSpace(SearchNode parent){
-        ArrayList<BoardAction> actions = new ArrayList<BoardAction>();
-        ArrayList<Integer> costs = new ArrayList<Integer>();
+        ArrayList<BoardAction> actions = new ArrayList<>();
+        ArrayList<Integer> costs = new ArrayList<>();
         
         ArrayList<Board> boards = generateChildStates(actions,costs);
         
-    	ArrayList<SearchNode> nodes = new ArrayList<SearchNode>();
+    	ArrayList<SearchNode> nodes = new ArrayList<>();
     	for (int i=0 ; i<boards.size() ; i++)
     	{
     		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), costs.get(i), true));
@@ -864,7 +864,12 @@ public class Board {
 	    			int dirX = neighbour.point.x - center.point.x;
 	    			int dirY = neighbour.point.y - center.point.y;
 	    			Point endLocation = new Point(neighbour.point.x + dirX, neighbour.point.y + dirY);
-	    			if (this.get(endLocation) != Symbol.Wall && this.get(endLocation).type != Symbol.Type.Box)
+                    Symbol endType = this.get(endLocation);
+                    if (endType != Symbol.Wall 
+                            && endType != Symbol.Box
+                            // Do not consider boards which create locked states, unless they
+                            // are boxes on goals.
+                            && (!isBoxLockedAtPoint(endLocation) || endType == Symbol.BoxOnGoal)) 
 	    			{
 	    				//Generating new Board
 	    				Board newBoard = new Board(this);

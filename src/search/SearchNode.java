@@ -20,8 +20,8 @@ import pathfinding.BoardAction;
  */
 public class SearchNode implements Comparable<SearchNode>{
 
-    protected Float pathCost;
-    protected Float estimatedCost;
+    protected Integer pathCost;
+    protected Integer estimatedCost;
     protected Board nodeState;
     protected BoardAction generatingAction;
     protected SearchNode parent;
@@ -59,7 +59,7 @@ public class SearchNode implements Comparable<SearchNode>{
      * expansion or a board space expansion. This defines which method of the board class is used
      * when the equals method of this class is called.
      */
-     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, float pathCost, boolean boardSpaceExpansion) {
+     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, int pathCost, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
@@ -82,7 +82,7 @@ public class SearchNode implements Comparable<SearchNode>{
      * expansion or a board space expansion. This defines which method of the board class is used
      * when the equals method of this class is called.
      */
-     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, float pathCost, float estimatedCost, boolean boardSpaceExpansion) {
+     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, int pathCost, int estimatedCost, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
@@ -172,7 +172,6 @@ public class SearchNode implements Comparable<SearchNode>{
         
     @Override
     public int compareTo(SearchNode o) {
-//        System.out.println("compareto node called");
         if (this.estimatedCost == o.estimatedCost)
             return 0;
         return this.estimatedCost < o.estimatedCost ? -1 : 1;
