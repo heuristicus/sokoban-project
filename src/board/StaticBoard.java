@@ -44,6 +44,8 @@ public class StaticBoard {
      * representing the cost of getting to the given point from the given goal.
      */
     private void generatePathCosts(){
+    
+    	
         for (Point goal : goals) {
             Queue<WeightedPoint> open = new LinkedList<>();
             List<Point> closed = new ArrayList<>();
@@ -64,19 +66,35 @@ public class StaticBoard {
                     
                     // Put the goal node being checked along with the cost of getting to
                     // this position from that goal into the map for this point.
-                    thisPoint.put(goal, next.cost);
+                //    
                     closed.add(next.point);
                     // expand the neighbours of this point and add them to the
                     // open list if they have not yet been visited.
                     List<WeightedPoint> neighbours = expandPoint(next);
+                // If there is one neighbours available, that means it is previous node, the cost should be infinity
+                    if(neighbours.size()==1){
+                    	 thisPoint.put(goal, Integer.MAX_VALUE);
+                    }else{
+                    	thisPoint.put(goal, next.cost);
+                    }
                     for (WeightedPoint neighbour : neighbours) {
                         if (!closed.contains(neighbour.point)){
                             open.add(neighbour);
                         }
                     }
+                }else {
+                	Map<Point, Integer> thisPoint = goalDistanceCost.get(next.point);
+                	if(thisPoint == null){
+                		thisPoint = new HashMap<>();
+                		goalDistanceCost.put(next.point, thisPoint);
+                		thisPoint.put(goal, Integer.MAX_VALUE);
+                	}
+
                 }
             }
         }
+        
+//        System.out.print(goalDistanceCost.toString());
     }
     
     private List<WeightedPoint> expandPoint(WeightedPoint p){
@@ -86,7 +104,9 @@ public class StaticBoard {
 			if (get(neighbour.point).isWalkable) {
 				WeightedPoint farneighbour = new WeightedPoint(SokobanUtil.applyActionToPoint(a, neighbour.point), neighbour.cost + 1);
 				if (get(farneighbour.point).isWalkable)
-				{freeNeighbours.add(neighbour);}
+				{freeNeighbours.add(neighbour);}else{
+				}
+
 			}
 		}
 		return freeNeighbours;
