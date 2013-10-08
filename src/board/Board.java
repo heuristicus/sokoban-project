@@ -589,7 +589,29 @@ public class Board {
 		return false;
 	}
 	
-	
+	/**
+	 * Checks if the state contains any locked box (statically or dynamically locked).
+	 * A box locked on a goal is not considered locked.
+	 * 
+	 * @return If true, means that the state and its childs won't lead to any solution.
+	 */
+    public boolean isLockedState()
+    {
+    	for (Point p : mObjects.keySet())
+    	{
+    		if (p != playerPosition)			//escaping player
+    		{
+    			if (get(p) != Symbol.BoxOnGoal)	//escaping boxes on goals
+    			{
+    				if (isBoxLocked(p))			//if any of the boxes is locked, the state is locked
+    					return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
+    
 	/** Used to check if a box is locked, statically (by walls, in a corner for example) or dynamically (by surrounding boxes configuration).
 	 * 	If called on a cell that's not containing a box, will return false.
 	 * 
