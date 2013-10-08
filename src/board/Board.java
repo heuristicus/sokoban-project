@@ -1020,9 +1020,9 @@ public class Board {
 	    			Point endLocation = new Point(neighbour.point.x + dirX, neighbour.point.y + dirY);
                     Symbol endSym = this.get(endLocation);
                     if (endSym != Symbol.Wall // cannot push into walls or other boxes
-                            && endSym.type != Symbol.Type.Box
+                            && endSym.type != Symbol.Type.Box)
                             // Don't push boxes onto locked points, unless the point is a goal
-                            && (!isBoxLocked(endLocation) || endSym == Symbol.Goal))
+                            // && (!isBoxLocked(endLocation) || endSym == Symbol.Goal))
 	    			{
 	    				//Generating new Board
 	    				Board newBoard = new Board(this);
@@ -1030,27 +1030,32 @@ public class Board {
 	    				newBoard.moveElement(playerPosition, center.point); //moving player to pushing point
 	    				newBoard.moveElement(neighbour.point, endLocation); //moving crate
 	    				newBoard.moveElement(center.point, neighbour.point);//moving player to it's end location
-	    				result.add(newBoard);
 	    				
-	    				//Generating BoxMovement
-	    				if (rRelatedBoxMovements != null)
+	    				//if the board is a locked state, just ignore it
+	    				if (!newBoard.isLockedState())
 	    				{
-	    					Action action;
-	    					if (dirX>0)
-	    						action = Action.RIGHT;
-	    					else if (dirX<0)
-	    						action = Action.LEFT;
-	    					else if (dirY>0)
-	    						action = Action.DOWN;
-	    					else	//if (dirY<0)
-	    						action = Action.UP;
-	    					BoardAction move = new BoardAction(action, neighbour.point);
-	    					rRelatedBoxMovements.add(move);
-	    				}
-	    				
-	    				if(rRelatedCosts != null)
-	    				{
-	    					rRelatedCosts.add(new Integer(center.cost+1));
+		    				result.add(newBoard);
+		    				
+		    				//Generating BoxMovement
+		    				if (rRelatedBoxMovements != null)
+		    				{
+		    					Action action;
+		    					if (dirX>0)
+		    						action = Action.RIGHT;
+		    					else if (dirX<0)
+		    						action = Action.LEFT;
+		    					else if (dirY>0)
+		    						action = Action.DOWN;
+		    					else	//if (dirY<0)
+		    						action = Action.UP;
+		    					BoardAction move = new BoardAction(action, neighbour.point);
+		    					rRelatedBoxMovements.add(move);
+		    				}
+		    				
+		    				if(rRelatedCosts != null)
+		    				{
+		    					rRelatedCosts.add(new Integer(center.cost+1));
+		    				}
 	    				}
 	    			}
 	    		}
