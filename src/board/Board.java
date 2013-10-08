@@ -273,7 +273,7 @@ public class Board {
 			Symbol boxDest = newBoard.get(boxDestination);
             // If the destination is not walkable or it puts the board into a locked
             // state, then we don't want to do this action
-			if (!boxDest.isWalkable || (boxDest != Symbol.Goal && isBoxLockedAtPoint(boxDestination))) {
+			if (!boxDest.isWalkable || (boxDest != Symbol.Goal && isBoxLocked(boxDestination))) {
 				throw new IllegalMoveException("Direction " + SokobanUtil.actionToString(a) 
                         + " is a box, but the box would become locked or there is a wall "
                         + "blocking it from being pushed.");
@@ -560,6 +560,7 @@ public class Board {
 	 * test that it is on a goad before running this method (no point doing it
 	 * the other way)
 	 */
+    @Deprecated
 	public boolean isBoxLockedAtPoint(Point p) {
 		// A box is locked when it can't be pushed anymore. It happens when two adjacent 
 		// sides of the box are not walkable. 
@@ -587,6 +588,58 @@ public class Board {
 		if (sumX % 2 != 0 || sumY %2 != 0 ) return true;
 		return false;
 	}
+	
+	
+	/** Used to check if a box is locked, statically (by walls, in a corner for example) or dynamically (by surrounding boxes configuration).
+	 * 	If called on a cell that's not containing a box, will return false.
+	 * 
+	 * @param p Point that we want to check
+	 * @return true if the box at point p is locked for ever, by walls and/or boxes configuration.
+	 */
+	public boolean isBoxLocked(Point p)
+	{
+		//functor class used to hide the recursive method
+		class Functor
+		{
+			boolean isMovable(Point p, HashSet<Point> exploredPoints)
+			{
+				Symbol sym = Board.this.get(p);
+				if (sym == Symbol.Wall)
+					return false;
+				else if (sym.type == Symbol.Type.Box)
+				{
+					if (exploredPoints.contains(p))
+						return false;
+					else
+					{
+						exploredPoints.add(p);
+						Point upPoint = new Point(p.x,p.y-1);
+						Point downPoint = new Point(p.x,p.y+1);
+						Point leftPoint = new Point(p.x-1,p.y);
+						Point rightPoint = new Point(p.x+1,p.y);
+						return (isMovable(leftPoint,exploredPoints) && isMovable(rightPoint,exploredPoints) || 	//horizontally free
+								isMovable(upPoint,exploredPoints) && isMovable(downPoint,exploredPoints));		//vertically free
+					}
+				}
+				else
+					return true;
+			}	
+		};
+		
+		Functor fun = new Functor();
+		
+		//if there's no box on point p, return false
+		if (this.get(p).type != Symbol.Type.Box)
+			return false;
+		
+		//initialize recursion
+		HashSet<Point> exploredPoints = new HashSet<Point>();
+		return !fun.isMovable(p,exploredPoints);
+
+	}
+	
+	
+	
 	
 //	public boolean isDynamicallyLocked()
 //	{	
@@ -947,7 +1000,7 @@ public class Board {
                     if (endSym != Symbol.Wall // cannot push into walls or other boxes
                             && endSym.type != Symbol.Type.Box
                             // Don't push boxes onto locked points, unless the point is a goal
-                            && (!isBoxLockedAtPoint(endLocation) || endSym == Symbol.Goal))
+                            && (!isBoxLocked(endLocation) || endSym == Symbol.Goal))
 	    			{
 	    				//Generating new Board
 	    				Board newBoard = new Board(this);
