@@ -387,6 +387,35 @@ public class BoardTest {
     }
     
     @Test
+    public void testEqualsHash(){
+        Board b1 = TestUtil.initBoard("boardTestEqFill1.map");
+        Board b2 = TestUtil.initBoard("boardTestEqFill2.map");
+        Board b3 = TestUtil.initBoard("boardTestEqFill3.map");
+        Board b4 = TestUtil.initBoard("boardTestEqFill4.map");
+        Board b5 = TestUtil.initBoard("boardTestEqFill5.map");
+        
+        Board b1a = null;
+        try {
+            b1a = b1.applyAction(Action.UP, false);
+        } catch (IllegalMoveException ex) {
+        }
+        
+        System.out.println(b1.getAccessiblePoints(b1.getPlayerPosition()).get(0));
+        System.out.println(b1a.getAccessiblePoints(b1a.getPlayerPosition()).get(0));
+        System.out.println(b1.toStringMarked(b1.getAccessiblePoints(b1.getPlayerPosition())));
+        System.out.println(b1a.toStringMarked(b1a.getAccessiblePoints(b1a.getPlayerPosition())));
+        System.out.println(b2.toStringMarked(b2.getAccessiblePoints(b2.getPlayerPosition())));
+        
+        assertFalse(b1.equalsHash(b2));
+        assertTrue(b1.equalsHash(b1a));
+        assertFalse(b1.equalsHash(b3));
+        assertFalse(b2.equalsHash(b3));
+        assertFalse(b1.equalsHash(b4));
+        assertTrue(b4.equalsHash(b5));
+    }
+    
+    
+    @Test
     public void testPrepareNextBoxMove() throws IllegalMoveException {
     	final String INPUT_TEST_FILE = "searchTestStart.map";
     	final String OUTPUT_TEST_FILE = "searchTestIntermediate1.map";
@@ -486,6 +515,27 @@ public class BoardTest {
             assertTrue("The contents of the result action list did not match the expected list.", result.get(p).containsAll(expected.get(p)));
         }
         
+    }
+    
+    @Test
+    public void testMakeStringHash(){
+        Board a = TestUtil.initBoard("simpleSmall.map");
+        a.makeStringHash();
+        String aExp = "       @$      $   $ $";
+        assertEquals(aExp, a.getStringHash());
+        Board b = TestUtil.initBoard("simpleLarge.map");
+        b.makeStringHash();
+        String bExp = "           @$                                 $$   $$$$                     $";
+        assertEquals(bExp, b.getStringHash());
+        System.out.println("c");
+        Board c = TestUtil.initBoard("fullTest.map");
+        c.makeStringHash();
+        String cExp = "           @                $   $  $        $";
+        assertEquals(cExp, c.getStringHash());
+        Board d = TestUtil.initBoard("test002.in");
+        d.makeStringHash();
+        String dExp = "           @          $ $        $        $ $        $        $ $";
+        assertEquals(dExp, d.getStringHash());
     }
     
 }

@@ -1,5 +1,6 @@
 package board;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,9 +22,10 @@ public class StaticBoard {
 	public final Symbol[][] grid; 
 	public final List<Point> goals;
     public final Map<Point, Map<Point, Integer> > goalDistanceCost;
+    public final Dimension mapDim;
 	
-	public static void init(Symbol[][] grid, List<Point> goals) {
-		INSTANCE = new StaticBoard(grid, goals);
+	public static void init(Symbol[][] grid, List<Point> goals, Dimension boardDim) {
+		INSTANCE = new StaticBoard(grid, goals, boardDim);
 	}
 	
 	public static StaticBoard getInstance() {
@@ -31,10 +33,11 @@ public class StaticBoard {
 		return INSTANCE;
 	}
 	
-	private StaticBoard(Symbol[][] grid, List<Point> goals) {
+	private StaticBoard(Symbol[][] grid, List<Point> goals, Dimension boardDim) {
 		this.grid = grid;
 		this.goals = Collections.unmodifiableList(goals);
         this.goalDistanceCost = new HashMap<>();
+        this.mapDim = boardDim;
         generatePathCosts();
 	}
     

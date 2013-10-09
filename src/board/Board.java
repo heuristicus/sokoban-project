@@ -23,6 +23,7 @@ import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
+import java.awt.Dimension;
 import utilities.WeightedPoint;
 
 /**
@@ -41,6 +42,7 @@ public class Board {
     // Top left most position accessible from the player position.
     private Point topLeftPosition;
     private boolean topLeftEvaluationNeeded = true;
+    private String stringHash = null;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
@@ -140,13 +142,19 @@ public class Board {
 		// To have the number of lines and initialize the array, it must be done
 		// in two steps.
 		Symbol[][] staticMap = new Symbol[tmpStrMap.size()][];
-		Map<Point, Symbol> dynamicMap = new HashMap<Point, Symbol>();
-		List<Point> goals = new ArrayList<Point>();
+		Map<Point, Symbol> dynamicMap = new HashMap<>();
+		List<Point> goals = new ArrayList<>();
 		Point playerPosition = null;
 
+        int maxX = -1; // x dimension depends on the longest string.
+        int maxY = tmpStrMap.size(); // the y dimension is the number of strings we have
 		for (int y = 0; y < tmpStrMap.size(); ++y) {
 			String row = tmpStrMap.get(y);
-			Symbol[] outRow = new Symbol[row.length()];
+            int rowLength = row.length();
+            // update the maximum x dimension
+            if (rowLength > maxX)
+                maxX = rowLength;
+			Symbol[] outRow = new Symbol[rowLength];
 			for (int x = 0; x < row.length(); ++x) {
 				Symbol s = Symbol.get(row.charAt(x));
 				if (s.type != Symbol.Type.None) {
@@ -172,7 +180,7 @@ public class Board {
 		if (playerPosition == null)
 			throw new RuntimeException("Player position not detected");
 
-		StaticBoard.init(staticMap, goals);
+		StaticBoard.init(staticMap, goals, new Dimension(maxX, maxY));
 		return new Board(dynamicMap, playerPosition);
 	}
 
@@ -800,6 +808,18 @@ public class Board {
         return false;
     }
     
+    /**
+     * Uses the stringhash object to decide whether two boards are equal.
+     * @param obj 
+     */
+    public boolean equalsHash(Object obj){
+        if (obj instanceof Board){
+            Board other = (Board)obj;
+            return other.getStringHash().equals(this.getStringHash());
+        }
+        return false;
+    }
+    
     public Board prepareNextBoxMove(Action action, Point movedBox, boolean destructive) throws IllegalMoveException {
     	Board newBoard = destructive ? this : new Board(this);
     	
@@ -811,12 +831,58 @@ public class Board {
 
     @Override
     public int hashCode() {
-        int result = 29;
-        int code = 0;
+//        int result = 29;
+//        int code = 0;
+//        
+//        code += mObjects.hashCode();
+//        
+//        return 37 * result + code;
+        return getStringHash().hashCode();
+    }
+
+    public String getStringHash() {
+        if (stringHash == null)
+            makeStringHash();
+        return stringHash;
+    }
+    
+    public void makeStringHash(){
+        Dimension boardDim = StaticBoard.getInstance().mapDim;
+//        System.out.println("Board dim " + boardDim.width + "," + boardDim.height);
         
-        code += mObjects.hashCode();
+        // Make a char array which can contain all squares on the board, and then
+        // fill it with spaces so that when converted to a string the blanks are
+        // there. Without the fill, null characters are not displayed.
+        char base[] = new char[boardDim.height * boardDim.width];
+        Arrays.fill(base, ' ');
+
+        // Initialise the player position as the top left position of the board.
+        // The highest current index is also the index of this position.
+        Point topLeft = this.getTopLeftPosition();
+        int highestIndex = topLeft.y * boardDim.width + topLeft.x;
+
+        // The player is positioned at the top left accessible position, and we
+        // ignore the actual position
+        base[highestIndex] = '@';
+        for (Point point : this.mObjects.keySet()) {
+//            System.out.println("Point is " + point);
+            int index;
+            char posType = this.get(point).type.toChar();
+            if (posType == '@') // Skip the actual player position in the creation
+                continue;
+            // Set the index of this position in the char array to the char which
+            // represents the symbol type.
+            base[(index = point.y * boardDim.width + point.x)] = posType;
+            // Keep track of the highest index so that we know when to cut off.
+            if (index > highestIndex)
+                highestIndex = index;
+//            System.out.println("Index is " + index);
+        }
         
-        return 37 * result + code;
+        // We don't care about anything past the last position which contains a dynamic object
+        String hash = new String(base, 0, highestIndex + 1);
+//        System.out.println("Final hash " + hash);
+        stringHash = hash;
     }
 
     /**
@@ -956,6 +1022,7 @@ public class Board {
 	    				//if the board is a locked state, just ignore it
 	    				if (!newBoard.isLockedState())
 	    				{
+                            newBoard.makeStringHash();
 		    				result.add(newBoard);
 		    				
 		    				//Generating BoxMovement
