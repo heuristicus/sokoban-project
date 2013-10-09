@@ -103,7 +103,7 @@ public class AStar extends SearchMethod {
                             // If the current state is in the open list and the path cost to that
                             // state node is greater than that of the path cost to this node,
                             // remove it from the open list - the path via this node is better
-//                            System.out.println("open list already contained successor, but this path is better.");
+                            //System.out.println("open list already contained successor, but this path is better.");
                             it.remove();
                             break;
                         }
