@@ -32,8 +32,8 @@ public class Main {
 	public static boolean USE_BOARD_EXPANSION = true;
 	
 	public static void main(String[] args) throws IOException {
-//        stdIn();
-        profile();
+        stdIn();
+//        profile();
 //        boardExpand();
     }
     

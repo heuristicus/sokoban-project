@@ -70,6 +70,7 @@ public class StaticBoardTest {
 	}
 	
 	@Test
+	@SuppressWarnings("serial")
 	public void testMapDeepEquals() {
 		// Check that equals works as expected on maps, even with nested ones.
 		assertEquals(new HashMap<Point, Map<Point, Integer>>(){{
@@ -94,6 +95,7 @@ public class StaticBoardTest {
 			}});
 	}
 	
+	/* Pain in the ass to do by hand */
 	@Test
 	public void testComputeCosts3() {
 		final String TEST_FILE = "../test100/test000.in";
@@ -110,14 +112,11 @@ public class StaticBoardTest {
 		}
     	goals.add(new Point(6,8));//, new HashMap<Point, Integer>());
     	
-    	// Fill with max value
+    	// Fill with empty maps
 		// Main room
 		for (int x = 5; x <= 10; ++x) {
         	for (int y = 6; y <= 10; ++y) {
         		Map<Point, Integer> costs = new HashMap<>();
-        		for(Point goal : goals) {
-        			costs.put(goal,  Integer.MAX_VALUE);
-        		}
         		expectedResult.put(new Point(x,y), costs);
         		
         	}
@@ -128,31 +127,63 @@ public class StaticBoardTest {
 				new Point(2,5), new Point(5,5), new Point(3,6), new Point(4,7))) {
     		// rest of the points
 			Map<Point, Integer> costs = new HashMap<>();
-    		for(Point goal : goals) {
-    			costs.put(goal,  Integer.MAX_VALUE);
-    		}
     		expectedResult.put(p, costs);
 
     	}
     	
     	// Costs
 		// for the main room
-		for (int x = 6; x <= 9; ++x) {
-			for (int y = 7; y <= 9; ++y) {
+		for (int x = 5; x <= 9; ++x) {
+			for (int y = 6; y <= 9; ++y) {
+				Point p = new Point(x,y);
+				if (expectedResult.get(p) == null) expectedResult.put(p, new HashMap<Point, Integer>());
 				for(Point goal: goals) {
-					expectedResult.get(new Point(x,y)).put(goal, Math.abs(x-goal.x) + Math.abs(y-goal.y));
+					expectedResult.get(p).put(goal, Math.abs(x-goal.x) + Math.abs(y-goal.y));
 				}
 			}
 		}
 		// for the weird points
 		for (Point p : Arrays.asList(new Point(2,4), new Point(3,4), new Point(3,5),
 				new Point(4,5), new Point(4,6), new Point(5,6), new Point(5,7))) {
+			if (expectedResult.get(p) == null) expectedResult.put(p, new HashMap<Point, Integer>());
 			for(Point goal: goals) {
 				expectedResult.get(p).put(goal, Math.abs(p.x-goal.x) + Math.abs(p.y-goal.y));
 			}
 		}		
 		
 		assertEquals(expectedResult,StaticBoard.getInstance().goalDistanceCost);
+	}
+	
+	class HackableBoard extends Board {
+
+		public HackableBoard(Board original) {
+			super(original);
+		}
+		
+		public void set(Point p, Symbol s) {
+			mObjects.put(p, s);
+		}
+		
+	}
+	
+	
+	@Test
+	public void displayCostMap() {
+		final String TEST_FILE = "../test100/test000.in";
+		HackableBoard board = new HackableBoard(TestUtil.initBoard(TEST_FILE));
+		StaticBoard sBoard = StaticBoard.getInstance();
+		for( int y = 0; y < sBoard.grid.length; ++y ) {
+			for( int x = 0; x < sBoard.grid[y].length; ++x ) {
+				Point p = new Point(x, y);
+				if(sBoard.get(p) != Symbol.Wall) {
+					if (StaticBoard.isLocked(p)) {
+						board.set(p, Symbol.Mark);
+					}
+				}
+			}
+			
+		}
+		System.out.println(board.toString());
 	}
 
 	@Test

@@ -4,10 +4,12 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
@@ -48,7 +50,7 @@ public class StaticBoard {
     	
         for (Point goal : goals) {
             Queue<WeightedPoint> open = new LinkedList<>();
-            List<Point> closed = new ArrayList<>();
+            Set<Point> closed = new HashSet<>(); // A set is more efficient for search
             
             WeightedPoint wp = new WeightedPoint(goal, 0);
             open.add(wp);
@@ -66,15 +68,16 @@ public class StaticBoard {
                     
                     // Put the goal node being checked along with the cost of getting to
                     // this position from that goal into the map for this point.
-                //    
-                    closed.add(next.point);
+
                     // expand the neighbours of this point and add them to the
                     // open list if they have not yet been visited.
                     List<WeightedPoint> neighbours = expandPoint(next);
-                // If there is one neighbours available, that means it is previous node, the cost should be infinity
-                    if(neighbours.size()==1){
-                    	 thisPoint.put(goal, Integer.MAX_VALUE);
-                    }else{
+                    /* If there is one neighbour available, that means it is previous node:
+                     * we are in a dead end, going there is useless, consider it unreachable.
+                     */ 
+                    if(neighbours.size()==1) {
+//                    	 thisPoint.put(goal, Integer.MAX_VALUE);
+                    } else {
                     	thisPoint.put(goal, next.cost);
                     }
                     for (WeightedPoint neighbour : neighbours) {
@@ -82,15 +85,16 @@ public class StaticBoard {
                             open.add(neighbour);
                         }
                     }
-                }else {
-                	Map<Point, Integer> thisPoint = goalDistanceCost.get(next.point);
-                	if(thisPoint == null){
-                		thisPoint = new HashMap<>();
-                		goalDistanceCost.put(next.point, thisPoint);
-                		thisPoint.put(goal, Integer.MAX_VALUE);
-                	}
-
                 }
+//                else {
+//                	Map<Point, Integer> thisPoint = goalDistanceCost.get(next.point);
+//                	if(thisPoint == null){
+//                		thisPoint = new HashMap<>();
+//                		goalDistanceCost.put(next.point, thisPoint);
+//                		thisPoint.put(goal, Integer.MAX_VALUE);
+//                	}
+//
+//                }
             }
         }
         
@@ -103,10 +107,9 @@ public class StaticBoard {
 			WeightedPoint neighbour = new WeightedPoint(SokobanUtil.applyActionToPoint(a, p.point), p.cost + 1);
 			if (get(neighbour.point).isWalkable) {
 				WeightedPoint farneighbour = new WeightedPoint(SokobanUtil.applyActionToPoint(a, neighbour.point), neighbour.cost + 1);
-				if (get(farneighbour.point).isWalkable)
-				{freeNeighbours.add(neighbour);}else{
+				if (get(farneighbour.point).isWalkable) {
+					freeNeighbours.add(neighbour);
 				}
-
 			}
 		}
 		return freeNeighbours;
@@ -123,6 +126,11 @@ public class StaticBoard {
 	/** @return Ascii art representation of the map (static only) */
 	public String toString() {
 		return SokobanUtil.stringifyGrid(grid);
+	}
+
+	public static boolean isLocked(Point p) {
+		Map<Point, Integer> costs = getInstance().goalDistanceCost.get(p); 
+		return costs == null || costs.isEmpty();
 	}
 	
 }
