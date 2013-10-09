@@ -4,13 +4,14 @@
  */
 package search;
 
-import board.Board;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
+
 import pathfinding.BoardAction;
+import board.Board;
 
 
 /**
@@ -38,7 +39,7 @@ public class AStar extends SearchMethod {
     @Override
     public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
         // Store already visited nodes
-        HashSet<SearchNode> closed = new HashSet();
+        HashSet<SearchNode> closed = new HashSet<>();
         // Store as yet unvisited nodes in a priority queue - we expand from the best
         Queue<SearchNode> open = new PriorityQueue<>();
         
@@ -46,7 +47,7 @@ public class AStar extends SearchMethod {
         open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
         SearchNode goalNode = new SearchNode(goal, null, null, boardSpace);
         while(!open.isEmpty()){
-//            System.out.println("open size: " + open.size() + " closed size: " + closed.size());
+            System.out.println("open size: " + open.size() + " closed size: " + closed.size() + " discarded locks: " +Board.lockedStatesIgnored);
 //            System.out.println("OPEN LIST =============");
 //            for (SearchNode searchNode : open) {
 //                System.out.println(searchNode);
@@ -85,7 +86,7 @@ public class AStar extends SearchMethod {
 //            System.out.println("Number of successor states: " + successors.size());
             for (SearchNode successor : successors) {
 //                System.out.println("Examining successor of front node");
-//                System.out.println(successor);
+                System.out.println(successor);
                 // Look through the open list to see if the successor is
                 // already present
                 Iterator<SearchNode> it = open.iterator();

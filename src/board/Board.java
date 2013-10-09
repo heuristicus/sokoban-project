@@ -36,13 +36,15 @@ import utilities.WeightedPoint;
 public class Board {
     
     private static final Action pushableTestDirections[] = {Action.UP, Action.LEFT};
-	private final Map<Point, Symbol> mObjects;
+	protected final Map<Point, Symbol> mObjects;
 	private Point playerPosition;
 	public List<List<Point>> availablePosition  = new ArrayList<List<Point>>();
     // Top left most position accessible from the player position.
     private Point topLeftPosition;
     private boolean topLeftEvaluationNeeded = true;
     private String stringHash = null;
+    /** Used only for profiling */
+    public static int lockedStatesIgnored = 0;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
@@ -664,7 +666,7 @@ public class Board {
 		
 		//initialize recursion
 		HashSet<Point> exploredPoints = new HashSet<Point>();
-		return !fun.isMovable(p,exploredPoints);
+		return StaticBoard.isLocked(p) || !fun.isMovable(p,exploredPoints);
 
 	}
 	
@@ -1045,6 +1047,10 @@ public class Board {
 		    				{
 		    					rRelatedCosts.add(new Integer(center.cost+1));
 		    				}
+	    				}
+	    				else
+	    				{
+	    					++lockedStatesIgnored;
 	    				}
 	    			}
 	    		}
