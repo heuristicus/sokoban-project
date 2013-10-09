@@ -20,9 +20,7 @@ import board.StaticBoard;
 import exceptions.IllegalMoveException;
 import pathfinding.BoardAction;
 import search.AStar;
-import search.IDAStar;
 import search.ManhattanClosestHeuristic;
-import search.MinMatchingHeuristic;
 
 
 public class Main {
@@ -34,25 +32,26 @@ public class Main {
 	public static boolean USE_BOARD_EXPANSION = true;
 	
 	public static void main(String[] args) throws IOException {
-//		printExpandedBoards();
-    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
-        System.out.println("Starting board:");
-        System.out.println(start);
-        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
-//        SearchMethod IDA = new IDAStar(new ManhattanClosestHeuristic());
+//        stdIn();
+        profile();
+//        boardExpand();
+    }
+    
+    public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
         System.out.println(goal);
+        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
         ArrayList<BoardAction> pathas = astar.findPath(start, goal, USE_BOARD_EXPANSION);
-//        ArrayList<BoardAction> pathas = IDA.findPath(start, goal, USE_BOARD_EXPANSION);
+        //        ArrayList<BoardAction> pathas = IDA.findPath(start, goal, USE_BOARD_EXPANSION);
         System.out.println("Box movements:");
         System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
         List<Action> pathWithMoves = null;
         if (USE_BOARD_EXPANSION)
         {
             try
-    		{
-    			pathWithMoves = start.generateFullActionList(pathas);
-    		}
+            {
+                pathWithMoves = start.generateFullActionList(pathas);
+            }
     		catch (IllegalMoveException e)
     		{
     			// TODO Auto-generated catch block
@@ -62,40 +61,15 @@ public class Main {
         {
             pathWithMoves = BoardAction.convertToActionList(pathas);
         }
-        
+        System.out.println("Full path:");
         System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
         
-        
-//        Board solved = null;
-//        try {
-//            solved = start.applyActionChained(pathas, false);
-//        } catch (IllegalMoveException ex) {
-//        }
-//        System.out.println("Solved board:");
-//        System.out.println(solved);
-//        		mainTest();
-//        profile();
-//        boardExpand();
-	}
+    }
     
-    public static void boardExpand() throws IOException{
-        Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/fullTest.map"), Charset.defaultCharset()));
-        Board goalas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/fullTestGoal.map"), Charset.defaultCharset()));
-        
-        System.out.println("astar finding solution for initial map");
-        System.out.println(startas);
-        
-        // Essentially does DFS!
-        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
-        
-        ArrayList<BoardAction> pathas = astar.findPath(startas, goalas, true);
-
-        if (pathas != null){
-            System.out.println("astar completed, path length " + pathas.size());
-            System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
-        } else {
-            System.out.println("astar could not find path.");
-        }
+    public static void stdIn(){
+        //		printExpandedBoards();
+    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
+        solveBoard(start);
     }
     
     public static void printExpandedBoards()
@@ -118,24 +92,8 @@ public class Main {
     }
     
     public static void profile() throws IOException {
-        Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
-        Board goalas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
-        
-        System.out.println("astar finding solution for initial map");
-        System.out.println(startas);
-        
-        // Essentially does DFS!
-        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
-        
-        ArrayList<BoardAction> pathas = astar.findPath(startas, goalas, false);
-
-        if (pathas != null){
-            System.out.println("astar completed, path length " + pathas.size());
-            System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
-        } else {
-            System.out.println("astar could not find path.");
-        }
-        
+        Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/fullTest.map"), Charset.defaultCharset()));
+        solveBoard(startas);
     }
     
     public static void mainTest() throws IOException{

@@ -394,9 +394,9 @@ public class Board {
 	 *         the accessible area will be the first element of the list.
 	 */
 	public List<Point> getAccessiblePoints(Point p) {
-		Queue<Point> q = new LinkedList<Point>();
+		Queue<Point> q = new LinkedList<>();
 		q.add(p);
-		List<Point> accessible = new ArrayList<Point>();
+		List<Point> accessible = new ArrayList<>();
 		accessible.add(p);
 		// Track the minimum values of point positions so that we can see which
 		// point is the top left of the flood filled region
@@ -611,8 +611,8 @@ public class Board {
     	ArrayList<SearchNode> nodes = new ArrayList<>();
     	for (int i=0 ; i<boards.size() ; i++)
     	{
-            System.out.println("successor " + i);
-            System.out.println(boards.get(i));
+//            System.out.println("successor " + i);
+//            System.out.println(boards.get(i));
     		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), costs.get(i), true));
     	}
     	return nodes;
