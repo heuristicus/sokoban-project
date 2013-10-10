@@ -30,6 +30,7 @@ import org.junit.Test;
 import pathfinding.BoardAction;
 import exceptions.IllegalMoveException;
 import search.SearchNode;
+import utilities.Pair;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import utilities.TestUtil;
@@ -536,6 +537,82 @@ public class BoardTest {
         d.makeStringHash();
         String dExp = "           @          $ $        $        $ $        $        $ $";
         assertEquals(dExp, d.getStringHash());
+    }
+    
+    
+    @Test
+    public void testFloodFillInitialise(){
+        Board a = TestUtil.initBoard("simpleSmall.map");
+        ArrayList<Pair<BoardAction, Integer>> aBoxExp = a.getPossibleActions();
+        aBoxExp.addAll(Arrays.asList(
+                new Pair<>(new BoardAction(Action.LEFT, new Point(2,1)), 5),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(2,1)), 7),
+                new Pair<>(new BoardAction(Action.UP, new Point(2,1)), 5),
+                
+                new Pair<>(new BoardAction(Action.LEFT, new Point(3,2)), 3),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(3,2)), 5),
+                new Pair<>(new BoardAction(Action.DOWN, new Point(3,2)), 5),
+                
+                new Pair<>(new BoardAction(Action.UP, new Point(3,3)), 2),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(3,3)), 2),                
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(3,3)), 4),
+                
+                new Pair<>(new BoardAction(Action.UP, new Point(1,3)), 4),
+                new Pair<>(new BoardAction(Action.DOWN, new Point(1,3)), 6),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(1,3)), 4)
+                ));
+        Point aTLRes = a.getTopLeftPosition();
+        ArrayList<Pair<BoardAction, Integer>> aBoxRes = a.getPossibleActions();
+        assertEquals(new Point(1,1), aTLRes);
+        
+        
+        Board b = TestUtil.initBoard("nonSquare.map");
+        ArrayList<Pair<BoardAction, Integer>> bBoxExp = new ArrayList<>();
+        bBoxExp.addAll(Arrays.asList(
+                new Pair<>(new BoardAction(Action.DOWN, new Point(4,2)), 2),
+                new Pair<>(new BoardAction(Action.UP, new Point(4,2)), 4),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(4,2)), 2),
+                new Pair<>(new BoardAction(Action.DOWN, new Point(2,3)), 3),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(2,3)), 3)
+                ));
+        
+        Point bTLRes = b.getTopLeftPosition();
+        ArrayList<Pair<BoardAction, Integer>> bBoxRes = b.getPossibleActions();
+        assertEquals(new Point(3,1), bTLRes);
+        assertEquals(bBoxExp.size(), bBoxRes.size());
+        assertTrue(bBoxExp.containsAll(bBoxRes));
+        
+        
+        Board c = TestUtil.initBoard("fullTest.map");
+        ArrayList<Pair<BoardAction, Integer>> cBoxExp = new ArrayList<>();
+                cBoxExp.addAll(Arrays.asList(
+                // Down action on box below player
+                new Pair<>(new BoardAction(Action.DOWN, new Point(2,3)), 2),
+                new Pair<>(new BoardAction(Action.UP, new Point(2,3)), 6),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(2,3)), 4),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(2,3)), 4),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(4,4)), 5)
+                ));
+        Point cTLRes = c.getTopLeftPosition();
+        ArrayList<Pair<BoardAction, Integer>> cBoxRes = c.getPossibleActions();
+        assertEquals(new Point(1,1), cTLRes);
+        assertEquals(cBoxExp.size(), cBoxRes.size());
+        assertTrue(cBoxExp.containsAll(cBoxRes));
+        
+        Board d = TestUtil.initBoard("tiny.map");
+        ArrayList<Pair<BoardAction, Integer>> dBoxExp = new ArrayList<>();
+        dBoxExp.addAll(Arrays.asList(
+                new Pair<>(new BoardAction(Action.DOWN, new Point(2,2)), 1),
+                new Pair<>(new BoardAction(Action.UP, new Point(2,2)), 5),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(2,2)), 3),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(2,2)), 3)
+                ));
+        Point dTLRes = d.getTopLeftPosition();
+        ArrayList<Pair<BoardAction, Integer>> dBoxRes = d.getPossibleActions();
+        assertEquals(new Point(1,1), dTLRes);
+        assertEquals(dBoxExp.size(), dBoxRes.size());
+        assertTrue(dBoxExp.containsAll(dBoxRes));
+        
     }
     
 }

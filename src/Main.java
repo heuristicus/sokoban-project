@@ -40,7 +40,6 @@ public class Main {
     
     public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
-//        System.out.println(goal);
         SearchMethod astar = new AStar(new Heuristic.ManhattanClosestHeuristic());
         ArrayList<BoardAction> pathas = astar.findPath(start, goal, USE_BOARD_EXPANSION);
         //        ArrayList<BoardAction> pathas = IDA.findPath(start, goal, USE_BOARD_EXPANSION);

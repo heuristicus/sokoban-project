@@ -23,5 +23,27 @@ public class BoardAction {
         }
         return aList;
     }
+
+    /**
+     * A boardAction object is considered to be equal to another if both the action
+     * and the point it is being applied to are the same
+     * @param obj
+     * @return 
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BoardAction){
+            BoardAction other = (BoardAction)obj;
+            return other.action.equals(this.action) && other.position.equals(this.position);
+        }
+        return false;
+    }
+    
+    @Override
+    public String toString() {
+        return "Action: " + action.toString() + ", Position: " + position.toString();
+    }
+    
+    
     
 }
