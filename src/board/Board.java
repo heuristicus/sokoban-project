@@ -394,8 +394,18 @@ public class Board {
 
 		return newBoard;
 	}
+	
+	
     
-    /**
+    protected ArrayList<Pair<BoardAction, Integer>> getPossibleActions()
+	{
+    	if (floodFillRequired)
+    		floodFillInitialise();
+    	
+		return possibleActions;
+	}
+
+	/**
      * Initialises the top left position and the list of actions that can be taken
      * from the current position of the player, in terms of a flood fill. This means that
      * all boxes that are in the accessible area which can be pushed are checked for which
@@ -727,17 +737,67 @@ public class Board {
     }
     
     public ArrayList<SearchNode> expandBoardSpace(SearchNode parent){
-        ArrayList<BoardAction> actions = new ArrayList<>();
-        ArrayList<Integer> costs = new ArrayList<>();
-        
-        ArrayList<Board> boards = generateChildStates(actions,costs);
-        
     	ArrayList<SearchNode> nodes = new ArrayList<>();
-    	for (int i=0 ; i<boards.size() ; i++)
+    	ArrayList<Pair<BoardAction,Integer> > boxList = getPossibleActions();
+    	for (Pair<BoardAction,Integer> boxAction : boxList)
     	{
-//            System.out.println("successor " + i);
-//            System.out.println(boards.get(i));
-    		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), costs.get(i), true));
+    		int dx = boxAction.first.action.dx;	//push direction
+    		int dy = boxAction.first.action.dy;
+    		Point boxPos = boxAction.first.position;
+    		Point pushPos = new Point(boxPos.x - dx, boxPos.y - dy);	//position where the player stands before pushing the box
+    		Point finalPos = new Point(boxPos.x + dx, boxPos.y + dy);
+    		if (get(finalPos).type == Symbol.Type.Box || get(finalPos) == Symbol.Wall)
+    		{
+    			//Generating new Board
+				Board newBoard = new Board(this);
+				
+				newBoard.moveElement(playerPosition, pushPos); //moving player to pushing point
+				newBoard.moveElement(boxPos, finalPos); //moving crate
+				newBoard.moveElement(pushPos, boxPos);//moving player to it's end location
+				
+				//if the board is a locked state, just ignore it
+				if (!newBoard.isLockedState())
+				{
+		    		nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
+				}
+				else
+				{
+					++lockedStatesIgnored;
+				}
+    		}
+    	}
+    	return nodes;
+    }
+    
+    
+    public ArrayList<SearchNode> expandBoardSpaceBackwards(SearchNode parent){
+    	ArrayList<SearchNode> nodes = new ArrayList<>();
+    	ArrayList<Pair<BoardAction,Integer> > boxList = getPossibleActions();
+    	for (Pair<BoardAction,Integer> boxAction : boxList)
+    	{
+    		int dx = boxAction.first.action.dx;	//push direction
+    		int dy = boxAction.first.action.dy;
+    		Point boxPos = boxAction.first.position;
+    		Point pushPos = new Point(boxPos.x - 2*dx, boxPos.y - 2*dy);	//position where the player stands before pulling the box
+    		Point finalPos = new Point(boxPos.x - dx, boxPos.y - dy);
+    		if (get(finalPos).type == Symbol.Type.Box || get(finalPos) == Symbol.Wall)
+    		{
+    			//Generating new Board
+    			Board newBoard = new Board(this);
+    			
+    			newBoard.moveElement(playerPosition, pushPos); //moving player to pushing point
+    			newBoard.moveElement(boxPos, finalPos); //moving crate
+    			
+    			//if the board is a locked state, just ignore it
+    			if (!newBoard.isLockedState())
+    			{
+    				nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
+    			}
+    			else
+    			{
+    				++lockedStatesIgnored;
+    			}
+    		}
     	}
     	return nodes;
     }
@@ -746,10 +806,8 @@ public class Board {
     public Point getTopLeftPosition()
     {
     	if (floodFillRequired)
-    	{
-    		this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
-    		floodFillRequired = false;
-    	}
+    		floodFillInitialise();
+
     	return topLeftPosition;
     }
     
