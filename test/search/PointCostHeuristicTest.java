@@ -4,11 +4,13 @@
  */
 package search;
 
-import board.Board;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 import utilities.SokobanUtil;
 import utilities.TestUtil;
+import board.Board;
 
 /**
  *
@@ -21,7 +23,7 @@ public class PointCostHeuristicTest {
 
     @Test
     public void testUtility() {
-        PointCostHeuristic h = new PointCostHeuristic();
+        Heuristic.PointCostHeuristic h = new Heuristic.PointCostHeuristic();
         Board b1 = TestUtil.initBoard("pointHeuristic1.map");
         Board goal = SokobanUtil.getSolvedBoard(b1);
         Board b2 = TestUtil.initBoard("pointHeuristic2.map");

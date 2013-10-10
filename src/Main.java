@@ -10,7 +10,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import pathfinding.BoardAction;
+import search.AStar;
 import search.BFSNoDuplication;
+import search.Heuristic;
+import search.Heuristic.ManhattanClosestHeuristic;
 import search.SearchMethod;
 import search.SearchNode;
 import utilities.SokobanUtil;
@@ -18,9 +22,6 @@ import utilities.SokobanUtil.Action;
 import board.Board;
 import board.StaticBoard;
 import exceptions.IllegalMoveException;
-import pathfinding.BoardAction;
-import search.AStar;
-import search.ManhattanClosestHeuristic;
 
 
 public class Main {
@@ -40,7 +41,7 @@ public class Main {
     public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
 //        System.out.println(goal);
-        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
+        SearchMethod astar = new AStar(new Heuristic.ManhattanClosestHeuristic());
         ArrayList<BoardAction> pathas = astar.findPath(start, goal, USE_BOARD_EXPANSION);
         //        ArrayList<BoardAction> pathas = IDA.findPath(start, goal, USE_BOARD_EXPANSION);
 //        System.out.println("Box movements:");

@@ -46,8 +46,8 @@ public class SearchAlgorithmTest {
     Board testMapBoardSpaceGoal;
         
     public SearchAlgorithmTest() {
-        aStarPlayerPath = new AStar(new DiagonalDistanceHeuristic());
-        aStarBoxPath = new AStar(new ManhattanClosestHeuristic());
+        aStarPlayerPath = new AStar(new Heuristic.DiagonalDistanceHeuristic());
+        aStarBoxPath = new AStar(new Heuristic.ManhattanClosestHeuristic());
         noDupBFS = new BFSNoDuplication();
         testMapStart = TestUtil.initBoard("searchTestStart.map");
         testMapGoal = TestUtil.initBoard("searchTestGoal.map");
@@ -94,7 +94,7 @@ public class SearchAlgorithmTest {
         System.out.println("goal map");
         System.out.println(goal);
         
-        SearchMethod as = new AStar(new ManhattanClosestHeuristic());
+        SearchMethod as = new AStar(new Heuristic.ManhattanClosestHeuristic());
         SearchMethod bfs = new BFSNoDuplication();
 //        ArrayList<Action> actions = as.findPath(start, goal, false);
 //        ArrayList<Action> actions = bfs.findPath(start, goal, false);
