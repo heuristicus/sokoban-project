@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import utilities.Pair;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import utilities.WeightedPoint;
@@ -49,7 +50,6 @@ public class StaticBoard {
      * representing the cost of getting to the given point from the given goal.
      */
     private void generatePathCosts(){
-    
     	
         for (Point goal : goals) {
             Queue<WeightedPoint> open = new LinkedList<>();
@@ -60,13 +60,14 @@ public class StaticBoard {
             while (!open.isEmpty()) { // while there are unexpanded points
                 WeightedPoint next = open.remove();
                 closed.add(next.point);
+                Symbol currentSymbol = get(next.point); 
+                if (currentSymbol.isWalkable) {
                 // Only consider walkable positions
-                if (get(next.point).isWalkable){
                     // Make sure the hashmap for this point is initialised
-                    Map<Point, Integer> thisPoint = goalDistanceCost.get(next.point);
-                    if (thisPoint == null){
-                        thisPoint = new HashMap<>();
-                        goalDistanceCost.put(next.point, thisPoint);
+                    Map<Point, Integer> currentCosts = goalDistanceCost.get(next.point);
+                    if (currentCosts == null){
+                        currentCosts = new HashMap<>();
+                        goalDistanceCost.put(next.point, currentCosts);
                     }
                     
                     // Put the goal node being checked along with the cost of getting to
@@ -74,48 +75,50 @@ public class StaticBoard {
 
                     // expand the neighbours of this point and add them to the
                     // open list if they have not yet been visited.
-                    List<WeightedPoint> neighbours = expandPoint(next);
-                    /* If there is one neighbour available, that means it is previous node:
-                     * we are in a dead end, going there is useless, consider it unreachable.
-                     */ 
-                    if(neighbours.size()==1) {
-//                    	 thisPoint.put(goal, Integer.MAX_VALUE);
-                    } else {
-                    	thisPoint.put(goal, next.cost);
+                    Pair<List<WeightedPoint>, Boolean> tmp = expandPoint(next); 
+                    List<WeightedPoint> neighbours = tmp.first;
+                    boolean isDeadEnd = tmp.second;
+                    /* If there is only one neighbour available, it is the previous node:
+                     * we are in a dead end, going there is useless, consider it unreachable. */
+                    if(!isDeadEnd || currentSymbol == Symbol.Goal) {
+                    	currentCosts.put(goal, next.cost);
                     }
+                    
                     for (WeightedPoint neighbour : neighbours) {
                         if (!closed.contains(neighbour.point)){
                             open.add(neighbour);
                         }
                     }
                 }
-//                else {
-//                	Map<Point, Integer> thisPoint = goalDistanceCost.get(next.point);
-//                	if(thisPoint == null){
-//                		thisPoint = new HashMap<>();
-//                		goalDistanceCost.put(next.point, thisPoint);
-//                		thisPoint.put(goal, Integer.MAX_VALUE);
-//                	}
-//
-//                }
             }
         }
-        
-//        System.out.print(goalDistanceCost.toString());
     }
     
-    private List<WeightedPoint> expandPoint(WeightedPoint p){
+    /**
+     * Flood fill expansion from a point
+     * The nodes to be expanded are the neighbours that have walkable on both sides
+     * The point is considered a dead end when it only has one walkable immediate neighbour
+     * @param p Origin point
+     * @return
+     * 	first: list of the nodes to be expanded
+     *  second: whether the current point is a dead end
+     */
+    private Pair<List<WeightedPoint>, Boolean> expandPoint(WeightedPoint p){
         List<WeightedPoint> freeNeighbours = new ArrayList<>();
-		for (Action a : Action.values()) {
-			WeightedPoint neighbour = new WeightedPoint(SokobanUtil.applyActionToPoint(a, p.point), p.cost + 1);
-			if (get(neighbour.point).isWalkable) {
-				WeightedPoint farneighbour = new WeightedPoint(SokobanUtil.applyActionToPoint(a, neighbour.point), neighbour.cost + 1);
-				if (get(farneighbour.point).isWalkable) {
-					freeNeighbours.add(neighbour);
+        int walkableImmediateNeighbours = 0;
+		
+        for (Action a : Action.values()) {
+			Point neighbour = SokobanUtil.applyActionToPoint(a, p.point);
+			
+			if (get(neighbour).isWalkable) {
+				++walkableImmediateNeighbours;
+				Point farNeighbour = SokobanUtil.applyActionToPoint(a, neighbour);
+				if (get(farNeighbour).isWalkable) {
+					freeNeighbours.add(new WeightedPoint(neighbour, p.cost + 1));
 				}
 			}
 		}
-		return freeNeighbours;
+		return new Pair<>(freeNeighbours, walkableImmediateNeighbours <= 1);
     }
 	
 	public Symbol get(Point point) {

@@ -149,8 +149,7 @@ public interface Heuristic<T> {
     
     public static class MinMatchingHeuristic implements Heuristic<Board> {
 
-    	public static Symbol[] START_SYMBOLS = { Symbol.Box, Symbol.BoxOnGoal };
-    	public static Symbol[] GOAL_SYMBOLS = { Symbol.Box, Symbol.BoxOnGoal };
+//    	public static Symbol[] GOAL_SYMBOLS = { Symbol.Box, Symbol.BoxOnGoal };
 
     	public float utility(Board start, Board goal) {
     		goal.setAvailablePosition();
@@ -164,7 +163,7 @@ public interface Heuristic<T> {
     		}
     		/** Create a 2D array to store the cost of box to Goals **/
     		for (Point startPt : startSet.keySet()) {
-    			if (isStartSymbol(start.get(startPt))) {
+    			if (start.get(startPt).type == Symbol.Type.Box) {
     				List<Integer> EstimateCost = new ArrayList<>(Goals.size());
     				for (Point goalPt : Goals) {
     					/**
@@ -238,16 +237,6 @@ public interface Heuristic<T> {
     		return minValue;
 
     	}
-
-    	private boolean isStartSymbol(Symbol sym) {
-    		for (Symbol ref : START_SYMBOLS) {
-    			if (ref == sym) {
-    				return true;
-    			}
-    		}
-    		return false;
-    	}
-
     }
     
     public static class DiagonalDistanceHeuristic implements Heuristic<Board> {
