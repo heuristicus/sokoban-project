@@ -8,6 +8,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.awt.Point;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,28 +48,17 @@ public class StaticBoardTest {
         Map<Point, Map<Point, Integer>> expectedResult = new HashMap<>();
         Point goal1 = new Point(6,1);
         Point goal2 = new Point(6,2);
-
-        // MAX_VALUE everywhere: locked points
-        // The walkable area is a rectangle
-        for (int x = 1; x <= 6; ++x) {
-        	for (int y = 1; y <= 4; ++y) {
-        		Map<Point, Integer> costs = new HashMap<>();
-        		costs.put(goal1, Integer.MAX_VALUE);
-        		costs.put(goal2, Integer.MAX_VALUE);
-        		expectedResult.put(new Point(x,y), costs);
-        	}
-		}
         
         // Costs for reachable points
         for (int x = 2; x <= 6; ++x) {
         	for (int y = 1; y <= 3; ++y) {
-        		expectedResult.get(new Point(x,y)).put(goal1, Math.abs(x-goal1.x) + Math.abs(y-goal1.y));
-        		if (y >= 2) expectedResult.get(new Point(x,y)).put(goal2, Math.abs(x-goal2.x) + Math.abs(y-goal2.y));
+        		Point p = new Point(x,y);
+        		if (expectedResult.get(p) == null) expectedResult.put(p, new HashMap<Point, Integer>());
+        		expectedResult.get(p).put(goal1, Math.abs(x-goal1.x) + Math.abs(y-goal1.y));
+        		if (y >= 2) expectedResult.get(p).put(goal2, Math.abs(x-goal2.x) + Math.abs(y-goal2.y));
         	}
         }
-        
-        System.out.println(expectedResult);
-        
+                
         assertEquals(expectedResult,StaticBoard.getInstance().goalDistanceCost);
 	}
 	
@@ -95,64 +88,37 @@ public class StaticBoardTest {
 			}});
 	}
 	
-	/* Pain in the ass to do by hand */
 	@Test
-	public void testComputeCosts3() {
+	public void testCostMapMinValue() throws IOException {
 		final String TEST_FILE = "../test100/test000.in";
 		TestUtil.initBoard(TEST_FILE);
+		StaticBoard sBoard = StaticBoard.getInstance();
+		String[] mapLines = sBoard.toString().split("\n");
 		
-		Map<Point, Map<Point, Integer>> expectedResult = new HashMap<>();
-
-		// Register the goals
-		List<Point> goals = new ArrayList<Point>();
-		for (int x = 7; x <= 9; ++x) {
-        	for (int y = 7; y <= 9; ++y) {
-        		goals.add(new Point(x,y));
-        	}
-		}
-    	goals.add(new Point(6,8));//, new HashMap<Point, Integer>());
-    	
-    	// Fill with empty maps
-		// Main room
-		for (int x = 5; x <= 10; ++x) {
-        	for (int y = 6; y <= 10; ++y) {
-        		Map<Point, Integer> costs = new HashMap<>();
-        		expectedResult.put(new Point(x,y), costs);
-        		
-        	}
-		}
-		
-		for (Point p : Arrays.asList(new Point(1,1), new Point(1,2), new Point(1,3), 
-				new Point(2,3), new Point(3,3), new Point(1,4), new Point(4,4), 
-				new Point(2,5), new Point(5,5), new Point(3,6), new Point(4,7))) {
-    		// rest of the points
-			Map<Point, Integer> costs = new HashMap<>();
-    		expectedResult.put(p, costs);
-
-    	}
-    	
-    	// Costs
-		// for the main room
-		for (int x = 5; x <= 9; ++x) {
-			for (int y = 6; y <= 9; ++y) {
-				Point p = new Point(x,y);
-				if (expectedResult.get(p) == null) expectedResult.put(p, new HashMap<Point, Integer>());
-				for(Point goal: goals) {
-					expectedResult.get(p).put(goal, Math.abs(x-goal.x) + Math.abs(y-goal.y));
+		for( int y = 0; y < sBoard.grid.length; ++y ) {
+			StringBuilder currentLine = new StringBuilder(mapLines[y]);
+			for( int x = 0; x < sBoard.grid[y].length; ++x ) {
+				Point p = new Point(x, y);
+				if(sBoard.get(p) != Symbol.Wall) {
+					if (StaticBoard.isLocked(p)) {
+						currentLine.setCharAt(x, 'X');
+					} else {
+						int minValue = Integer.MAX_VALUE;
+						for (Point key : sBoard.goalDistanceCost.get(p).keySet()) {
+							minValue = Math.min(minValue, sBoard.goalDistanceCost.get(p).get(key));
+						}
+						currentLine.setCharAt(x, Character.forDigit(minValue, 10));
+					}
 				}
 			}
+			mapLines[y] = currentLine.toString();	
 		}
-		// for the weird points
-		for (Point p : Arrays.asList(new Point(2,4), new Point(3,4), new Point(3,5),
-				new Point(4,5), new Point(4,6), new Point(5,6), new Point(5,7))) {
-			if (expectedResult.get(p) == null) expectedResult.put(p, new HashMap<Point, Integer>());
-			for(Point goal: goals) {
-				expectedResult.get(p).put(goal, Math.abs(p.x-goal.x) + Math.abs(p.y-goal.y));
-			}
-		}		
 		
-		assertEquals(expectedResult,StaticBoard.getInstance().goalDistanceCost);
+		List<String> expectedOutput = Files.readAllLines(Paths.get(BoardTest.testMapDir, "test000.costs.map"), Charset.defaultCharset());
+		assertEquals(expectedOutput, Arrays.asList(mapLines));
+		
 	}
+	
 	
 	class HackableBoard extends Board {
 
