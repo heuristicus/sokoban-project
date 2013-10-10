@@ -532,7 +532,7 @@ public class BoardTest {
         c.makeStringHash();
         String cExp = "           @                $   $  $        $";
         assertEquals(cExp, c.getStringHash());
-        Board d = TestUtil.initBoard("test002.in");
+        Board d = TestUtil.initBoard("../test100/test002.in");
         d.makeStringHash();
         String dExp = "           @          $ $        $        $ $        $        $ $";
         assertEquals(dExp, d.getStringHash());
