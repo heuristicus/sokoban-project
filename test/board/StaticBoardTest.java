@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +38,42 @@ public class StaticBoardTest {
     
     @After
     public void tearDown() {
+    }
+    
+    private void testMinValueCostMap(String testFile, String expectedOutputFile, boolean debug) throws IOException {
+    	TestUtil.initBoard(testFile);
+		StaticBoard sBoard = StaticBoard.getInstance();
+		String[] mapLines = sBoard.toString().split("\n");
+		
+		for( int y = 0; y < sBoard.grid.length; ++y ) {
+			StringBuilder currentLine = new StringBuilder(mapLines[y]);
+			for( int x = 0; x < sBoard.grid[y].length; ++x ) {
+				Point p = new Point(x, y);
+				if(sBoard.get(p) != Symbol.Wall) {
+					if (StaticBoard.isLocked(p)) {
+						currentLine.setCharAt(x, 'X');
+					} else {
+						int minValue = Integer.MAX_VALUE;
+						for (Point key : sBoard.goalDistanceCost.get(p).keySet()) {
+							minValue = Math.min(minValue, sBoard.goalDistanceCost.get(p).get(key));
+						}
+						currentLine.setCharAt(x, Character.forDigit(minValue, 30)); // After 9, it goes in ascii order from a
+					}
+				}
+			}
+			mapLines[y] = currentLine.toString();	
+		}
+		
+		if (debug) {
+			StringBuilder sb = new StringBuilder();
+			for( int i = 0; i < mapLines.length; ++i) {
+				sb.append(mapLines[i]).append('\n');
+			}
+			System.out.println(sb.toString());			
+		}
+		
+		List<String> expectedOutput = Files.readAllLines(Paths.get(BoardTest.testMapDir, expectedOutputFile), Charset.defaultCharset());
+		assertEquals(expectedOutput, Arrays.asList(mapLines));
     }
 
 	@Test
@@ -90,33 +125,17 @@ public class StaticBoardTest {
 	
 	@Test
 	public void testCostMapMinValue() throws IOException {
-		final String TEST_FILE = "../test100/test000.in";
-		TestUtil.initBoard(TEST_FILE);
-		StaticBoard sBoard = StaticBoard.getInstance();
-		String[] mapLines = sBoard.toString().split("\n");
-		
-		for( int y = 0; y < sBoard.grid.length; ++y ) {
-			StringBuilder currentLine = new StringBuilder(mapLines[y]);
-			for( int x = 0; x < sBoard.grid[y].length; ++x ) {
-				Point p = new Point(x, y);
-				if(sBoard.get(p) != Symbol.Wall) {
-					if (StaticBoard.isLocked(p)) {
-						currentLine.setCharAt(x, 'X');
-					} else {
-						int minValue = Integer.MAX_VALUE;
-						for (Point key : sBoard.goalDistanceCost.get(p).keySet()) {
-							minValue = Math.min(minValue, sBoard.goalDistanceCost.get(p).get(key));
-						}
-						currentLine.setCharAt(x, Character.forDigit(minValue, 10));
-					}
-				}
-			}
-			mapLines[y] = currentLine.toString();	
-		}
-		
-		List<String> expectedOutput = Files.readAllLines(Paths.get(BoardTest.testMapDir, "test000.costs.map"), Charset.defaultCharset());
-		assertEquals(expectedOutput, Arrays.asList(mapLines));
-		
+		testMinValueCostMap("../test100/test000.in", "test000.costs.map", false);
+	}
+	
+	@Test
+	public void testCostMapMinValue1() throws IOException {
+		testMinValueCostMap("testCosts.map", "testCosts.expected.map", false);
+	}
+	
+	@Test
+	public void testCostMapMinValue2() throws IOException {
+		testMinValueCostMap("testCosts2.map", "testCosts2.expected.map", false);
 	}
 	
 	
@@ -132,10 +151,10 @@ public class StaticBoardTest {
 		
 	}
 	
-	
 	@Test
 	public void displayCostMap() {
-		final String TEST_FILE = "../test100/test000.in";
+//		final String TEST_FILE = "../test100/test000.in";
+		final String TEST_FILE = "testCosts2.map";
 		HackableBoard board = new HackableBoard(TestUtil.initBoard(TEST_FILE));
 		StaticBoard sBoard = StaticBoard.getInstance();
 		for( int y = 0; y < sBoard.grid.length; ++y ) {
