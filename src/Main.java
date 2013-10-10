@@ -39,12 +39,12 @@ public class Main {
     
     public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
-        System.out.println(goal);
+//        System.out.println(goal);
         SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
         ArrayList<BoardAction> pathas = astar.findPath(start, goal, USE_BOARD_EXPANSION);
         //        ArrayList<BoardAction> pathas = IDA.findPath(start, goal, USE_BOARD_EXPANSION);
-        System.out.println("Box movements:");
-        System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
+//        System.out.println("Box movements:");
+//        System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
         List<Action> pathWithMoves = null;
         if (USE_BOARD_EXPANSION)
         {
@@ -61,7 +61,7 @@ public class Main {
         {
             pathWithMoves = BoardAction.convertToActionList(pathas);
         }
-        System.out.println("Full path:");
+//        System.out.println("Full path:");
         System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
         
     }
@@ -69,6 +69,7 @@ public class Main {
     public static void stdIn(){
         //		printExpandedBoards();
     	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
+        System.exit(0);
         solveBoard(start);
     }
     

@@ -157,7 +157,8 @@ public class SearchNode implements Comparable<SearchNode>{
         if (obj instanceof SearchNode){
             SearchNode node = (SearchNode)obj;
             if (boardSpaceExpansion){
-                return this.nodeState.equalsPlayerFill(node.nodeState);
+//                return this.nodeState.equalsPlayerFill(node.nodeState);
+                return this.nodeState.equalsHash(node.nodeState);
             } else {
                 return this.nodeState.equals(node.nodeState);
             }

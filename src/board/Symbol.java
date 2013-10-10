@@ -15,7 +15,19 @@ public enum Symbol {
 	PlayerOnGoal('+', '.', '@', true, Type.Player),
 	BoxOnGoal(   '*', '.', '$', false, Type.Box);
 	
-	public static enum Type {Player, Box, Mark, None};
+	public static enum Type {
+        Player, Box, Mark, None;
+        
+        public char toChar() {
+            switch(this){
+                case Player: return '@';
+                case Box: return '$';
+                case Mark: return 'X';
+                case None: return ' ';
+                default: return '\u0000';
+            }
+        }
+    };
 
 	public final char value;
 	public final char staticValue;
