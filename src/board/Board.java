@@ -25,6 +25,7 @@ import utilities.SokobanUtil.Action;
 import utilities.WeightedPoint;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
+import utilities.Pair;
 
 /**
  * Dynamic representation of the world.
@@ -41,7 +42,8 @@ public class Board {
 	public List<List<Point>> availablePosition  = new ArrayList<List<Point>>();
     // Top left most position accessible from the player position.
     private Point topLeftPosition;
-    private boolean topLeftEvaluationNeeded = true;
+    private ArrayList<Pair<BoardAction, Integer> > possibleActions = null;
+    private boolean floodFillRequired = true;
     private String stringHash = null;
     /** Used only for profiling */
     public static int lockedStatesIgnored = 0;
@@ -49,14 +51,14 @@ public class Board {
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
 		this.playerPosition = playerPosition;
-		topLeftEvaluationNeeded = true;
+		floodFillRequired = true;
 	}
 	
 	public Board(Board original) {
 		this.mObjects = new HashMap<>(original.mObjects);		//TODO is a shallow copy enough?
 		this.playerPosition = new Point(original.playerPosition);
         this.topLeftPosition = original.topLeftPosition;
-        topLeftEvaluationNeeded = original.topLeftEvaluationNeeded;
+        floodFillRequired = original.floodFillRequired;
 	}
 
 	public Map<Point, Symbol> getDynamicObjects() {
@@ -243,7 +245,7 @@ public class Board {
 			if (element == Symbol.Type.Player) {
 				playerPosition = to;
 			}
-			topLeftEvaluationNeeded = true;
+			floodFillRequired = true;
 			return true;
 		}
 
@@ -392,7 +394,45 @@ public class Board {
 
 		return newBoard;
 	}
+    
+    /**
+     * Initialises the top left position and the list of actions that can be taken
+     * from the current position of the player, in terms of a flood fill. This means that
+     * all boxes that are in the accessible area which can be pushed are checked for which
+     * actions can be applied to them.
+     */
+    private void floodFillInitialise(){
+        Queue<Point> q = new LinkedList<>();
+		q.add(playerPosition);
+		List<Point> accessible = new ArrayList<>();
+		accessible.add(playerPosition);
+		// Track the minimum values of point positions so that we can see which
+		// point is the top left of the flood filled region
+		Point minPoint = playerPosition;
+		while (!q.isEmpty()) {
+			Point next = q.remove();
+			if (this.get(next).isWalkable) {
+				List<Point> neighbours = getFreeNeighbours(next);
+				for (Point point : neighbours) {
+					if (!accessible.contains(point)) {
+						accessible.add(point);
+						q.add(point);
+						// Modify the minimum point location if the current
+						// point
+						// is "lower" than the current minimum
+						minPoint = SokobanUtil.pointMin(minPoint, point);
+						// System.out.println("min point is: " + minPoint);
+					}
+				}
+			}
+		}
 
+		// Move the point with the minimum value to the beginning of the list.
+		accessible.remove(minPoint);
+		accessible.add(0, minPoint);
+
+    }
+    
 	/**
 	 * Gets the points on this board which are accessible from the given point.
 	 * This is done using something like a flood fill.
@@ -705,10 +745,10 @@ public class Board {
     
     public Point getTopLeftPosition()
     {
-    	if (topLeftEvaluationNeeded)
+    	if (floodFillRequired)
     	{
     		this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
-    		topLeftEvaluationNeeded = false;
+    		floodFillRequired = false;
     	}
     	return topLeftPosition;
     }
@@ -1024,7 +1064,7 @@ public class Board {
 	    				//if the board is a locked state, just ignore it
 	    				if (!newBoard.isLockedState())
 	    				{
-                            newBoard.makeStringHash();
+//                            newBoard.makeStringHash();
 		    				result.add(newBoard);
 		    				
 		    				//Generating BoxMovement
@@ -1060,3 +1100,102 @@ public class Board {
     }
     
 }
+
+//  public ArrayList<Board> generateChildStates(ArrayList<BoardAction> rRelatedBoxMovements, ArrayList<Integer> rRelatedCosts)
+//    {  	
+//    	ArrayList<Board> result = new ArrayList<>();
+//
+//    	//Visitable positions will go through openList and end up in closedList.
+//    	LinkedList<WeightedPoint> openList = new LinkedList<>();
+//    	LinkedList<WeightedPoint> closedList = new LinkedList<>();
+//    	
+//    	
+//    	//initialise openList with playerPosition.
+//    	WeightedPoint start = new WeightedPoint(playerPosition, 0);
+//    	openList.add(start);
+//    	
+//    	
+//    	while (!openList.isEmpty())
+//    	{
+//    		WeightedPoint center = openList.removeFirst();
+//    		closedList.add(center);
+////    		System.out.println("center x:"+center.point.x + " y:" + center.point.y);
+//    		
+//    		WeightedPoint[] neighbours = new WeightedPoint[4];
+//    		
+//    		neighbours[0] = new WeightedPoint(center.point.x, center.point.y-1, center.cost+1);	//UP
+//    		neighbours[1] = new WeightedPoint(center.point.x, center.point.y+1, center.cost+1);	//DOWN
+//    		neighbours[2] = new WeightedPoint(center.point.x-1, center.point.y, center.cost+1);	//LEFT
+//    		neighbours[3] = new WeightedPoint(center.point.x+1, center.point.y, center.cost+1);	//RIGHT
+//    		
+//    		for (WeightedPoint neighbour : neighbours)
+//    		{
+//    			Symbol nSymb = this.get(neighbour.point);
+////    			System.out.println("at x:"+ neighbour.point.x + " y:" + neighbour.point.y +"symbol: "+ "'"+ nSymb +"'");
+//	    		if (nSymb != Symbol.Wall && nSymb.type != Symbol.Type.Box)
+//	    		{
+//	    			//adding open neighbour only if not visited and not already in openList
+//	    			if (!openList.contains(neighbour) && !closedList.contains(neighbour))
+//	    			{
+//	        			openList.addLast(neighbour);
+//	    			}
+//	    		}
+//	    		else if (nSymb.type == Symbol.Type.Box)
+//	    		{
+//	    			//check if push is possible
+//	    			int dirX = neighbour.point.x - center.point.x;
+//	    			int dirY = neighbour.point.y - center.point.y;
+//	    			Point endLocation = new Point(neighbour.point.x + dirX, neighbour.point.y + dirY);
+//                    Symbol endSym = this.get(endLocation);
+//                    if (endSym != Symbol.Wall // cannot push into walls or other boxes
+//                            && endSym.type != Symbol.Type.Box)
+//                            // Don't push boxes onto locked points, unless the point is a goal
+//                            // && (!isBoxLocked(endLocation) || endSym == Symbol.Goal))
+//	    			{
+//	    				//Generating new Board
+//	    				Board newBoard = new Board(this);
+//	    				
+//	    				newBoard.moveElement(playerPosition, center.point); //moving player to pushing point
+//	    				newBoard.moveElement(neighbour.point, endLocation); //moving crate
+//	    				newBoard.moveElement(center.point, neighbour.point);//moving player to it's end location
+//	    				
+//	    				//if the board is a locked state, just ignore it
+//	    				if (!newBoard.isLockedState())
+//	    				{
+////                            newBoard.makeStringHash();
+//		    				result.add(newBoard);
+//		    				
+//		    				//Generating BoxMovement
+//		    				if (rRelatedBoxMovements != null)
+//		    				{
+//		    					Action action;
+//		    					if (dirX>0)
+//		    						action = Action.RIGHT;
+//		    					else if (dirX<0)
+//		    						action = Action.LEFT;
+//		    					else if (dirY>0)
+//		    						action = Action.DOWN;
+//		    					else	//if (dirY<0)
+//		    						action = Action.UP;
+//		    					BoardAction move = new BoardAction(action, neighbour.point);
+//		    					rRelatedBoxMovements.add(move);
+//		    				}
+//		    				
+//		    				if(rRelatedCosts != null)
+//		    				{
+//		    					rRelatedCosts.add(new Integer(center.cost+1));
+//		    				}
+//	    				}
+//	    				else
+//	    				{
+//	    					++lockedStatesIgnored;
+//	    				}
+//	    			}
+//	    		}
+//    		}
+//    	}
+//    	return result;
+//    }
+//    
+//}
+
