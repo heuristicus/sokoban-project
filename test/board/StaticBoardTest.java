@@ -40,7 +40,7 @@ public class StaticBoardTest {
     public void tearDown() {
     }
     
-    private void testMinValueCostMap(String testFile, String expectedOutputFile) throws IOException {
+    private void testMinValueCostMap(String testFile, String expectedOutputFile, boolean debug) throws IOException {
     	TestUtil.initBoard(testFile);
 		StaticBoard sBoard = StaticBoard.getInstance();
 		String[] mapLines = sBoard.toString().split("\n");
@@ -64,11 +64,13 @@ public class StaticBoardTest {
 			mapLines[y] = currentLine.toString();	
 		}
 		
-		StringBuilder sb = new StringBuilder();
-		for( int i = 0; i < mapLines.length; ++i) {
-			sb.append(mapLines[i]).append('\n');
+		if (debug) {
+			StringBuilder sb = new StringBuilder();
+			for( int i = 0; i < mapLines.length; ++i) {
+				sb.append(mapLines[i]).append('\n');
+			}
+			System.out.println(sb.toString());			
 		}
-		System.out.println(sb.toString());
 		
 		List<String> expectedOutput = Files.readAllLines(Paths.get(BoardTest.testMapDir, expectedOutputFile), Charset.defaultCharset());
 		assertEquals(expectedOutput, Arrays.asList(mapLines));
@@ -123,17 +125,17 @@ public class StaticBoardTest {
 	
 	@Test
 	public void testCostMapMinValue() throws IOException {
-		testMinValueCostMap("../test100/test000.in", "test000.costs.map");
+		testMinValueCostMap("../test100/test000.in", "test000.costs.map", false);
 	}
 	
 	@Test
 	public void testCostMapMinValue1() throws IOException {
-		testMinValueCostMap("testCosts.map", "testCosts.expected.map");
+		testMinValueCostMap("testCosts.map", "testCosts.expected.map", false);
 	}
 	
 	@Test
 	public void testCostMapMinValue2() throws IOException {
-		testMinValueCostMap("testCosts2.map", "testCosts2.expected.map");
+		testMinValueCostMap("testCosts2.map", "testCosts2.expected.map", false);
 	}
 	
 	
