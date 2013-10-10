@@ -1,5 +1,6 @@
 package board;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,15 +17,14 @@ import java.util.Set;
 
 import pathfinding.BoardAction;
 import search.AStar;
-import search.DiagonalDistanceHeuristic;
+import search.Heuristic;
 import search.SearchMethod;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
+import utilities.WeightedPoint;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
-import java.awt.Dimension;
-import utilities.WeightedPoint;
 
 /**
  * Dynamic representation of the world.
@@ -919,7 +919,7 @@ public class Board {
     	boolean doubleCheck = true; // Double check mode: actually execute all the steps before adding them to the list.
     	
     	
-    	SearchMethod aStar = new AStar(new DiagonalDistanceHeuristic());
+    	SearchMethod aStar = new AStar(new Heuristic.DiagonalDistanceHeuristic());
     	List<Action> completeActionList = new ArrayList<>();
     	for (BoardAction bm : boxActions) { // loop through all the box actions
     		// Get the board state after that action.
