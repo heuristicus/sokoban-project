@@ -785,7 +785,7 @@ public class Board {
     		Point boxPos = boxAction.first.position;
     		Point pushPos = new Point(boxPos.x - dx, boxPos.y - dy);	//position where the player stands before pushing the box
     		Point finalPos = new Point(boxPos.x + dx, boxPos.y + dy);
-    		if (get(finalPos).type != Symbol.Type.Box || get(finalPos) != Symbol.Wall)
+    		if (get(finalPos).type != Symbol.Type.Box && get(finalPos) != Symbol.Wall)
     		{
     			//Generating new Board
 				Board newBoard = new Board(this);
@@ -818,7 +818,7 @@ public class Board {
     		Point boxPos = boxAction.first.position;
     		Point pushPos = new Point(boxPos.x - 2*dx, boxPos.y - 2*dy);	//position where the player stands before pulling the box
     		Point finalPos = new Point(boxPos.x - dx, boxPos.y - dy);
-    		if (get(pushPos).type != Symbol.Type.Box || get(pushPos) != Symbol.Wall)
+    		if (get(pushPos).type != Symbol.Type.Box && get(pushPos) != Symbol.Wall)
     		{
     			//Generating new Board
     			Board newBoard = new Board(this);
