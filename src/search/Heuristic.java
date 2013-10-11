@@ -11,6 +11,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import utilities.Pair;
@@ -155,14 +158,18 @@ public interface Heuristic<T> {
     /**
      * MinMatching between the goals and the boxes
      * @return 
-     * 	sum(cost_per_box_to_reach_goal²).
+     * 	sum(cost_per_box_to_reach_goal).
 	 * 	If no solution is found, returns Float.POSITIVE_INFINITY
-     * @deprecated Not tested!
      */
-    @Deprecated
     public static class MinMatching2Heuristic implements Heuristic<Board> {
     	
     	private static final Logger LOG = Logger.getLogger(MinMatching2Heuristic.class.getName());
+    	{
+    		Handler consoleHandler = new ConsoleHandler();
+    		consoleHandler.setLevel(Level.FINER);
+    		LOG.setLevel(Level.ALL);
+    		LOG.addHandler(consoleHandler);
+    	}
     	
     	// TODO might not be needed if we just want the max instead of sorting the list
     	private static Comparator<Map.Entry<Point, Integer>> candidatesPerGoalComparator = 
@@ -184,7 +191,6 @@ public interface Heuristic<T> {
     	
     	@Override
     	public float utility(Board start, Board goal) {
-    		goal.setAvailablePosition();
     		List<Point> goals = StaticBoard.getInstance().goals;
     		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().goalDistanceCost;
     		
@@ -197,6 +203,7 @@ public interface Heuristic<T> {
     		// Initialize the data structures: count the candidates for the boxes and goals
     		for (Point p: start.getDynamicObjects().keySet()) {
     			if (start.get(p).type != Symbol.Type.Box) continue;
+    			if (costMap.get(p) == null) return Float.POSITIVE_INFINITY; // Box in a locked position
     			
     			candidatesPerBox.add(new Pair<>(p, costMap.get(p)));
     			for (Point key : costMap.get(p).keySet()) {
@@ -241,12 +248,14 @@ public interface Heuristic<T> {
     			Point selectedGoal = selectedCandidates.get(0).getKey();
     			
 //    			estimatedCost[goals.indexOf(selectedGoal)] = pair.second.get(selectedGoal);
-//    			totalCost += pair.second.get(selectedGoal);
-    			totalCost += Math.pow(pair.second.get(selectedGoal), 2);
+    			totalCost += pair.second.get(selectedGoal);
+//    			totalCost += Math.pow(pair.second.get(selectedGoal), 2);
     			
     			// Update the data structures to not include the goal and the box anymore.
     			for (Point p : pair.second.keySet()) {
-    				candidatesPerGoal.put(p, candidatesPerGoal.get(p) - 1);
+    				if (candidatesPerGoal.containsKey(p)) {
+    					candidatesPerGoal.put(p, candidatesPerGoal.get(p) - 1);    					
+    				}
     			}
     			candidatesPerGoal.remove(selectedGoal);
     		}

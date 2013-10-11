@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import pathfinding.BoardAction;
 import search.AStar;
@@ -31,6 +35,12 @@ public class Main {
 	 */
 	
 	public static boolean USE_BOARD_EXPANSION = true;
+	
+	{
+		Handler consoleHandler = new ConsoleHandler();
+		consoleHandler.setLevel(Level.FINER);
+		Logger.getAnonymousLogger().addHandler(consoleHandler);
+	}
 	
 	public static void main(String[] args) throws IOException {
         stdIn();
