@@ -154,7 +154,7 @@ public class StaticBoardTest {
 	@Test
 	public void displayCostMap() {
 //		final String TEST_FILE = "../test100/test000.in";
-		final String TEST_FILE = "testCosts2.map";
+		final String TEST_FILE = "tiny.map";
 		HackableBoard board = new HackableBoard(TestUtil.initBoard(TEST_FILE));
 		StaticBoard sBoard = StaticBoard.getInstance();
 		for( int y = 0; y < sBoard.grid.length; ++y ) {

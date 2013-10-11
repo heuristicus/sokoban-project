@@ -342,6 +342,65 @@ public class BoardTest {
     }
     
     @Test
+    public void testExpandBoardSpace(){
+        Board a = TestUtil.initBoard("fullTest.map");
+        ArrayList<Board> aExp = new ArrayList<>(
+                Arrays.asList(
+                TestUtil.initBoard("fullTestE1.map"),
+//                TestUtil.initBoard("fullTestE2.map"), // locked
+                TestUtil.initBoard("fullTestE3.map"),
+                TestUtil.initBoard("fullTestE4.map"),
+                TestUtil.initBoard("fullTestE5.map")
+                ));
+        ArrayList<SearchNode> aNodes = a.expandBoardSpace(null);
+        assertEquals(aExp.size(), aNodes.size());
+        for (SearchNode searchNode : aNodes) {
+            assertTrue("Board\n " + searchNode.getNodeState() + " is not an expected result of the expansion.",
+                    aExp.contains(searchNode.getNodeState()));
+        }
+        
+        Board b = TestUtil.initBoard("tiny.map");
+        ArrayList<Board> bExp = new ArrayList<>(
+                Arrays.asList(
+                TestUtil.initBoard("tinyE1.map")
+//                TestUtil.initBoard("tinyE2.map"),
+//                TestUtil.initBoard("tinyE3.map"),
+//                TestUtil.initBoard("tinyE4.map")
+                ));
+        ArrayList<SearchNode> bNodes = b.expandBoardSpace(null);
+        assertEquals(bExp.size(), bNodes.size());
+        for (SearchNode searchNode : bNodes) {
+            assertTrue("Board\n " + searchNode.getNodeState() + " is not an expected result of the expansion.",
+                    bExp.contains(searchNode.getNodeState()));
+        }
+        
+        Board c = TestUtil.initBoard("simpleSmall.map");
+        ArrayList<Board> cExp = new ArrayList<>(
+                Arrays.asList(
+                TestUtil.initBoard("simpleSmallE1.map"),
+                TestUtil.initBoard("simpleSmallE2.map"),
+                TestUtil.initBoard("simpleSmallE3.map"),
+                TestUtil.initBoard("simpleSmallE4.map"),
+                TestUtil.initBoard("simpleSmallE5.map"),
+                TestUtil.initBoard("simpleSmallE6.map"),
+                TestUtil.initBoard("simpleSmallE7.map")
+//                TestUtil.initBoard("simpleSmallE1.map"),
+//                TestUtil.initBoard(".map")
+                ));
+        ArrayList<SearchNode> cNodes = c.expandBoardSpace(null);
+        System.out.println("Expanded nodes");
+        for (SearchNode searchNode : cNodes) {
+            System.out.println(searchNode);
+        }
+        assertEquals(cExp.size(), cNodes.size());
+        for (SearchNode searchNode : cNodes) {
+            assertTrue("Board\n " + searchNode.getNodeState() + " is not an expected result of the expansion.",
+                    cExp.contains(searchNode.getNodeState()));
+        }
+        
+    }
+    
+    @Test
     public void testEquals(){
         Board b1 = TestUtil.initBoard("boardTestEq1.map");
         Board b2 = TestUtil.initBoard("boardTestEq2.map");
