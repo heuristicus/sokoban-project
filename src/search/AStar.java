@@ -129,7 +129,7 @@ public class AStar extends SearchMethod {
 //                    System.out.println("successor estimated cost: " + successor.estimatedCost);
                     open.add(successor);
                 }
-            }
+            }	
         }
         
         // Went through all nodes without finding the goal - there is no path.
