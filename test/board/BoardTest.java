@@ -30,6 +30,7 @@ import org.junit.Test;
 import pathfinding.BoardAction;
 import exceptions.IllegalMoveException;
 import search.SearchNode;
+import utilities.Pair;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import utilities.TestUtil;
@@ -341,6 +342,65 @@ public class BoardTest {
     }
     
     @Test
+    public void testExpandBoardSpace(){
+        Board a = TestUtil.initBoard("fullTest.map");
+        ArrayList<Board> aExp = new ArrayList<>(
+                Arrays.asList(
+                TestUtil.initBoard("fullTestE1.map"),
+//                TestUtil.initBoard("fullTestE2.map"), // locked
+                TestUtil.initBoard("fullTestE3.map"),
+                TestUtil.initBoard("fullTestE4.map"),
+                TestUtil.initBoard("fullTestE5.map")
+                ));
+        ArrayList<SearchNode> aNodes = a.expandBoardSpace(null);
+        assertEquals(aExp.size(), aNodes.size());
+        for (SearchNode searchNode : aNodes) {
+            assertTrue("Board\n " + searchNode.getNodeState() + " is not an expected result of the expansion.",
+                    aExp.contains(searchNode.getNodeState()));
+        }
+        
+        Board b = TestUtil.initBoard("tiny.map");
+        ArrayList<Board> bExp = new ArrayList<>(
+                Arrays.asList(
+                TestUtil.initBoard("tinyE1.map")
+//                TestUtil.initBoard("tinyE2.map"),
+//                TestUtil.initBoard("tinyE3.map"),
+//                TestUtil.initBoard("tinyE4.map")
+                ));
+        ArrayList<SearchNode> bNodes = b.expandBoardSpace(null);
+        assertEquals(bExp.size(), bNodes.size());
+        for (SearchNode searchNode : bNodes) {
+            assertTrue("Board\n " + searchNode.getNodeState() + " is not an expected result of the expansion.",
+                    bExp.contains(searchNode.getNodeState()));
+        }
+        
+        Board c = TestUtil.initBoard("simpleSmall.map");
+        ArrayList<Board> cExp = new ArrayList<>(
+                Arrays.asList(
+                TestUtil.initBoard("simpleSmallE1.map"),
+                TestUtil.initBoard("simpleSmallE2.map"),
+                TestUtil.initBoard("simpleSmallE3.map"),
+                TestUtil.initBoard("simpleSmallE4.map"),
+                TestUtil.initBoard("simpleSmallE5.map"),
+                TestUtil.initBoard("simpleSmallE6.map"),
+                TestUtil.initBoard("simpleSmallE7.map")
+//                TestUtil.initBoard("simpleSmallE1.map"),
+//                TestUtil.initBoard(".map")
+                ));
+        ArrayList<SearchNode> cNodes = c.expandBoardSpace(null);
+        System.out.println("Expanded nodes");
+        for (SearchNode searchNode : cNodes) {
+            System.out.println(searchNode);
+        }
+        assertEquals(cExp.size(), cNodes.size());
+        for (SearchNode searchNode : cNodes) {
+            assertTrue("Board\n " + searchNode.getNodeState() + " is not an expected result of the expansion.",
+                    cExp.contains(searchNode.getNodeState()));
+        }
+        
+    }
+    
+    @Test
     public void testEquals(){
         Board b1 = TestUtil.initBoard("boardTestEq1.map");
         Board b2 = TestUtil.initBoard("boardTestEq2.map");
@@ -536,6 +596,82 @@ public class BoardTest {
         d.makeStringHash();
         String dExp = "           @          $ $        $        $ $        $        $ $";
         assertEquals(dExp, d.getStringHash());
+    }
+    
+    
+    @Test
+    public void testFloodFillInitialise(){
+        Board a = TestUtil.initBoard("simpleSmall.map");
+        ArrayList<Pair<BoardAction, Integer>> aBoxExp = a.getPossibleActions();
+        aBoxExp.addAll(Arrays.asList(
+                new Pair<>(new BoardAction(Action.LEFT, new Point(2,1)), 5),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(2,1)), 7),
+                new Pair<>(new BoardAction(Action.UP, new Point(2,1)), 5),
+                
+                new Pair<>(new BoardAction(Action.LEFT, new Point(3,2)), 3),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(3,2)), 5),
+                new Pair<>(new BoardAction(Action.DOWN, new Point(3,2)), 5),
+                
+                new Pair<>(new BoardAction(Action.UP, new Point(3,3)), 2),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(3,3)), 2),                
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(3,3)), 4),
+                
+                new Pair<>(new BoardAction(Action.UP, new Point(1,3)), 4),
+                new Pair<>(new BoardAction(Action.DOWN, new Point(1,3)), 6),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(1,3)), 4)
+                ));
+        Point aTLRes = a.getTopLeftPosition();
+        ArrayList<Pair<BoardAction, Integer>> aBoxRes = a.getPossibleActions();
+        assertEquals(new Point(1,1), aTLRes);
+        
+        
+        Board b = TestUtil.initBoard("nonSquare.map");
+        ArrayList<Pair<BoardAction, Integer>> bBoxExp = new ArrayList<>();
+        bBoxExp.addAll(Arrays.asList(
+                new Pair<>(new BoardAction(Action.DOWN, new Point(4,2)), 2),
+                new Pair<>(new BoardAction(Action.UP, new Point(4,2)), 4),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(4,2)), 2),
+                new Pair<>(new BoardAction(Action.DOWN, new Point(2,3)), 3),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(2,3)), 3)
+                ));
+        
+        Point bTLRes = b.getTopLeftPosition();
+        ArrayList<Pair<BoardAction, Integer>> bBoxRes = b.getPossibleActions();
+        assertEquals(new Point(3,1), bTLRes);
+        assertEquals(bBoxExp.size(), bBoxRes.size());
+        assertTrue(bBoxExp.containsAll(bBoxRes));
+        
+        
+        Board c = TestUtil.initBoard("fullTest.map");
+        ArrayList<Pair<BoardAction, Integer>> cBoxExp = new ArrayList<>();
+                cBoxExp.addAll(Arrays.asList(
+                // Down action on box below player
+                new Pair<>(new BoardAction(Action.DOWN, new Point(2,3)), 2),
+                new Pair<>(new BoardAction(Action.UP, new Point(2,3)), 6),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(2,3)), 4),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(2,3)), 4),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(4,4)), 5)
+                ));
+        Point cTLRes = c.getTopLeftPosition();
+        ArrayList<Pair<BoardAction, Integer>> cBoxRes = c.getPossibleActions();
+        assertEquals(new Point(1,1), cTLRes);
+        assertEquals(cBoxExp.size(), cBoxRes.size());
+        assertTrue(cBoxExp.containsAll(cBoxRes));
+        
+        Board d = TestUtil.initBoard("tiny.map");
+        ArrayList<Pair<BoardAction, Integer>> dBoxExp = new ArrayList<>();
+        dBoxExp.addAll(Arrays.asList(
+                new Pair<>(new BoardAction(Action.DOWN, new Point(2,2)), 1),
+                new Pair<>(new BoardAction(Action.UP, new Point(2,2)), 5),
+                new Pair<>(new BoardAction(Action.LEFT, new Point(2,2)), 3),
+                new Pair<>(new BoardAction(Action.RIGHT, new Point(2,2)), 3)
+                ));
+        Point dTLRes = d.getTopLeftPosition();
+        ArrayList<Pair<BoardAction, Integer>> dBoxRes = d.getPossibleActions();
+        assertEquals(new Point(1,1), dTLRes);
+        assertEquals(dBoxExp.size(), dBoxRes.size());
+        assertTrue(dBoxExp.containsAll(dBoxRes));
+        
     }
     
 }

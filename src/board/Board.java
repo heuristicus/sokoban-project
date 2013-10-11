@@ -335,11 +335,11 @@ public class Board {
 			newBoard = new Board(this);
 		}
 
-		System.out.println(a.toString());
-		System.out.println(Goal.toString());
+//		System.out.println(a.toString());
+//		System.out.println(Goal.toString());
 		Point destination = SokobanUtil.applyActionToPoint(a, Goal);
 		Symbol destObject = newBoard.get(destination);
-		System.out.println(destObject.toString());
+//		System.out.println(destObject.toString());
 		if (destObject.equals(Symbol.Wall)) {
 			System.out.println("Cannot be reached");
 			throw new IllegalMoveException("Cannot be reached");
@@ -394,43 +394,93 @@ public class Board {
 
 		return newBoard;
 	}
+	
+	
     
-    /**
+    public ArrayList<Pair<BoardAction, Integer>> getPossibleActions()
+	{
+    	if (floodFillRequired)
+    		floodFillInitialise();
+    	
+		return possibleActions;
+	}
+
+	/**
      * Initialises the top left position and the list of actions that can be taken
      * from the current position of the player, in terms of a flood fill. This means that
      * all boxes that are in the accessible area which can be pushed are checked for which
      * actions can be applied to them.
      */
     private void floodFillInitialise(){
-        Queue<Point> q = new LinkedList<>();
-		q.add(playerPosition);
-		List<Point> accessible = new ArrayList<>();
-		accessible.add(playerPosition);
+        possibleActions = new ArrayList<>();
+        Queue<Pair<Point,Integer>> q = new LinkedList<>();
+        // We start the fill at the player position, which has cost zero.
+        Pair<Point, Integer> start = new Pair(playerPosition, 0);
+        // The queue stores points which we have not yet expanded.
+		q.add(start);
+        ArrayList<Point> accessible = new ArrayList<>();
+        accessible.add(start.first);
 		// Track the minimum values of point positions so that we can see which
 		// point is the top left of the flood filled region
 		Point minPoint = playerPosition;
-		while (!q.isEmpty()) {
-			Point next = q.remove();
-			if (this.get(next).isWalkable) {
-				List<Point> neighbours = getFreeNeighbours(next);
-				for (Point point : neighbours) {
-					if (!accessible.contains(point)) {
-						accessible.add(point);
-						q.add(point);
-						// Modify the minimum point location if the current
-						// point
-						// is "lower" than the current minimum
-						minPoint = SokobanUtil.pointMin(minPoint, point);
-						// System.out.println("min point is: " + minPoint);
-					}
-				}
-			}
+        Point neighbours[] = new Point[4];
+        int count = 0;
+		while (!q.isEmpty()) { // Continue until there are no more points to expand
+			Pair<Point, Integer> next = q.remove();
+//            System.out.println("next point " + next);
+            // If the point is walkable, then we need to examine its neighbours.
+            // Otherwise, we cannot move to that point, so we ignore it.
+			if (this.get(next.first).isWalkable) {
+                // Add each neighbour point to the neighbour array by applying
+                // each possible action to the point currently being evaluated.
+                // The order of evaluation is UP, DOWN, LEFT, RIGHT
+                for (Action action : Action.values()) {
+//                    System.out.println("Applying action " + action + " to point " + next.first);
+                    neighbours[count++] = SokobanUtil.applyActionToPoint(action, next.first);
+//                    System.out.println("Point " + (count - 1) + " is " + neighbours[count - 1]);
+                }
+                count = 0; // reset the count so that next loop we refill from zero.
+                // We look at each point to determine whether we should add it to the
+                // list of accessible positions (if it is walkable), or what action
+                // we can take to push a neighbouring box.
+                for (int i = 0; i < 4; i++) {
+                    Symbol thisSym = get(neighbours[i]);
+//                    System.out.println("Analysing point " + i + ", " + neighbours[i]);
+//                    System.out.println("Symbol: " + thisSym);
+                    if (!accessible.contains(neighbours[i])){
+//                        System.out.println("Not in closed list.");
+                        if (thisSym.isWalkable){
+                            // Only add the neighbour to the list of accessible points
+                            // if it is a walkable space. Otherwise we will not look
+                            // at box locations more than once.
+                            accessible.add(neighbours[i]);
+//                            System.out.println("Is walkable.");
+                            // Add the neighbour to the queue to be examined, with
+                            // a cost that is one greater than the cost to get to the
+                            // currently examined point
+                            q.add(new Pair(neighbours[i], next.second + 1));
+                            // See if the neighbour we are looking at is smaller than
+                            // the current minimum (top leftmost) point.
+                            minPoint = SokobanUtil.pointMin(minPoint, neighbours[i]);
+                        } else if (thisSym.type == Type.Box){
+//                            System.out.println("Is a box.");
+                            // We do not want to add boxes to the accessible points
+                            // list, but we need to add them to the list of accessible
+                            // boxes along with the action that was applied to get to
+                            // to that box. This is an action that we might be able to
+                            // apply to the box, but we don't check that now.
+                            possibleActions.add(new Pair(new BoardAction(Action.values()[i], neighbours[i]), next.second + 1));
+//                            System.out.println("Possible actions now " + possibleActions);
+                        }
+                    }
+                }
+
+            }
+            floodFillRequired = false;
 		}
 
 		// Move the point with the minimum value to the beginning of the list.
-		accessible.remove(minPoint);
-		accessible.add(0, minPoint);
-
+        topLeftPosition = minPoint;
     }
     
 	/**
@@ -508,7 +558,7 @@ public class Board {
 	 * No check is done on whether the point is a box, a wall or anything else.
 	 */
 	public List<Point> getFreeNeighbours(Point p) {
-		List<Point> freeNeighbours = new ArrayList<Point>();
+		List<Point> freeNeighbours = new ArrayList<>();
 		for (Action a : Action.values()) {
 			Point neighbour = SokobanUtil.applyActionToPoint(a, p);
 			if (get(neighbour).isWalkable) {
@@ -517,7 +567,7 @@ public class Board {
 		}
 		return freeNeighbours;
 	}
-	
+    
 	/** Returns the list of access points for each box*/
 	public Map<Point, List<Point>> getMapBoxAccessPoints() {
 		Map<Point, List<Point>> boxtToAccessPoints = new HashMap<>();
@@ -625,7 +675,6 @@ public class Board {
 				surroundingWalls.add(neighbour);
 			}
 		}
-		
 		if (surroundingWalls.size() > 2 ) return true;
 		if (surroundingWalls.size() < 2 ) return false;
 		
@@ -727,17 +776,66 @@ public class Board {
     }
     
     public ArrayList<SearchNode> expandBoardSpace(SearchNode parent){
-        ArrayList<BoardAction> actions = new ArrayList<>();
-        ArrayList<Integer> costs = new ArrayList<>();
-        
-        ArrayList<Board> boards = generateChildStates(actions,costs);
-        
     	ArrayList<SearchNode> nodes = new ArrayList<>();
-    	for (int i=0 ; i<boards.size() ; i++)
+    	ArrayList<Pair<BoardAction,Integer> > boxList = getPossibleActions();
+    	for (Pair<BoardAction,Integer> boxAction : boxList)
     	{
-//            System.out.println("successor " + i);
-//            System.out.println(boards.get(i));
-    		nodes.add(new SearchNode(boards.get(i), parent, actions.get(i), costs.get(i), true));
+    		int dx = boxAction.first.action.dx;	//push direction
+    		int dy = boxAction.first.action.dy;
+    		Point boxPos = boxAction.first.position;
+    		Point pushPos = new Point(boxPos.x - dx, boxPos.y - dy);	//position where the player stands before pushing the box
+    		Point finalPos = new Point(boxPos.x + dx, boxPos.y + dy);
+    		if (get(finalPos).type != Symbol.Type.Box && get(finalPos) != Symbol.Wall)
+    		{
+    			//Generating new Board
+				Board newBoard = new Board(this);
+				
+				newBoard.moveElement(playerPosition, pushPos); //moving player to pushing point
+				newBoard.moveElement(boxPos, finalPos); //moving crate
+				newBoard.moveElement(pushPos, boxPos);//moving player to it's end location
+				//if the board is a locked state, just ignore it
+				if (!newBoard.isLockedState())
+				{
+		    		nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
+				}
+				else
+				{
+					++lockedStatesIgnored;
+				}
+    		}             
+    	}
+    	return nodes;
+    }
+    
+    
+    public ArrayList<SearchNode> expandBoardSpaceBackwards(SearchNode parent){
+    	ArrayList<SearchNode> nodes = new ArrayList<>();
+    	ArrayList<Pair<BoardAction,Integer> > boxList = getPossibleActions();
+    	for (Pair<BoardAction,Integer> boxAction : boxList)
+    	{
+    		int dx = boxAction.first.action.dx;	//push direction
+    		int dy = boxAction.first.action.dy;
+    		Point boxPos = boxAction.first.position;
+    		Point pushPos = new Point(boxPos.x - 2*dx, boxPos.y - 2*dy);	//position where the player stands before pulling the box
+    		Point finalPos = new Point(boxPos.x - dx, boxPos.y - dy);
+    		if (get(pushPos).type != Symbol.Type.Box && get(pushPos) != Symbol.Wall)
+    		{
+    			//Generating new Board
+    			Board newBoard = new Board(this);
+    			
+    			newBoard.moveElement(playerPosition, pushPos); //moving player to pushing point
+    			newBoard.moveElement(boxPos, finalPos); //moving crate
+    			
+    			//if the board is a locked state, just ignore it
+    			if (!newBoard.isLockedState())
+    			{
+    				nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
+    			}
+    			else
+    			{
+    				++lockedStatesIgnored;
+    			}
+    		}
     	}
     	return nodes;
     }
@@ -746,10 +844,8 @@ public class Board {
     public Point getTopLeftPosition()
     {
     	if (floodFillRequired)
-    	{
-    		this.topLeftPosition = getAccessiblePoints(playerPosition).get(0);
-    		floodFillRequired = false;
-    	}
+    		floodFillInitialise();
+
     	return topLeftPosition;
     }
     

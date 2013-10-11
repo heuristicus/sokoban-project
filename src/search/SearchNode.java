@@ -165,7 +165,7 @@ public class SearchNode implements Comparable<SearchNode>{
         }
         return false;
     }
-
+    
     @Override
     public int hashCode() {
         return nodeState.hashCode(); //To change body of generated methods, choose Tools | Templates.
