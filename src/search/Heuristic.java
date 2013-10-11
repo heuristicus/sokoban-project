@@ -6,9 +6,14 @@ package search;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import utilities.Pair;
 import board.Board;
 import board.StaticBoard;
 import board.Symbol;
@@ -147,54 +152,158 @@ public interface Heuristic<T> {
         
     }
     
+    /**
+     * MinMatching between the goals and the boxes
+     * @return 
+     * 	sum(cost_per_box_to_reach_goal²).
+	 * 	If no solution is found, returns Float.POSITIVE_INFINITY
+     * @deprecated Not tested!
+     */
+    @Deprecated
+    public static class MinMatching2Heuristic implements Heuristic<Board> {
+    	
+    	private static final Logger LOG = Logger.getLogger(MinMatching2Heuristic.class.getName());
+    	
+    	// TODO might not be needed if we just want the max instead of sorting the list
+    	private static Comparator<Map.Entry<Point, Integer>> candidatesPerGoalComparator = 
+    			new Comparator<Map.Entry<Point,Integer>>()  {
+		    		@Override
+					public int compare(Map.Entry<Point, Integer> o1, Map.Entry<Point, Integer> o2) {
+						return Integer.compare(o1.getValue(), o2.getValue());
+					}
+    			};
+    			
+    	/** Sorts the collection by size of the inner cost list */
+    	private static Comparator<Pair<Point, Map<Point, Integer>>> candidatesPerBoxComparator = 
+    			new Comparator<Pair<Point, Map<Point, Integer>>>() {
+					@Override
+					public int compare(Pair<Point, Map<Point, Integer>> o1, Pair<Point, Map<Point, Integer>> o2) {
+						return Integer.compare(o1.second.size(), o2.second.size());
+					}
+				};
+    	
+    	@Override
+    	public float utility(Board start, Board goal) {
+    		goal.setAvailablePosition();
+    		List<Point> goals = StaticBoard.getInstance().goals;
+    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().goalDistanceCost;
+    		
+    		List<Pair<Point, Map<Point, Integer>>> candidatesPerBox = new ArrayList<>(goals.size());
+    		Map<Point, Integer> candidatesPerGoal = new HashMap<>(goals.size());
+    		for (Point p : goals) {
+    			candidatesPerGoal.put(p, 0);
+    		}
+    		
+    		// Initialize the data structures: count the candidates for the boxes and goals
+    		for (Point p: start.getDynamicObjects().keySet()) {
+    			if (start.get(p).type != Symbol.Type.Box) continue;
+    			
+    			candidatesPerBox.add(new Pair<>(p, costMap.get(p)));
+    			for (Point key : costMap.get(p).keySet()) {
+    				candidatesPerGoal.put(key, candidatesPerGoal.get(key) + 1);
+    			}
+    			
+    		}
+    		Collections.sort(candidatesPerBox, candidatesPerBoxComparator);
+    		
+    		/* This array will contain the length of the path to reach each goal from
+    		 * the box considered to fit best.
+    		 * Not used yet :/ 
+    		 */
+//    		int[] estimatedCost = new int[goals.size()];
+    		
+    		int totalCost = 0;
+    		for (Pair<Point, Map<Point, Integer>> pair : candidatesPerBox) {
+    			LOG.fine("Looking for a match for (" + pair.first.x + "," + pair.first.y + 
+    					"), " + pair.second.size() + " possibilities");
+    			
+    			List<Map.Entry<Point, Integer>> selectedCandidates = new ArrayList<>(pair.second.size());
+    			for (Map.Entry<Point, Integer> entry : candidatesPerGoal.entrySet()) {
+    				if (pair.second.containsKey(entry.getKey())) {
+    					selectedCandidates.add(entry);
+    				}
+    			}
+    			
+    			if (selectedCandidates.isEmpty()) {
+    				// A box has no available goal: no solution found
+    				return Float.POSITIVE_INFINITY;
+    			}
+    			
+    			// Sorting the selected goals by number of candidates
+    			Collections.sort(selectedCandidates, candidatesPerGoalComparator);
+    			LOG.fine("Sorted list of possible goals: (" + selectedCandidates.toString());
+    			
+    			/* Finally: getting the selected goal. 
+    			 * Here the method could be changed to try not to get the first, to ensure a 
+    			 * more reliable solution. 
+    			 * TODO: if we stick with first, it might be better to get it from the loop
+    			 * instead of sorting the array. */
+    			Point selectedGoal = selectedCandidates.get(0).getKey();
+    			
+//    			estimatedCost[goals.indexOf(selectedGoal)] = pair.second.get(selectedGoal);
+//    			totalCost += pair.second.get(selectedGoal);
+    			totalCost += Math.pow(pair.second.get(selectedGoal), 2);
+    			
+    			// Update the data structures to not include the goal and the box anymore.
+    			for (Point p : pair.second.keySet()) {
+    				candidatesPerGoal.put(p, candidatesPerGoal.get(p) - 1);
+    			}
+    			candidatesPerGoal.remove(selectedGoal);
+    		}
+
+    		// The value of the current state is based on the cost to reach all the goals
+    		
+    		return totalCost;
+
+    	}
+    }
+    
     public static class MinMatchingHeuristic implements Heuristic<Board> {
 
 //    	public static Symbol[] GOAL_SYMBOLS = { Symbol.Box, Symbol.BoxOnGoal };
 
     	public float utility(Board start, Board goal) {
     		goal.setAvailablePosition();
-    		List<Point> Goals = goal.getGoalPoints();
+    		List<Point> goals = StaticBoard.getInstance().goals;
     		Map<Point, Symbol> startSet = start.getDynamicObjects();
-    		List<List<Integer>> Cost = new ArrayList<>();
-    		List<Integer> DegreeOfOccupied = new ArrayList<>(Goals.size());
+    		List<List<Integer>> cost = new ArrayList<>();
+    		List<Integer> degreeOfOccupied = new ArrayList<>(goals.size());
 
-    		for (int i = 0; i < Goals.size(); i++) {
-    			DegreeOfOccupied.add(0);
+    		for (int i = 0; i < goals.size(); i++) {
+    			degreeOfOccupied.add(0);
     		}
     		/** Create a 2D array to store the cost of box to Goals **/
     		for (Point startPt : startSet.keySet()) {
     			if (start.get(startPt).type == Symbol.Type.Box) {
-    				List<Integer> EstimateCost = new ArrayList<>(Goals.size());
-    				for (Point goalPt : Goals) {
+    				List<Integer> estimateCost = new ArrayList<>(goals.size());
+    				for (Point goalPt : goals) {
     					/**
     					 * If it is available position, calculate the Manhattan
     					 * Heuristic
     					 **/
     	
-    					if (goal.availablePosition.get(Goals.indexOf(goalPt))
-    							.contains(startPt)) {
-    						EstimateCost.add(Math.abs(startPt.x - goalPt.x)
+    					if (goal.availablePosition.get(goals.indexOf(goalPt)).contains(startPt)) {
+    						estimateCost.add(Math.abs(startPt.x - goalPt.x) 
     								+ Math.abs(startPt.y - goalPt.y));
-    						DegreeOfOccupied
-    								.set(Goals.indexOf(goalPt), DegreeOfOccupied
-    										.get(Goals.indexOf(goalPt)) + 1);
+    						degreeOfOccupied.set(goals.indexOf(goalPt), 
+    								degreeOfOccupied.get(goals.indexOf(goalPt)) + 1);
     					} else {
     						/** If no, then it is positive infinity **/
-    						EstimateCost.add(Integer.MAX_VALUE);
+    						estimateCost.add(Integer.MAX_VALUE);
     					}
 
     				}
 
-    				Cost.add(EstimateCost);
+    				cost.add(estimateCost);
     			}
     		}
     		/** Greedy Estimation, may overestimated but save Computational Time **/
-    		List<Integer> FinalEstimateCost = new ArrayList<>(Goals.size());
-    		for (int i = 0; i < Goals.size(); i++) {
+    		List<Integer> FinalEstimateCost = new ArrayList<>(goals.size());
+    		for (int i = 0; i < goals.size(); i++) {
     			FinalEstimateCost.add(0);
     		}
 
-    		for (List<Integer> innerList : Cost) {
+    		for (List<Integer> innerList : cost) {
 
     			int MinValue = Integer.MAX_VALUE;
     			int MinIndex = 0;
@@ -205,7 +314,7 @@ public interface Heuristic<T> {
     				 * reach
     				 **/
     				if (value != Integer.MAX_VALUE) {
-    					if (DegreeOfOccupied.get(i) < DegreeOfOccupied
+    					if (degreeOfOccupied.get(i) < degreeOfOccupied
     							.get(MinIndex)) {
     						MinIndex = i;
     						MinValue = value;
@@ -220,7 +329,7 @@ public interface Heuristic<T> {
     				return (float) Integer.MAX_VALUE;
     			}
     			FinalEstimateCost.set(MinIndex, MinValue);
-    			DegreeOfOccupied.set(MinIndex, DegreeOfOccupied.get(MinIndex) - 1);
+    			degreeOfOccupied.set(MinIndex, degreeOfOccupied.get(MinIndex) - 1);
     		}
 
     		/**
