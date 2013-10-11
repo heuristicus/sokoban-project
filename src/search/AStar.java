@@ -124,7 +124,7 @@ public class AStar extends SearchMethod {
 //                System.out.println("successor in closed? " + inClosed);
                 if (!inOpen && !inClosed){
 //                    System.out.println("successor path cost " + successor.pathCost + " successor utility " + h.utility(successor.nodeState, goal));
-                    //                    System.out.println("Successor not in either list - Adding the successor to the open list");
+//                    System.out.println("Successor not in either list - Adding the successor to the open list");
                     successor.estimatedCost = successor.pathCost + (int) h.utility(successor.nodeState, goal);
 //                    System.out.println("successor estimated cost: " + successor.estimatedCost);
                     open.add(successor);

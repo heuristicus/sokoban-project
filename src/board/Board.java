@@ -412,7 +412,6 @@ public class Board {
      * actions can be applied to them.
      */
     private void floodFillInitialise(){
-        System.out.println(this);
         possibleActions = new ArrayList<>();
         Queue<Pair<Point,Integer>> q = new LinkedList<>();
         // We start the fill at the player position, which has cost zero.
@@ -676,7 +675,6 @@ public class Board {
 				surroundingWalls.add(neighbour);
 			}
 		}
-		
 		if (surroundingWalls.size() > 2 ) return true;
 		if (surroundingWalls.size() < 2 ) return false;
 		
@@ -804,7 +802,7 @@ public class Board {
 				{
 					++lockedStatesIgnored;
 				}
-    		}
+    		}             
     	}
     	return nodes;
     }
@@ -820,7 +818,7 @@ public class Board {
     		Point boxPos = boxAction.first.position;
     		Point pushPos = new Point(boxPos.x - 2*dx, boxPos.y - 2*dy);	//position where the player stands before pulling the box
     		Point finalPos = new Point(boxPos.x - dx, boxPos.y - dy);
-    		if (get(pushPos).type == Symbol.Type.Box || get(pushPos) == Symbol.Wall)
+    		if (get(pushPos).type != Symbol.Type.Box || get(pushPos) != Symbol.Wall)
     		{
     			//Generating new Board
     			Board newBoard = new Board(this);
