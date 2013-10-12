@@ -86,7 +86,12 @@ public class SearchNode implements Comparable<SearchNode>{
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;
-        this.pathCost= pathCost+ parent.pathCost;
+        
+        if (parent == null)
+        	this.pathCost = pathCost;
+        else
+        	this.pathCost= pathCost + parent.pathCost;
+        
         this.estimatedCost = estimatedCost;
         this.boardSpaceExpansion = boardSpaceExpansion;
     }

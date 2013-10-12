@@ -82,24 +82,7 @@ public class Main {
         solveBoard(start);
     }
     
-    public static void printExpandedBoards()
-    {
-    	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
-    	System.out.println("BASE MAP");
-    	System.out.println(start.toString());
-    	
-		ArrayList<BoardAction> actions = new ArrayList<>();
-		ArrayList<Board> childs = start.generateChildStates(actions,null);
 
-		for (int i=0 ; i< childs.size(); i++)
-		{
-			BoardAction action = actions.get(i);
-			System.out.println("action point " +action.position.toString());
-			System.out.println("action direction " +action.action.toString());
-			System.out.println(childs.get(i).toString());
-			
-		}
-    }
     
     public static void profile() throws IOException {
         Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/fullTest.map"), Charset.defaultCharset()));
@@ -145,75 +128,7 @@ public class Main {
         } catch (IllegalMoveException ex) {
             
         }
-        
 
-        //Expand Board test
-        Board start=null;
-		HashSet<String> expected = new HashSet<String>();
-		expected.add(	"########\n"+
-						"#.     #\n"+
-						"#$   ###\n"+
-						"#    @$#\n"+
-						"#   *###\n"+
-						"#      #\n"+
-						"########");
-		
-		expected.add(	"########\n"+
-						"#.     #\n"+
-						"#$   ###\n"+
-						"#    $ #\n"+
-						"#   +###\n"+
-						"#   $  #\n"+
-						"########");
-		
-		expected.add(	"########\n"+
-						"#.     #\n"+
-						"#$   ###\n"+
-						"#   $$ #\n"+
-						"#   +###\n"+
-						"#      #\n"+
-						"########");
-		
-		expected.add(	"########\n"+
-						"#*     #\n"+
-						"#@   ###\n"+
-						"#    $ #\n"+
-						"#   *###\n"+
-						"#      #\n"+
-						"########");
-		
-		expected.add(	"########\n"+
-						"#.     #\n"+
-						"#@   ###\n"+
-						"#$   $ #\n"+
-						"#   *###\n"+
-						"#      #\n"+
-						"########");
-		try
-		{
-			start = Board.read(Files.newBufferedReader(Paths.get("./maps/test/boardTestExpandBoard.map"), Charset.defaultCharset()));
-		} catch (IOException e)
-		{
-		}
-//		System.out.println("-start map-");
-//		System.out.println(start.toString());
-		
-		ArrayList<Board> childs = start.generateChildStates(null,null);
-//		System.out.println("child count: " + childs.size());
-		
-		int notExpected = 0;
-		for (Board b : childs)
-		{
-			if (!expected.remove(b.toString()))
-			{
-				notExpected++;
-			}
-		}
-		
-		System.out.println("Board Expansion done");
-		System.out.println("ERRORS: " + (expected.size() + notExpected));
-	
-		//Expand Board test END
         
 		
 		System.out.println("Free neighbours of (4,2): ");
@@ -238,7 +153,7 @@ public class Main {
 		Board newBoard = null;
 
 		// Can throw IOException, but that is not recoverable inside the method. So throw it anyway.
-        start = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
+        Board start = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestStart.map"), Charset.defaultCharset()));
         Board goal = Board.read(Files.newBufferedReader(Paths.get("./maps/test/searchTestGoal.map"), Charset.defaultCharset()));
         
         System.out.println("BFS finding solution for initial map");
