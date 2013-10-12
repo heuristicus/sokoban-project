@@ -46,7 +46,6 @@ public class AStar extends SearchMethod {
         
         // Add the start state as a node with zero path cost
         open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
-        SearchNode goalNode = new SearchNode(goal, null, null, boardSpace);
         while(!open.isEmpty()){
 //            System.out.println("open size: " + open.size() + " closed size: " + closed.size() + " discarded locks: " +Board.lockedStatesIgnored);
 //            System.out.println("OPEN LIST =============");
@@ -72,7 +71,7 @@ public class AStar extends SearchMethod {
 //            System.out.println(front);
             // If front is the goal, return the action sequence.
 //            System.out.println("Checking goal state");
-            if (front.equals(goalNode)){
+            if (front.getNodeState().isSolved()){
 //                System.out.println("Found the goal!");
 //                System.out.println("Front:");
 //                System.out.println(front);

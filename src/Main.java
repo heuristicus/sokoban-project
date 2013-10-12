@@ -50,9 +50,11 @@ public class Main {
 	    
 	    public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
-//        SearchMethod astar = new AStar(new Heuristic.RealClosestHeuristic());
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
         SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
+//		((AStar)search).printTrace = true;
+//        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
+//        SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
 //		((AStar)search).printTrace = true;
         ArrayList<BoardAction> path = search.findPath(start, goal, USE_BOARD_EXPANSION);
 

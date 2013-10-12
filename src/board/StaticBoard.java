@@ -75,14 +75,8 @@ public class StaticBoard {
 
                     // expand the neighbours of this point and add them to the
                     // open list if they have not yet been visited.
-                    Pair<List<WeightedPoint>, Boolean> tmp = expandPoint(next); 
-                    List<WeightedPoint> neighbours = tmp.first;
-                    boolean isDeadEnd = tmp.second;
-                    /* If there is only one neighbour available, it is the previous node:
-                     * we are in a dead end, going there is useless, consider it unreachable. */
-                    if(!isDeadEnd || currentSymbol == Symbol.Goal) {
-                    	currentCosts.put(goal, next.cost);
-                    }
+                    List<WeightedPoint> neighbours = expandPoint(next); 
+                	currentCosts.put(goal, next.cost);
                     
                     for (WeightedPoint neighbour : neighbours) {
                         if (!closed.contains(neighbour.point)){
@@ -96,29 +90,24 @@ public class StaticBoard {
     
     /**
      * Flood fill expansion from a point
-     * The nodes to be expanded are the neighbours that have walkable on both sides
-     * The point is considered a dead end when it only has one walkable immediate neighbour
+     * The nodes to be expanded are the neighbours that have walkable tiles on both sides
      * @param p Origin point
-     * @return
-     * 	first: list of the nodes to be expanded
-     *  second: whether the current point is a dead end
+     * @return list of the nodes to be expanded
      */
-    private Pair<List<WeightedPoint>, Boolean> expandPoint(WeightedPoint p){
+    private List<WeightedPoint> expandPoint(WeightedPoint p){
         List<WeightedPoint> freeNeighbours = new ArrayList<>();
-        int walkableImmediateNeighbours = 0;
 		
         for (Action a : Action.values()) {
 			Point neighbour = SokobanUtil.applyActionToPoint(a, p.point);
 			
 			if (get(neighbour).isWalkable) {
-				++walkableImmediateNeighbours;
 				Point farNeighbour = SokobanUtil.applyActionToPoint(a, neighbour);
 				if (get(farNeighbour).isWalkable) {
 					freeNeighbours.add(new WeightedPoint(neighbour, p.cost + 1));
 				}
 			}
 		}
-		return new Pair<>(freeNeighbours, walkableImmediateNeighbours <= 1);
+		return freeNeighbours;
     }
 	
 	public Symbol get(Point point) {

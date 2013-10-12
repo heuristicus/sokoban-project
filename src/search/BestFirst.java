@@ -30,7 +30,6 @@ public class BestFirst extends SearchMethod {
         Queue<SearchNode> open = new PriorityQueue<>();
         HashSet<SearchNode> closed = new HashSet<>();
         
-        SearchNode goalNode = new SearchNode(goal, null, null, boardSpace);
         SearchNode first = new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace);
         open.add(first);
         
@@ -46,8 +45,8 @@ public class BestFirst extends SearchMethod {
             // Quick check to see if any of the successors are goals. Don't need
             // to look at others if the goal is present.
             for (SearchNode successor : successors) {
-                if (successor.equals(goalNode)){
-                	System.out.println("YAY");
+
+                if (successor.getNodeState().isSolved()){
                     return successor.actionUnwind();
                 }
             }
