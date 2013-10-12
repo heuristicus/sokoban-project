@@ -189,13 +189,13 @@ public class SokobanUtil {
         }
 
         for (Point point : toRemove) {
-            System.out.println("Removing point " + point);
+//            System.out.println("Removing point " + point);
             goalList.remove(point);
         }
         
         HashMap<Point, Point> pointMap = new HashMap<>();
         
-        System.out.println(dynamicObjects.keySet().size());
+//        System.out.println(dynamicObjects.keySet().size());
         for (Point p : dynamicObjects.keySet()) {
             if (solved.get(p) == Symbol.Player || toRemove.contains(p))
                 continue;

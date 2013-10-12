@@ -53,7 +53,7 @@ public class Main {
 //        SearchMethod astar = new AStar(new Heuristic.RealClosestHeuristic());
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
         SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
-		//((AStar)astar).printTrace = true;
+//		((AStar)search).printTrace = true;
         ArrayList<BoardAction> path = search.findPath(start, goal, USE_BOARD_EXPANSION);
 
 //        System.out.println("Box movements:");

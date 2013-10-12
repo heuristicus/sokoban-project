@@ -784,6 +784,10 @@ public class Board {
     public ArrayList<SearchNode> expandBoardSpace(SearchNode parent){
     	ArrayList<SearchNode> nodes = new ArrayList<>();
     	ArrayList<Pair<BoardAction,Integer> > boxList = getPossibleActions();
+    	
+    	System.out.println("expanded board");
+    	System.out.println(this.toString());
+    	
     	for (Pair<BoardAction,Integer> boxAction : boxList)
     	{
     		int dx = boxAction.first.action.dx;	//push direction
@@ -1017,7 +1021,8 @@ public class Board {
 //            System.out.println("Point is " + point);
             int index;
             char posType = this.get(point).type.toChar();
-            if (posType == '@') // Skip the actual player position in the creation
+//            if (posType == '@') // Skip the actual player position in the creation
+            if (point.equals(playerPosition)) // Skip the actual player position in the creation
                 continue;
             // Set the index of this position in the char array to the char which
             // represents the symbol type.
