@@ -25,6 +25,7 @@ import utilities.SokobanUtil.Action;
 import board.Board;
 import board.StaticBoard;
 import exceptions.IllegalMoveException;
+import search.BestFirst;
 
 
 public class Main {
@@ -49,9 +50,11 @@ public class Main {
 	    
 	    public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
-        SearchMethod astar = new AStar(new Heuristic.RealClosestHeuristic());
-        ArrayList<BoardAction> pathas = astar.findPath(start, goal, USE_BOARD_EXPANSION);
-        //        ArrayList<BoardAction> pathas = IDA.findPath(start, goal, USE_BOARD_EXPANSION);
+//        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
+        SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
+
+        ArrayList<BoardAction> path = search.findPath(start, goal, USE_BOARD_EXPANSION);
+
 //        System.out.println("Box movements:");
 //        System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
         List<Action> pathWithMoves = null;
@@ -59,7 +62,7 @@ public class Main {
         {
             try
             {
-                pathWithMoves = start.generateFullActionList(pathas);
+                pathWithMoves = start.generateFullActionList(path);
             }
     		catch (IllegalMoveException e)
     		{
@@ -68,7 +71,7 @@ public class Main {
     		}
         }else
         {
-            pathWithMoves = BoardAction.convertToActionList(pathas);
+            pathWithMoves = BoardAction.convertToActionList(path);
         }
 //        System.out.println("Full path:");
         System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
