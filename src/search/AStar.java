@@ -90,13 +90,13 @@ public class AStar extends SearchMethod {
             
             ArrayList<SearchNode> successors = front.expand();
 //            System.out.println("Number of successor states: " + successors.size());
-//            if (printTrace)
-//            	System.out.println("CHILDS");
+            if (printTrace)
+            	System.out.println("CHILDS");
             
             for (SearchNode successor : successors) {
 //                System.out.println("Examining successor of front node");
-//                if (printTrace)
-//                	System.out.println(successor);
+                if (printTrace)
+                	System.out.println(successor);
                 
                 // Look through the open list to see if the successor is
                 // already present

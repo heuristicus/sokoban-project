@@ -753,6 +753,10 @@ public class Board {
 		if (this.get(p).type != Symbol.Type.Box)
 			return false;
 		
+		//cannot be locked on goal
+		if (this.get(p) == Symbol.BoxOnGoal)
+			return false;
+		
 		//initialize recursion
 		HashSet<Point> exploredPoints = new HashSet<Point>();
 		return StaticBoard.isLocked(p) || !fun.isMovable(p,exploredPoints);
@@ -801,6 +805,8 @@ public class Board {
 				}
 				else
 				{
+//					System.out.println("considered locked");
+//					System.out.println(newBoard.toString());
 					++lockedStatesIgnored;
 				}
     		}             
