@@ -5,16 +5,16 @@
 package exceptions;
 
 /**
- *
+ * 
  * @author michal
  */
 @SuppressWarnings("serial")
-public class IllegalMoveException extends Exception {
-    public IllegalMoveException(){
-        
-    }
+public class IllegalMoveException extends RuntimeException {
+	public IllegalMoveException() {
 
-    public IllegalMoveException(String message) {
-        super(message);
-    }
+	}
+
+	public IllegalMoveException(String message) {
+		super(message);
+	}
 }

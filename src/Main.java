@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import utilities.BoardAction;
 import search.AStar;
 import search.BFSNoDuplication;
+import search.BestFirst;
 import search.Heuristic;
 import search.Heuristic.ManhattanClosestHeuristic;
 import search.SearchMethod;
@@ -25,7 +26,6 @@ import utilities.SokobanUtil.Action;
 import board.Board;
 import board.StaticBoard;
 import exceptions.IllegalMoveException;
-import search.BestFirst;
 
 
 public class Main {
@@ -50,9 +50,10 @@ public class Main {
 	    
 	    public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
+//        SearchMethod astar = new AStar(new Heuristic.RealClosestHeuristic());
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
         SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
-
+		//((AStar)astar).printTrace = true;
         ArrayList<BoardAction> path = search.findPath(start, goal, USE_BOARD_EXPANSION);
 
 //        System.out.println("Box movements:");

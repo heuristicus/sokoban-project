@@ -13,9 +13,11 @@ import java.nio.file.Paths;
 
 import board.Board;
 import board.Symbol;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -117,6 +119,14 @@ public class SokobanUtil {
 		}
     }
     
+    public static String str(Point p, Board b) {
+    	return "(" + p.x + "," + p.y + "," + b.get(p) + ")";
+    }
+    
+    public static String reportAction(Point from, Point to, Board b) {
+    	return "=> from " + SokobanUtil.str(from, b) + "to " + SokobanUtil.str(to, b) + "\n" + b;
+    }
+    
     public static String readMapAsString(String filename) throws IOException {
         return new String(Files.readAllBytes(Paths.get(filename)));
     }
@@ -156,44 +166,48 @@ public class SokobanUtil {
     public static Board getSolvedBoard(Board b) {
         Board solved = new Board(b);
         List<Point> goalList = new ArrayList<>(solved.getGoalPoints());
-        if (goalList.size() != solved.getDynamicObjects().size() - 1)
+        Map<Point, Symbol> dynamicObjects = solved.getDynamicObjects();
+        if (goalList.size() != dynamicObjects.size() - 1)
             throw new RuntimeException("The number of goals and boxes did not match while constructing a solved board.");
         // Map to store the pairs of points - cannot modify the mObjects set while
         // going through it.
-        HashMap<Point, Point> pointMap = new HashMap<>();
+
         if (solved.get(solved.getPlayerPosition()) == Symbol.PlayerOnGoal){
             solved.moveElement(solved.getPlayerPosition(), solved.getFirstEmpty());
         }
-        for (Point p : solved.getDynamicObjects().keySet()) {
-            if (goalList.isEmpty())
-                break;
-//            System.out.println(p);
+        
+        List<Point> toRemove = new ArrayList<>();
+        for (Point p : dynamicObjects.keySet()) {
             Symbol pointSymbol = solved.get(p);
-            if (pointSymbol == Symbol.Player){
+            if (pointSymbol == Symbol.Player)
                 // Ignore the player position
-//                System.out.println("player, ignoring");
                 continue;
-            } else if (pointSymbol == Symbol.BoxOnGoal){
+            if (pointSymbol == Symbol.BoxOnGoal)
                 // If this is a box on a goal, the goal is filled, so remove it
                 // from the goal list and continue.
-//                System.out.println("this object is a box on a goal.");
-                goalList.remove(p);
+                toRemove.add(p);
+        }
+
+        for (Point point : toRemove) {
+            System.out.println("Removing point " + point);
+            goalList.remove(point);
+        }
+        
+        HashMap<Point, Point> pointMap = new HashMap<>();
+        
+        System.out.println(dynamicObjects.keySet().size());
+        for (Point p : dynamicObjects.keySet()) {
+            if (solved.get(p) == Symbol.Player || toRemove.contains(p))
                 continue;
-            }
-            Point goal;
-            int i = -1;
-            // go through the goal list until we find one that is unoccupied.
-            while(solved.get((goal = goalList.get(++i))) == Symbol.BoxOnGoal);
-            // remove the unoccupied goal from the list
-            goalList.remove(i);
 //            System.out.println("putting box at " + p + " onto goal at " + goal);
             // Move the box we are looking at onto the empty goal position.
-            pointMap.put(p, goal);
+            pointMap.put(p, goalList.remove(0));
         }
+        
         for (Point point : pointMap.keySet()) {
             solved.moveElement(point, pointMap.get(point));
         }
-        
+    
         return solved;
     }
     

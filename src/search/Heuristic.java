@@ -58,6 +58,7 @@ public interface Heuristic<T> {
     					{
     						float MHdistance = Math.abs(startPt.x - goalPt.x) + Math.abs(startPt.y - goalPt.y);
     						bestDistance = Math.min(bestDistance, MHdistance);
+//    						bestDistance = Math.min(bestDistance, MHdistance*MHdistance);
     					}
     				}
     				estimation += bestDistance;

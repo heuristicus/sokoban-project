@@ -12,39 +12,7 @@ import static org.junit.Assert.*;
  * @author michal
  */
 public class SearchNodeTest {
-    
-    public SearchNodeTest() {
-    }
-
-    @Test
-    public void testNodeUnwind() {
-        fail();
-    }
-
-    @Test
-    public void testActionUnwind() {
-        fail();
-    }
-
-    @Test
-    public void testExpand() {
-        fail();
-    }
-
-    @Test
-    public void testGetNodeState() {
-        fail();
-    }
-
-    @Test
-    public void testEquals() {
-        fail();
-    }
-
-    @Test
-    public void testHashCode() {
-        fail();
-    }
+ 
 
     @Test
     public void testCompareTo() {
@@ -61,10 +29,5 @@ public class SearchNodeTest {
         assertEquals(1, b.compareTo(a));
         assertEquals(1, c.compareTo(b));
         assertEquals(-1, b.compareTo(c));
-    }
-
-    @Test
-    public void testToString() {
-        fail();
     }
 }

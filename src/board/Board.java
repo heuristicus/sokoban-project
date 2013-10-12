@@ -71,14 +71,14 @@ public class Board {
 	}
  
 	public void setAvailablePosition(){
-		try{
+//		try{
 		List<Point> Goals = StaticBoard.getInstance().goals;
 		for(int i = 0 ; i < Goals.size() ; i++){
 			 availablePosition.add(getAccessiblePointsfromGoal(Goals.get(i)));
 		}
-		}catch(Exception e){
-			
-		}
+//		}catch(Exception e){
+//			
+//		}
 	}
 	
 	public List<Point> getGoalPoints(){
@@ -204,9 +204,11 @@ public class Board {
 	 * 
 	 * @return whether operation was successful
 	 */
-	public boolean moveElement(Point from, Point to) {
+	public void moveElement(Point from, Point to) {
 		if (!mObjects.containsKey(from))
-			return false;
+			throw new IllegalMoveException("Point to move is not a dynamic object.");
+		
+		if (from.equals(to)) return;
 
 		Symbol.Type element = mObjects.get(from).type;
 		Symbol destination = StaticBoard.getInstance().get(to);
@@ -222,7 +224,7 @@ public class Board {
 					finalState = Symbol.Box;
 					break;
 				default:
-					return false;
+					throw new IllegalMoveException("Can't move that: \n" + SokobanUtil.reportAction(from, to, this));
 				}
 			} else if (destination == Symbol.Goal) {
 				switch (element) {
@@ -233,10 +235,10 @@ public class Board {
 					finalState = Symbol.BoxOnGoal;
 					break;
 				default:
-					return false;
+					throw new IllegalMoveException("Can't move that: \n" +SokobanUtil.reportAction(from, to, this));
 				}
 			} else {
-				return false;
+				throw new IllegalMoveException("Can't move there: \n" + SokobanUtil.reportAction(from, to, this));
 			}
 
 			mObjects.remove(from);
@@ -245,10 +247,10 @@ public class Board {
 				playerPosition = to;
 			}
 			floodFillRequired = true;
-			return true;
+			return;
 		}
 
-		return false;
+		throw new IllegalMoveException("Can't move there: \n" + SokobanUtil.reportAction(from, to, this));
 	}
 
 	/**
@@ -294,8 +296,7 @@ public class Board {
 			newBoard.moveElement(destination, boxDestination);
 			newBoard.moveElement(player, destination);
 		} else if (!destObject.isWalkable) {
-			throw new IllegalMoveException("Direction " + SokobanUtil.actionToString(a) 
-                    + " is not a box, and is not walkable.");
+			throw new IllegalMoveException("Direction " + a + " is not a box, and is not walkable.");
 		} else {
 			newBoard.moveElement(player, destination);
 		}
@@ -535,7 +536,7 @@ public class Board {
 		while (!q.isEmpty()) {
 			Point next = q.remove();
 			for (Action a : Action.values()) {
-				try {
+//				try {
 					applyPullAction(a, true, next);
 					Point ReachPoint = SokobanUtil.applyActionToPoint(a, next);
 					System.out.print("Reach:" + ReachPoint.toString());
@@ -544,9 +545,9 @@ public class Board {
 						{accessible.add(ReachPoint);
 						q.add(ReachPoint);}
 					
-				} catch (IllegalMoveException e) {
-					
-				}
+//				} catch (IllegalMoveException e) {
+//					
+//				}
             }
            
         }
@@ -772,6 +773,7 @@ public class Board {
             try {
                 expanded.add(new SearchNode(this.applyAction(a, false), parent, new BoardAction(a, playerPosition), 1, false));
             } catch (IllegalMoveException ex) {
+            	// Ignore if the move is not possible
 //                System.out.println(ex.getMessage());
             }
         }
@@ -801,7 +803,8 @@ public class Board {
 				//if the board is a locked state, just ignore it
 				if (!newBoard.isLockedState())
 				{
-		    		nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
+		    		nodes.add(new SearchNode(newBoard, parent, boxAction.first, 1, true));
+//		    		nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
 				}
 				else
 				{
