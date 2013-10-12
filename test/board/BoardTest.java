@@ -185,12 +185,12 @@ public class BoardTest {
     @Test
     public void testApplyAction() throws Exception {
     	Board board = TestUtil.initBoardFromString(BoardTest.inlineMaps.get("MAP_00"));
-        Board result = board.applyAction(Action.UP, false);
+        Board result = board.applyAction(Action.UP, false, true);
         assertFalse(board.equals(result));
         assertEquals(Symbol.Empty, board.get(new Point(4,3)));
         assertEquals(Symbol.Player, result.get(new Point(4,3)));
         
-        result = board.applyAction(Action.UP, true);
+        result = board.applyAction(Action.UP, true, true);
         assertTrue(board.equals(result));
         assertEquals(board.get(new Point(4,3)), Symbol.Player);
     }
@@ -316,8 +316,8 @@ public class BoardTest {
         }
         
         // Get the results of the expansion of each board
-        ArrayList<SearchNode> blockedResult = blocked.expandPlayerSpace(null);
-        ArrayList<SearchNode> surroundedResult = surrounded.expandPlayerSpace(null);
+        ArrayList<SearchNode> blockedResult = blocked.expandPlayerMoves(null);
+        ArrayList<SearchNode> surroundedResult = surrounded.expandPlayerMoves(null);
         
         // The two resulting lists should be the same size as the expected lists
         assertEquals(blockedExpected.size(), blockedResult.size());
@@ -427,7 +427,7 @@ public class BoardTest {
         
         Board b1a = null;
         try {
-            b1a = b1.applyAction(Action.UP, false);
+            b1a = b1.applyAction(Action.UP, false, true);
         } catch (IllegalMoveException ex) {
         }
         
@@ -455,7 +455,7 @@ public class BoardTest {
         
         Board b1a = null;
         try {
-            b1a = b1.applyAction(Action.UP, false);
+            b1a = b1.applyAction(Action.UP, false, true);
         } catch (IllegalMoveException ex) {
         }
         

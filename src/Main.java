@@ -106,8 +106,8 @@ public class Main {
         
         Board tt, tt2;
         try {
-            tt = board.applyAction(Action.UP, false);
-            tt2 = tt.applyAction(Action.DOWN, false);
+            tt = board.applyAction(Action.UP, false, true);
+            tt2 = tt.applyAction(Action.DOWN, false, true);
             System.out.println("board");
             System.out.println(board);
             System.out.println("tt");
@@ -206,11 +206,11 @@ public class Main {
 		try {
 			Board solvedBoard = board.applyActionChained(solve, false);
 			System.out.println(solvedBoard);
-			newBoard = board.applyAction(Action.UP, false);
+			newBoard = board.applyAction(Action.UP, false, true);
 			System.out.println(newBoard);
-			newBoard.applyAction(Action.RIGHT, true);
+			newBoard.applyAction(Action.RIGHT, true, true);
 			System.out.println(newBoard);
-			newBoard.applyAction(Action.UP, true);
+			newBoard.applyAction(Action.UP, true, true);
 			System.out.println(newBoard);
 		} catch (IllegalMoveException ex) {
 			System.out.println("Could not move player.");

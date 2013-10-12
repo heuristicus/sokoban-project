@@ -264,14 +264,14 @@ public class Board {
 	 *            function is called on, destroying the previous board state. If
 	 *            false, the board is cloned and the action is applied to the
 	 *            cloned board
+	 * @param allowBoxMove TODO
 	 * @throws Exception
 	 *             If it is impossible to apply the action (moving into a wall,
 	 *             moving into a box that can't be pushed)
 	 * @return The original object if destructive is false, a cloned board
 	 *         otherwise
 	 * */
-	public Board applyAction(Action a, boolean destructive)
-			throws IllegalMoveException {
+	public Board applyAction(Action a, boolean destructive, boolean allowBoxMove) {
 		Board newBoard = destructive ? this : new Board(this);
 
         Point player = newBoard.getPlayerPosition();
@@ -281,6 +281,9 @@ public class Board {
 //		System.out.println(newBoard);
 //		System.out.println("dest object " + destObject);
 		if (destObject.type == Type.Box) {
+			if (!allowBoxMove) {
+				throw new IllegalMoveException("Box moves are not allowed.");
+			}
 			Point boxDestination = SokobanUtil.applyActionToPoint(a,
 					destination);
 			Symbol boxDest = newBoard.get(boxDestination);
@@ -320,7 +323,7 @@ public class Board {
 		for (Action action : actionList) {
 			// Don't care about modifying board state anymore, so use the
 			// destructive method
-			newBoard.applyAction(action, true);
+			newBoard.applyAction(action, true, true);
 		}
 
 		return newBoard;
@@ -766,15 +769,16 @@ public class Board {
 	
 
     
-    public ArrayList<SearchNode> expandPlayerSpace(SearchNode parent) {
+    public ArrayList<SearchNode> expandPlayerMoves(SearchNode parent) {
         ArrayList<SearchNode> expanded = new ArrayList<>();
         
         for (Action a : Action.values()) {
             try {
-                expanded.add(new SearchNode(this.applyAction(a, false), parent, new BoardAction(a, playerPosition), 1, false));
+                expanded.add(new SearchNode(this.applyAction(a, false, false), parent, new BoardAction(a, playerPosition), 1, false));
             } catch (IllegalMoveException ex) {
             	// Ignore if the move is not possible
-//                System.out.println(ex.getMessage());
+            	System.out.println(parent);
+                System.out.println(ex.getMessage());
             }
         }
         
@@ -1101,9 +1105,9 @@ public class Board {
             
     		// Now push the box
     		if (doubleCheck) {
-    			currentBoard.applyAction(bm.action, true);
+    			currentBoard.applyAction(bm.action, true, true);
     		} else {
-    			currentBoard = intermediateBoard.applyAction(bm.action, true);
+    			currentBoard = intermediateBoard.applyAction(bm.action, true, true);
     		}
     		
     		completeActionList.add(bm.action);

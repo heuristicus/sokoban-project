@@ -44,6 +44,8 @@ public class AStar extends SearchMethod {
         // Store as yet unvisited nodes in a priority queue - we expand from the best
         Queue<SearchNode> open = new PriorityQueue<>();
         
+        SearchNode goalState = new SearchNode(goal, null, null, boardSpace);
+        
         // Add the start state as a node with zero path cost
         open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
         while(!open.isEmpty()){
@@ -71,7 +73,7 @@ public class AStar extends SearchMethod {
 //            System.out.println(front);
             // If front is the goal, return the action sequence.
 //            System.out.println("Checking goal state");
-            if (front.getNodeState().isSolved()){
+            if (front.equals(goalState)){
 //                System.out.println("Found the goal!");
 //                System.out.println("Front:");
 //                System.out.println(front);
