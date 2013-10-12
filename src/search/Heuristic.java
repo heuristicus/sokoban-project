@@ -280,7 +280,7 @@ public interface Heuristic<T> {
     			
     		}
     		Collections.sort(candidatesPerBox, candidatesPerBoxComparator);
-    		LOG.fine("Candidates per box, sorted: " + candidatesPerBox.toString());
+//    		LOG.fine("Candidates per box, sorted: " + candidatesPerBox.toString());
     		/* This array will contain the length of the path to reach each goal from
     		 * the box considered to fit best.
     		 * Not used yet :/ 
