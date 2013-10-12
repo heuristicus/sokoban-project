@@ -776,9 +776,9 @@ public class Board {
             try {
                 expanded.add(new SearchNode(this.applyAction(a, false, false), parent, new BoardAction(a, playerPosition), 1, false));
             } catch (IllegalMoveException ex) {
-            	// Ignore if the move is not possible
-            	System.out.println(parent);
-                System.out.println(ex.getMessage());
+//            	// Ignore if the move is not possible
+//            	System.out.println(parent);
+//                System.out.println(ex.getMessage());
             }
         }
         
@@ -789,8 +789,8 @@ public class Board {
     	ArrayList<SearchNode> nodes = new ArrayList<>();
     	ArrayList<Pair<BoardAction,Integer> > boxList = getPossibleActions();
     	
-    	System.out.println("expanded board");
-    	System.out.println(this.toString());
+//    	System.out.println("expanded board");
+//    	System.out.println(this.toString());
     	
     	for (Pair<BoardAction,Integer> boxAction : boxList)
     	{
