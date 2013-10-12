@@ -79,10 +79,10 @@ public class SearchNode implements Comparable<SearchNode>{
         this.parent = parent;
         this.generatingAction = generatingAction;
         
-//        if (parent == null)
+        if (parent == null)
         	this.pathCost = pathCost;
-//        else
-//        	this.pathCost= pathCost + parent.pathCost;
+        else
+        	this.pathCost= pathCost + parent.pathCost;
         
         this.estimatedCost = estimatedCost;
         this.boardSpaceExpansion = boardSpaceExpansion;

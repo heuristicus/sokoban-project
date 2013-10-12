@@ -106,7 +106,7 @@ public interface Heuristic<T> {
     		float estimation = 0;
     		for (Point startPt : start.keySet())
     		{
-    			if (startPt!=begin.getPlayerPosition())
+    			if (!startPt.equals(begin.getPlayerPosition()))
     			{
     				float bestDistance = Float.POSITIVE_INFINITY;
     				if(StaticBoard.getInstance().goalDistanceCost.get(startPt) != null)
