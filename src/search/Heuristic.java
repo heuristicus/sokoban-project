@@ -56,7 +56,6 @@ public interface Heuristic<T> {
     				{
     					if (isGoalSymbol(goal.get(goalPt)))
     					{
-    						
     						float MHdistance = Math.abs(startPt.x - goalPt.x) + Math.abs(startPt.y - goalPt.y);
     						bestDistance = Math.min(bestDistance, MHdistance);
     					}
@@ -66,6 +65,8 @@ public interface Heuristic<T> {
     		}
     		return estimation;
     	}
+        
+        
     	
     	private boolean isStartSymbol(Symbol sym)
     	{
@@ -93,20 +94,36 @@ public interface Heuristic<T> {
     	
     }
     
-    public static class ManhattanHeuristic implements Heuristic<Board>{
-
-        /**
-         * THIS IS A PLACEHOLDER!
-         * @param start
-         * @param goal
-         * @return 
-         */
+    public static class RealClosestHeuristic implements Heuristic<Board>
+    {
         @Override
-        public float utility(Board start, Board goal) {
-            return 1.0f;
-        }
+    	/** Returns an optimistic estimation of the coast to go from state start to state goal.
+    	 * 	
+    	 */
+    	public float utility(Board begin, Board end)
+    	{		
+            Map<Point, Symbol> start = begin.getDynamicObjects();
+    		float estimation = 0;
+    		for (Point startPt : start.keySet())
+    		{
+    			if (startPt!=begin.getPlayerPosition())
+    			{
+    				float bestDistance = Float.POSITIVE_INFINITY;
+    				if(StaticBoard.getInstance().goalDistanceCost.get(startPt) != null)
+    				{
+	    				for (Integer dist : StaticBoard.getInstance().goalDistanceCost.get(startPt).values())
+	    				{	
+							bestDistance = Math.min(bestDistance, dist);
+	    				}
+    				}
+    				estimation += bestDistance;
+    			}	
+    		}
+    		return estimation;
+    	}
         
     }
+    
     
     /**
      * This heuristic takes into account walls in the map. For each box, the closest
@@ -210,13 +227,13 @@ public interface Heuristic<T> {
      */
     public static class MinMatching2Heuristic implements Heuristic<Board> {
     	
-    	private static final Logger LOG = Logger.getLogger(MinMatching2Heuristic.class.getName());
-    	{
-    		Handler consoleHandler = new ConsoleHandler();
-    		consoleHandler.setLevel(Level.FINER);
-    		LOG.setLevel(Level.ALL);
-    		LOG.addHandler(consoleHandler);
-    	}
+//    	private static final Logger LOG = Logger.getLogger(MinMatching2Heuristic.class.getName());
+//    	{
+//    		Handler consoleHandler = new ConsoleHandler();
+//    		consoleHandler.setLevel(Level.FINER);
+//    		LOG.setLevel(Level.ALL);
+//    		LOG.addHandler(consoleHandler);
+//    	}
     	
     	// TODO might not be needed if we just want the max instead of sorting the list
     	private static Comparator<Map.Entry<Point, Integer>> candidatesPerGoalComparator = 
@@ -272,8 +289,8 @@ public interface Heuristic<T> {
     		
     		int totalCost = 0;
     		for (Pair<Point, Map<Point, Integer>> pair : candidatesPerBox) {
-    			LOG.fine("Looking for a match for (" + pair.first.x + "," + pair.first.y + 
-    					"), " + pair.second.size() + " possibilities");
+//    			LOG.fine("Looking for a match for (" + pair.first.x + "," + pair.first.y + 
+//    					"), " + pair.second.size() + " possibilities");
     			
     			List<Map.Entry<Point, Integer>> selectedCandidates = new ArrayList<>(pair.second.size());
     			for (Map.Entry<Point, Integer> entry : candidatesPerGoal.entrySet()) {
@@ -289,7 +306,7 @@ public interface Heuristic<T> {
     			
     			// Sorting the selected goals by number of candidates
     			Collections.sort(selectedCandidates, candidatesPerGoalComparator);
-    			LOG.fine("Sorted list of possible goals: (" + selectedCandidates.toString());
+//    			LOG.fine("Sorted list of possible goals: (" + selectedCandidates.toString());
     			
     			/* Finally: getting the selected goal. 
     			 * Here the method could be changed to try not to get the first, to ensure a 
