@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class SokobanUtil {
     
+    public static final Action ACTION_VALUES[] = Action.values();
+    
     public enum Action { 
     	UP(0,-1),
     	DOWN(0,1),

@@ -40,11 +40,7 @@ public class SearchNode implements Comparable<SearchNode>{
      * when the equals method of this class is called.
      */
     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, boolean boardSpaceExpansion) {
-        this.nodeState = nodeState;
-        this.parent = parent;
-        this.generatingAction = generatingAction;
-        pathCost = null;
-        this.boardSpaceExpansion = boardSpaceExpansion;
+        this(nodeState, parent, generatingAction, null, boardSpaceExpansion);
     }
     
     /**
@@ -59,12 +55,8 @@ public class SearchNode implements Comparable<SearchNode>{
      * expansion or a board space expansion. This defines which method of the board class is used
      * when the equals method of this class is called.
      */
-     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, int pathCost, boolean boardSpaceExpansion) {
-        this.nodeState = nodeState;
-        this.parent = parent;
-        this.generatingAction = generatingAction;
-        this.pathCost= pathCost + parent.pathCost;
-        this.boardSpaceExpansion = boardSpaceExpansion;
+     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, Integer pathCost, boolean boardSpaceExpansion) {
+         this(nodeState, parent, generatingAction, pathCost, null, boardSpaceExpansion);
     }
     
          /**
@@ -82,7 +74,7 @@ public class SearchNode implements Comparable<SearchNode>{
      * expansion or a board space expansion. This defines which method of the board class is used
      * when the equals method of this class is called.
      */
-     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, int pathCost, int estimatedCost, boolean boardSpaceExpansion) {
+     public SearchNode(Board nodeState, SearchNode parent, BoardAction generatingAction, Integer pathCost, Integer estimatedCost, boolean boardSpaceExpansion) {
         this.nodeState = nodeState;
         this.parent = parent;
         this.generatingAction = generatingAction;

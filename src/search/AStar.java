@@ -62,6 +62,7 @@ public class AStar extends SearchMethod {
 //            }
 //            System.out.println("");
             SearchNode front = open.remove(); // The best node in the queue
+//            System.out.println("cost of front node " + front.estimatedCost);
 //            System.out.println("Checking if closed contains the front node");
 //            System.out.println(front);
             // If front is the goal, return the action sequence.
@@ -90,6 +91,10 @@ public class AStar extends SearchMethod {
                 // Look through the open list to see if the successor is
                 // already present
                 Iterator<SearchNode> it = open.iterator();
+//                while(it.hasNext()){
+//                    System.out.println("Element of open: " + it.next().estimatedCost);
+//                }
+//                it = open.iterator();
 //                System.out.println("Checking open list to see if it contains the successor.");
                 boolean inOpen = false;
                 while(it.hasNext()){
