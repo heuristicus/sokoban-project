@@ -971,6 +971,14 @@ public class Board {
     	
     	return newBoard;
     }
+    
+    public boolean isSolved() {
+    	for (Point dynObject : mObjects.keySet()) {
+    		if (get(dynObject).type == Symbol.Type.Player) continue;
+    		if (get(dynObject) != Symbol.BoxOnGoal) return false;
+    	}
+    	return true;
+    }
 
     @Override
     public int hashCode() {
