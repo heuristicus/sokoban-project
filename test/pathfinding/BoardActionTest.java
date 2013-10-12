@@ -4,6 +4,7 @@
  */
 package pathfinding;
 
+import utilities.BoardAction;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;

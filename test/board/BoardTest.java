@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 import exceptions.IllegalMoveException;
 import search.SearchNode;
 import utilities.Pair;

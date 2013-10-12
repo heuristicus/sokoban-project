@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 import board.Board;
 
 

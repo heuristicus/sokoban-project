@@ -15,14 +15,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 import search.AStar;
 import search.Heuristic;
 import search.SearchMethod;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
-import utilities.WeightedPoint;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
 import utilities.Pair;

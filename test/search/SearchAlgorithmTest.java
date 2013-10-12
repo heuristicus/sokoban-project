@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import utilities.TestUtil;
 import static org.junit.Assert.fail;
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 
 /**
  *

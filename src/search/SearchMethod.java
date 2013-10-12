@@ -2,7 +2,7 @@ package search;
 
 import board.Board;
 import java.util.ArrayList;
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 
 
 // T is an object which is used to represent the state. U should represent the set of actions which can be taken

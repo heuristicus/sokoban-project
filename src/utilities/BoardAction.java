@@ -1,4 +1,4 @@
-package pathfinding;
+package utilities;
 
 import java.awt.Point;
 import java.util.ArrayList;

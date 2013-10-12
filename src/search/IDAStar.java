@@ -6,7 +6,7 @@ package search;
 
 import board.Board;
 import java.util.ArrayList;
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 import utilities.Pair;
 
 /**
