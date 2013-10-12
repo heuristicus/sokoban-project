@@ -698,7 +698,7 @@ public class Board {
     {
     	for (Point p : mObjects.keySet())
     	{
-    		if (p.equals(playerPosition))			//escaping player
+    		if (!p.equals(playerPosition))			//escaping player
     		{
     			if (get(p) != Symbol.BoxOnGoal)	//escaping boxes on goals
     			{
