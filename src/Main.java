@@ -51,6 +51,7 @@ public class Main {
 	    public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
         SearchMethod astar = new AStar(new Heuristic.ManhattanClosestHeuristic());
+//        ((AStar)astar).printTrace = true;
         ArrayList<BoardAction> pathas = astar.findPath(start, goal, USE_BOARD_EXPANSION);
         //        ArrayList<BoardAction> pathas = IDA.findPath(start, goal, USE_BOARD_EXPANSION);
 //        System.out.println("Box movements:");

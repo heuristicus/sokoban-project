@@ -27,6 +27,7 @@ import board.Board;
 public class AStar extends SearchMethod {
 
     Heuristic<Board> h;
+    public boolean printTrace = false;
     
     /**
      * Basic constructor
@@ -62,6 +63,11 @@ public class AStar extends SearchMethod {
 //            }
 //            System.out.println("");
             SearchNode front = open.remove(); // The best node in the queue
+            if (printTrace)
+            {
+	            System.out.println("FRONT FRONT FRONT FRONT FRONT FRONT FRONT FRONT");
+	            System.out.println(front.toString());
+            }
 //            System.out.println("Checking if closed contains the front node");
 //            System.out.println(front);
             // If front is the goal, return the action sequence.
@@ -84,9 +90,14 @@ public class AStar extends SearchMethod {
             
             ArrayList<SearchNode> successors = front.expand();
 //            System.out.println("Number of successor states: " + successors.size());
+//            if (printTrace)
+//            	System.out.println("CHILDS");
+            
             for (SearchNode successor : successors) {
 //                System.out.println("Examining successor of front node");
-//                System.out.println(successor);
+//                if (printTrace)
+//                	System.out.println(successor);
+                
                 // Look through the open list to see if the successor is
                 // already present
                 Iterator<SearchNode> it = open.iterator();
