@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 
 import board.Board;
 import board.Symbol;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,6 +116,14 @@ public class SokobanUtil {
 		} catch (IOException e) {
 			throw new RuntimeException("File no found: " + filePath.toAbsolutePath(), e);
 		}
+    }
+    
+    public static String str(Point p, Board b) {
+    	return "(" + p.x + "," + p.y + "," + b.get(p) + ")";
+    }
+    
+    public static String reportAction(Point from, Point to, Board b) {
+    	return "=> from " + SokobanUtil.str(from, b) + "to " + SokobanUtil.str(to, b) + "\n" + b;
     }
     
     public static String readMapAsString(String filename) throws IOException {

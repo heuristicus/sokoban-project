@@ -126,56 +126,55 @@ public class BoardTest {
     @Test
     public void testMoveElement() {
         Board board = TestUtil.initBoard("readTest1.map");
-        boolean result;
         Point from, to;
         
         // Moving a box to an empty tile
         from = new Point(1,1);
         to = new Point(4,1);
-        result = board.moveElement(from, to);
-        assertEquals(true, result);
+        board.moveElement(from, to);
         assertEquals(Symbol.Empty, board.get(from));
         assertEquals(Symbol.Box, board.get(to));
         
         // Moving the box to a goal
         from = to;
         to = new Point(2,1);
-        result = board.moveElement(from, to);
-        assertEquals(true, result);
+        board.moveElement(from, to);
         assertEquals(Symbol.Empty, board.get(from));
         assertEquals(Symbol.BoxOnGoal, board.get(to));
         
         // Moving the box on top of the player (should fail)
         from = to;
         to = new Point(1,2);
-        result = board.moveElement(from, to);
-        assertEquals(false, result);
+        try { 
+        	board.moveElement(from, to);
+        	fail();
+        } catch (RuntimeException e) {}
         assertEquals(Symbol.BoxOnGoal, board.get(from));
         assertEquals(Symbol.Player, board.get(to));
         
         // Moving the box on top of a non walkable tile (wall) (should fail)
         to = new Point(0,0);
-        result = board.moveElement(from, to);
-        assertEquals(false, result);
+        try {
+        	board.moveElement(from, to);
+        	fail();
+        } catch (RuntimeException e) {};
         assertEquals(Symbol.BoxOnGoal, board.get(from));
         assertEquals(Symbol.Wall, board.get(to));
         
         // Moving the box back to its initial position
-        result = board.moveElement(from, new Point(1,1));
+        board.moveElement(from, new Point(1,1));
         
         // Moving the player to an empty tile
         from = new Point(1,2);
         to = new Point(4,1);
-        result = board.moveElement(from, to);
-        assertEquals(true, result);
+        board.moveElement(from, to);
         assertEquals(Symbol.Empty, board.get(from));
         assertEquals(Symbol.Player, board.get(to));
         
         // Moving the player to a goal
         from = to;
         to = new Point(2,1);
-        result = board.moveElement(from, to);
-        assertEquals(true, result);
+        board.moveElement(from, to);
         assertEquals(Symbol.Empty, board.get(from));
         assertEquals(Symbol.PlayerOnGoal, board.get(to));
     }
