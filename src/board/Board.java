@@ -1088,7 +1088,6 @@ public class Board {
     	for (BoardAction bm : boxActions) { // loop through all the box actions
     		// Get the board state after that action.
     		intermediateBoard = currentBoard.prepareNextBoxMove(bm.action, bm.position, false);
-    		
     		if (! currentBoard.equals(intermediateBoard)) { // the player moved in-between. 
     			// get the list of moves made.
     			ArrayList<BoardAction> foundPath = aStar.findPath(currentBoard, intermediateBoard, false);
@@ -1097,9 +1096,7 @@ public class Board {
     				currentBoard.applyActionChained(BoardAction.convertToActionList(foundPath), true);
     				if (! currentBoard.equals(intermediateBoard)) 
     					throw new RuntimeException("The intermediate path obtained is not valid.");
-    				
-    			}
-    			
+                }
     			completeActionList.addAll(BoardAction.convertToActionList(foundPath));
     		}
             
@@ -1109,7 +1106,6 @@ public class Board {
     		} else {
     			currentBoard = intermediateBoard.applyAction(bm.action, true, true);
     		}
-    		
     		completeActionList.add(bm.action);
     		
     	}

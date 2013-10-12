@@ -40,8 +40,6 @@ public class BestFirst extends SearchMethod {
             closed.add(front);
             ArrayList<SearchNode> successors = front.expand();
             
-            System.out.println("successors" + successors.size());
-            
             // Quick check to see if any of the successors are goals. Don't need
             // to look at others if the goal is present.
             for (SearchNode successor : successors) {
