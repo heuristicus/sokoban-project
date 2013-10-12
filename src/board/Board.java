@@ -15,14 +15,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 import search.AStar;
 import search.Heuristic;
 import search.SearchMethod;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
-import utilities.WeightedPoint;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
 import utilities.Pair;
@@ -412,19 +411,20 @@ public class Board {
      * actions can be applied to them.
      */
     private void floodFillInitialise(){
-        possibleActions = new ArrayList<>();
+        possibleActions = new ArrayList<>((mObjects.size() - 1) * 4);
         Queue<Pair<Point,Integer>> q = new LinkedList<>();
         // We start the fill at the player position, which has cost zero.
         Pair<Point, Integer> start = new Pair(playerPosition, 0);
         // The queue stores points which we have not yet expanded.
 		q.add(start);
-        ArrayList<Point> accessible = new ArrayList<>();
+        HashSet<Point> accessible = new HashSet<>();
         accessible.add(start.first);
 		// Track the minimum values of point positions so that we can see which
 		// point is the top left of the flood filled region
 		Point minPoint = playerPosition;
         Point neighbours[] = new Point[4];
         int count = 0;
+        Action actionValues[] = SokobanUtil.ACTION_VALUES;
 		while (!q.isEmpty()) { // Continue until there are no more points to expand
 			Pair<Point, Integer> next = q.remove();
 //            System.out.println("next point " + next);
@@ -434,7 +434,7 @@ public class Board {
                 // Add each neighbour point to the neighbour array by applying
                 // each possible action to the point currently being evaluated.
                 // The order of evaluation is UP, DOWN, LEFT, RIGHT
-                for (Action action : Action.values()) {
+                for (Action action : actionValues) {
 //                    System.out.println("Applying action " + action + " to point " + next.first);
                     neighbours[count++] = SokobanUtil.applyActionToPoint(action, next.first);
 //                    System.out.println("Point " + (count - 1) + " is " + neighbours[count - 1]);
@@ -469,7 +469,7 @@ public class Board {
                             // boxes along with the action that was applied to get to
                             // to that box. This is an action that we might be able to
                             // apply to the box, but we don't check that now.
-                            possibleActions.add(new Pair(new BoardAction(Action.values()[i], neighbours[i]), next.second + 1));
+                            possibleActions.add(new Pair(new BoardAction(actionValues[i], neighbours[i]), next.second + 1));
 //                            System.out.println("Possible actions now " + possibleActions);
                         }
                     }

@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 import board.Board;
 
 
@@ -101,6 +101,10 @@ public class AStar extends SearchMethod {
                 // Look through the open list to see if the successor is
                 // already present
                 Iterator<SearchNode> it = open.iterator();
+//                while(it.hasNext()){
+//                    System.out.println("Element of open: " + it.next().estimatedCost);
+//                }
+//                it = open.iterator();
 //                System.out.println("Checking open list to see if it contains the successor.");
                 boolean inOpen = false;
                 while(it.hasNext()){

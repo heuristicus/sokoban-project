@@ -8,7 +8,7 @@ import board.Board;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import pathfinding.BoardAction;
+import utilities.BoardAction;
 
 /**
  *
