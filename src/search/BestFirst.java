@@ -20,9 +20,20 @@ import utilities.BoardAction;
 public class BestFirst extends SearchMethod {
 
     Heuristic<Board> h;
-
+    Direction searchDirection;
+    
     public BestFirst(Heuristic<Board> h) {
+        this(h, Direction.FORWARDS);
+    }
+    
+    public BestFirst(Heuristic<Board> h, Direction searchDirection){
         this.h = h;
+        this.searchDirection = searchDirection;
+    }
+
+    @Override
+    public ArrayList<SearchNode> step() {
+        return super.step(); //To change body of generated methods, choose Tools | Templates.
     }
     
     @Override
@@ -38,7 +49,7 @@ public class BestFirst extends SearchMethod {
             SearchNode front = open.remove();
             
             closed.add(front);
-            ArrayList<SearchNode> successors = front.expand();
+            ArrayList<SearchNode> successors = front.expand(searchDirection);
             
             // Quick check to see if any of the successors are goals. Don't need
             // to look at others if the goal is present.

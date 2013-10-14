@@ -27,6 +27,7 @@ import board.Board;
 public class AStar extends SearchMethod {
 
     Heuristic<Board> h;
+    Direction searchDirection;
     public boolean printTrace = false;
     
     /**
@@ -34,9 +35,19 @@ public class AStar extends SearchMethod {
      * @param h The heuristic to use for state evaluation
      */
     public AStar(Heuristic<Board> h){
-        this.h = h;
+        this(h, Direction.FORWARDS);
     }
     
+    public AStar(Heuristic<Board> h, Direction searchDirection){
+        this.h = h;
+        this.searchDirection = searchDirection;
+    }
+
+    @Override
+    public ArrayList<SearchNode> step() {
+        return super.step(); //To change body of generated methods, choose Tools | Templates.
+    }
+        
     @Override
     public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
         // Store already visited nodes
@@ -89,7 +100,7 @@ public class AStar extends SearchMethod {
                 closed.add(front);
             }
             
-            ArrayList<SearchNode> successors = front.expand();
+            ArrayList<SearchNode> successors = front.expand(searchDirection);
 //            System.out.println("Number of successor states: " + successors.size());
             if (printTrace)
             	System.out.println("CHILDS");

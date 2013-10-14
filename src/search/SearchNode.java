@@ -6,6 +6,7 @@ package search;
 
 import board.Board;
 import java.util.ArrayList;
+import search.SearchMethod.Direction;
 import utilities.BoardAction;
 
 
@@ -126,13 +127,39 @@ public class SearchNode implements Comparable<SearchNode>{
              path.add(this.generatingAction);
              return path;
          }
+     } 
+     
+     /**
+      * Expand this node and get a list of its successor nodes.
+      * @return 
+      */
+     public ArrayList<SearchNode> expand(){
+         return expand(Direction.FORWARDS);
      }
      
-     public ArrayList<SearchNode> expand(){
-         if (boardSpaceExpansion){
-             return this.nodeState.expandBoardSpace(this);
+     /**
+      * Expand this node and get a list of its successor nodes. The actual expansion
+      * is done by the board class.
+      * @param searchDirection The direction in which the search is being done.
+      * @return A list of SearchNode which contains the expanded states with the
+      * expansion done in the requested direction.
+      */
+     public ArrayList<SearchNode> expand(Direction searchDirection){
+         if (searchDirection == Direction.FORWARDS){
+             if (boardSpaceExpansion){
+                 return this.nodeState.expandBoardSpace(this);
+             } else {
+                 return this.nodeState.expandPlayerMoves(this);
+             }
+         } else if (searchDirection == Direction.BACKWARDS){
+             if (boardSpaceExpansion){
+                 return this.nodeState.expandBoardSpaceBackwards(this);
+             } else {
+                 return null; // No reverse player expansion yet!
+//                 return this.nodeState.expandPlayerMoves(this);
+             }
          } else {
-             return this.nodeState.expandPlayerMoves(this);
+             return null;
          }
          
      }

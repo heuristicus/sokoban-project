@@ -13,6 +13,8 @@ import utilities.BoardAction;
 public abstract class SearchMethod
 {
 
+    public enum Direction { FORWARDS, BACKWARDS };
+    
     public SearchMethod() {}
     
     /**
@@ -29,5 +31,16 @@ public abstract class SearchMethod
      * @return A path from the start state to the goal state, in reverse order.
      */
     public abstract ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace);
-
+    
+    /**
+     * A function to step through the search one 'level' at a time. This may
+     * correspond to a single iteration of a search which uses a loop, or something
+     * else if the search does not use a loop. Returns null by default, and should
+     * be overwritten by any search method which may require the step functionality.
+     * @return 
+     */
+    public ArrayList<SearchNode> step(){
+        return null;
+    }
+    
 }

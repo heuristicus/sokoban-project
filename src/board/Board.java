@@ -789,8 +789,8 @@ public class Board {
     	ArrayList<SearchNode> nodes = new ArrayList<>();
     	ArrayList<Pair<BoardAction,Integer> > boxList = getPossibleActions();
     	
-//    	System.out.println("expanded board");
-//    	System.out.println(this.toString());
+        //    	System.out.println("expanded board");
+        //    	System.out.println(this.toString());
     	
     	for (Pair<BoardAction,Integer> boxAction : boxList)
     	{
