@@ -51,12 +51,12 @@ public class Main {
 	    public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
-        SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
+        SearchMethod search = new BestFirst(start, goal, new Heuristic.ManhattanClosestHeuristic(), USE_BOARD_EXPANSION);
 //		((AStar)search).printTrace = true;
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
 //        SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
 //		((AStar)search).printTrace = true;
-        ArrayList<BoardAction> path = search.findPath(start, goal, USE_BOARD_EXPANSION);
+        ArrayList<BoardAction> path = search.findPath();
 
 //        System.out.println("Box movements:");
 //        System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
@@ -163,8 +163,8 @@ public class Main {
         
         System.out.println("BFS finding solution for initial map");
         System.out.println(start);
-        SearchMethod bfs = new BFSNoDuplication();
-        ArrayList<BoardAction> path = bfs.findPath(start, goal, false);
+        SearchMethod bfs = new BFSNoDuplication(start, goal, false);
+        ArrayList<BoardAction> path = bfs.findPath();
 
         if (path != null){
             System.out.println("BFS completed, path length " + path.size());
@@ -181,9 +181,9 @@ public class Main {
         System.out.println(startas);
         
         // Essentially does DFS!
-        SearchMethod astar = new AStar(new ManhattanClosestHeuristic());
+        SearchMethod astar = new AStar(startas, goalas, new ManhattanClosestHeuristic(), false);
         
-        ArrayList<BoardAction> pathas = astar.findPath(startas, goalas, false);
+        ArrayList<BoardAction> pathas = astar.findPath();
 
         if (pathas != null){
             System.out.println("astar completed, path length " + pathas.size());

@@ -1085,15 +1085,14 @@ public class Board {
     	
     	boolean doubleCheck = true; // Double check mode: actually execute all the steps before adding them to the list.
     	
-    	
-    	SearchMethod aStar = new AStar(new Heuristic.DiagonalDistanceHeuristic());
     	List<Action> completeActionList = new ArrayList<>();
     	for (BoardAction bm : boxActions) { // loop through all the box actions
     		// Get the board state after that action.
     		intermediateBoard = currentBoard.prepareNextBoxMove(bm.action, bm.position, false);
     		if (! currentBoard.equals(intermediateBoard)) { // the player moved in-between. 
     			// get the list of moves made.
-    			ArrayList<BoardAction> foundPath = aStar.findPath(currentBoard, intermediateBoard, false);
+                SearchMethod aStar = new AStar(currentBoard, intermediateBoard, new Heuristic.DiagonalDistanceHeuristic(), false);
+    			ArrayList<BoardAction> foundPath = aStar.findPath();
     			
     			if (doubleCheck) {
     				currentBoard.applyActionChained(BoardAction.convertToActionList(foundPath), true);

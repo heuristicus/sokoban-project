@@ -23,8 +23,6 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import utilities.TestUtil;
 import static org.junit.Assert.fail;
 import utilities.BoardAction;
@@ -46,9 +44,6 @@ public class SearchAlgorithmTest {
     Board testMapBoardSpaceGoal;
         
     public SearchAlgorithmTest() {
-        aStarPlayerPath = new AStar(new Heuristic.DiagonalDistanceHeuristic());
-        aStarBoxPath = new AStar(new Heuristic.ManhattanClosestHeuristic());
-        noDupBFS = new BFSNoDuplication();
         testMapStart = TestUtil.initBoard("searchTestStart.map");
         testMapGoal = TestUtil.initBoard("searchTestGoal.map");
         testMapIntermediate1 = TestUtil.initBoard("searchTestIntermediate1.map");
@@ -74,7 +69,8 @@ public class SearchAlgorithmTest {
     
     @Test
     public void testAStar() {
-        ArrayList<BoardAction> foundPath = aStarPlayerPath.findPath(testMapStart, testMapIntermediate1, false);
+        aStarPlayerPath = new AStar(testMapStart, testMapIntermediate1, new Heuristic.DiagonalDistanceHeuristic(), false);
+        ArrayList<BoardAction> foundPath = aStarPlayerPath.findPath();
         assertEquals(Arrays.asList(Action.UP, Action.LEFT, Action.UP), BoardAction.convertToActionList(foundPath));
 //        ArrayList<BoardAction> path2 = aStarBoxPath.findPath(testMapBoardSpaceStart, testMapBoardSpaceGoal, true);
 //        assertEquals(Arrays.asList(Action.RIGHT, Action.RIGHT, Action.RIGHT), BoardAction.convertToActionList(path2));
@@ -94,17 +90,19 @@ public class SearchAlgorithmTest {
         System.out.println("goal map");
         System.out.println(goal);
         
-        SearchMethod as = new AStar(new Heuristic.ManhattanClosestHeuristic());
-        SearchMethod bfs = new BFSNoDuplication();
+        SearchMethod as = new AStar(start, goal, new Heuristic.ManhattanClosestHeuristic(), true);
+        SearchMethod bfs = new BFSNoDuplication(start, goal, true);
 //        ArrayList<Action> actions = as.findPath(start, goal, false);
 //        ArrayList<Action> actions = bfs.findPath(start, goal, false);
 //        SokobanUtil.actionListAsString(actions);
+        fail();
     }
     
     @Test
     public void testBreadthFirstSearch(){
 //        ArrayList<Action> foundPath = BFS.findPath(testMapStart, testMapGoal, false);
 //        System.out.println(SokobanUtil.actionListAsString(foundPath));
+        fail();
     }
     
     @Test
@@ -115,6 +113,7 @@ public class SearchAlgorithmTest {
         System.out.println(testMapGoal);
 //        ArrayList<BoardAction> findPath = noDupBFS.findPath(testMapStart, testMapGoal, false);
 //        System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(findPath)));
+        fail();
     }
     
 }

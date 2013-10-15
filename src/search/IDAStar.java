@@ -15,17 +15,24 @@ import utilities.Pair;
  */
 public class IDAStar extends SearchMethod {
 
+    
+    Board start;
+    Board goal;
+    boolean boardSpace;
     Heuristic<Board> h;
     
-    public IDAStar(Heuristic<Board> h) {
+    public IDAStar(Board start, Board goal, Heuristic<Board> h, boolean boardSpace) {
         this.h = h;
+        this.start = start;
+        this.goal = goal;
+        this.boardSpace = boardSpace;
     }
     
     int count = 0;
 
         
     @Override
-    public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
+    public ArrayList<BoardAction> findPath() {
         float lowerBound = h.utility(start, goal);
         
         SearchNode currentNode = new SearchNode(start, null, null, 0, boardSpace);
