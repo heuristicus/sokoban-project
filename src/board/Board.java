@@ -418,7 +418,7 @@ public class Board {
         possibleActions = new ArrayList<>((mObjects.size() - 1) * 4);
         Queue<Pair<Point,Integer>> q = new LinkedList<>();
         // We start the fill at the player position, which has cost zero.
-        Pair<Point, Integer> start = new Pair(playerPosition, 0);
+        Pair<Point, Integer> start = new Pair<>(playerPosition, 0);
         // The queue stores points which we have not yet expanded.
 		q.add(start);
         HashSet<Point> accessible = new HashSet<>();
@@ -462,7 +462,7 @@ public class Board {
                             // Add the neighbour to the queue to be examined, with
                             // a cost that is one greater than the cost to get to the
                             // currently examined point
-                            q.add(new Pair(neighbours[i], next.second + 1));
+                            q.add(new Pair<>(neighbours[i], next.second + 1));
                             // See if the neighbour we are looking at is smaller than
                             // the current minimum (top leftmost) point.
                             minPoint = SokobanUtil.pointMin(minPoint, neighbours[i]);
@@ -473,7 +473,7 @@ public class Board {
                             // boxes along with the action that was applied to get to
                             // to that box. This is an action that we might be able to
                             // apply to the box, but we don't check that now.
-                            possibleActions.add(new Pair(new BoardAction(actionValues[i], neighbours[i]), next.second + 1));
+                            possibleActions.add(new Pair<>(new BoardAction(actionValues[i], neighbours[i]), next.second + 1));
 //                            System.out.println("Possible actions now " + possibleActions);
                         }
                     }
@@ -986,6 +986,9 @@ public class Board {
     	return newBoard;
     }
     
+    /**
+     * Tests that the board is solved by checking that all the boxes are placed on goals.
+     */
     public boolean isSolved() {
     	for (Point dynObject : mObjects.keySet()) {
     		if (get(dynObject).type == Symbol.Type.Player) continue;

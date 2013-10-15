@@ -54,8 +54,8 @@ public class StaticBoardTest {
 						currentLine.setCharAt(x, 'X');
 					} else {
 						int minValue = Integer.MAX_VALUE;
-						for (Point key : sBoard.goalDistanceCost.get(p).keySet()) {
-							minValue = Math.min(minValue, sBoard.goalDistanceCost.get(p).get(key));
+						for (Point key : sBoard.pointToGoalCost.get(p).keySet()) {
+							minValue = Math.min(minValue, sBoard.pointToGoalCost.get(p).get(key));
 						}
 						currentLine.setCharAt(x, Character.forDigit(minValue, 30)); // After 9, it goes in ascii order from a
 					}
@@ -90,8 +90,8 @@ public class StaticBoardTest {
 						currentLine.setCharAt(x, 'X');
 					} else {
 						int maxValue = -1;
-						for (Point key : sBoard.goalDistanceCost.get(p).keySet()) {
-							maxValue = Math.max(maxValue, sBoard.goalDistanceCost.get(p).get(key));
+						for (Point key : sBoard.pointToGoalCost.get(p).keySet()) {
+							maxValue = Math.max(maxValue, sBoard.pointToGoalCost.get(p).get(key));
 						}
 						currentLine.setCharAt(x, Character.forDigit(maxValue, 30)); // After 9, it goes in ascii order from a
 					}
@@ -130,7 +130,7 @@ public class StaticBoardTest {
         	}
         }
                 
-        assertEquals(expectedResult,StaticBoard.getInstance().goalDistanceCost);
+        assertEquals(expectedResult,StaticBoard.getInstance().pointToGoalCost);
 	}
 	
 	@Test
@@ -213,7 +213,7 @@ public class StaticBoardTest {
 	@Test
     public void testInit() {
         TestUtil.initBoard("testPathCost.map");
-        Map<Point, Map<Point, Integer> > costs = StaticBoard.getInstance().goalDistanceCost;
+        Map<Point, Map<Point, Integer> > costs = StaticBoard.getInstance().pointToGoalCost;
         for (Point point : StaticBoard.getInstance().goals) {
             Map<Point, Integer> gp = costs.get(point);
             assertTrue(gp.containsKey(point));

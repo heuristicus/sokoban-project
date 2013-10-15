@@ -11,10 +11,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import utilities.Pair;
 import board.Board;
@@ -110,9 +106,9 @@ public interface Heuristic<T> {
     			if (!startPt.equals(begin.getPlayerPosition()))
     			{
     				float bestDistance = Float.POSITIVE_INFINITY;
-    				if(StaticBoard.getInstance().goalDistanceCost.get(startPt) != null)
+    				if(StaticBoard.getInstance().pointToGoalCost.get(startPt) != null)
     				{
-	    				for (Integer dist : StaticBoard.getInstance().goalDistanceCost.get(startPt).values())
+	    				for (Integer dist : StaticBoard.getInstance().pointToGoalCost.get(startPt).values())
 	    				{	
 							bestDistance = Math.min(bestDistance, dist);
 	    				}
@@ -146,7 +142,7 @@ public interface Heuristic<T> {
         public float utility(Board start, Board goal) {
             float totalCost = 0;
             Map<Point, Symbol> dynamic = start.getDynamicObjects();
-            Map<Point, Map<Point, Integer> > pointCosts = StaticBoard.getInstance().goalDistanceCost;
+            Map<Point, Map<Point, Integer> > pointCosts = StaticBoard.getInstance().pointToGoalCost;
             // Go through each point in the dynamic portion of the map, ignoring the player.
             for (Point point : dynamic.keySet()) {
                 Symbol thisSymbol = start.get(point);
@@ -184,7 +180,7 @@ public interface Heuristic<T> {
     		double[][] costMatrix = new double[goals.size()][goals.size()];
     		
     		
-    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().goalDistanceCost;
+    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().pointToGoalCost;
     		
     		// Initialize the matrix
     		int i = 0;
@@ -261,7 +257,7 @@ public interface Heuristic<T> {
     	@Override
     	public float utility(Board start, Board goal) {
     		List<Point> goals = StaticBoard.getInstance().goals;
-    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().goalDistanceCost;
+    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().pointToGoalCost;
     		
     		List<Pair<Point, Map<Point, Integer>>> candidatesPerBox = new ArrayList<>(goals.size());
     		Map<Point, Integer> candidatesPerGoal = new HashMap<>(goals.size());

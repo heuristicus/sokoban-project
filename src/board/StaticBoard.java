@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import utilities.Pair;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
 import utilities.WeightedPoint;
@@ -24,7 +23,8 @@ public class StaticBoard {
 	/** Warning, grid[y][x] is the value at the point (x,y)*/
 	public final Symbol[][] grid; 
 	public final List<Point> goals;
-    public final Map<Point, Map<Point, Integer> > goalDistanceCost;
+    public final Map<Point, Map<Point, Integer> > pointToGoalCost;
+    public final Map<Point, Map<Point, Integer> > goalToPointCost;
     public final Dimension mapDim;
 	
 	public static void init(Symbol[][] grid, List<Point> goals, Dimension boardDim) {
@@ -39,7 +39,8 @@ public class StaticBoard {
 	private StaticBoard(Symbol[][] grid, List<Point> goals, Dimension boardDim) {
 		this.grid = grid;
 		this.goals = Collections.unmodifiableList(goals);
-        this.goalDistanceCost = new HashMap<>();
+        this.pointToGoalCost = new HashMap<>();
+        this.goalToPointCost = new HashMap<>();
         this.mapDim = boardDim;
         generatePathCosts();
 	}
@@ -64,10 +65,10 @@ public class StaticBoard {
                 if (currentSymbol.isWalkable) {
                 // Only consider walkable positions
                     // Make sure the hashmap for this point is initialised
-                    Map<Point, Integer> currentCosts = goalDistanceCost.get(next.point);
+                    Map<Point, Integer> currentCosts = pointToGoalCost.get(next.point);
                     if (currentCosts == null){
                         currentCosts = new HashMap<>();
-                        goalDistanceCost.put(next.point, currentCosts);
+                        pointToGoalCost.put(next.point, currentCosts);
                     }
                     
                     // Put the goal node being checked along with the cost of getting to
@@ -124,7 +125,7 @@ public class StaticBoard {
 	}
 
 	public static boolean isLocked(Point p) {
-		Map<Point, Integer> costs = getInstance().goalDistanceCost.get(p); 
+		Map<Point, Integer> costs = getInstance().pointToGoalCost.get(p); 
 		return costs == null || costs.isEmpty();
 	}
 	
