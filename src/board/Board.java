@@ -146,6 +146,7 @@ public class Board {
 		// in two steps.
 		Symbol[][] staticMap = new Symbol[tmpStrMap.size()][];
 		Map<Point, Symbol> dynamicMap = new HashMap<>();
+		List<Point> boxSetup = new ArrayList<>();
 		List<Point> goals = new ArrayList<>();
 		Point playerPosition = null;
 
@@ -167,6 +168,8 @@ public class Board {
 
 					if (s.type == Symbol.Type.Player) {
 						playerPosition = new Point(x, y);
+					} else if (s.type == Symbol.Type.Box){
+						boxSetup.add(new Point(x, y));
 					}
 				} else {
 					outRow[x] = s;
@@ -180,10 +183,11 @@ public class Board {
 			staticMap[y] = outRow;
 		}
 
+		
 		if (playerPosition == null)
 			throw new RuntimeException("Player position not detected");
-
-		StaticBoard.init(staticMap, goals, new Dimension(maxX, maxY));
+			
+		StaticBoard.init(staticMap, goals, boxSetup, new Dimension(maxX, maxY));
 		return new Board(dynamicMap, playerPosition);
 	}
 
