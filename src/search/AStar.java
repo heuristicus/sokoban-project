@@ -51,7 +51,12 @@ public class AStar extends MemoSearchMethod {
         this.goal = goal;
         this.boardSpace = boardSpace;
         
-        open = new PriorityQueue<>();
+        init();
+    }
+    
+    private void init()
+    {
+    	open = new PriorityQueue<>();
         closed = new HashSet<>();
         goalState = new SearchNode(goal, null, null, boardSpace);
         endPoint = null;
@@ -110,10 +115,7 @@ public class AStar extends MemoSearchMethod {
         
     @Override
     public ArrayList<BoardAction> findPath() {
-        open = new PriorityQueue<>();
-        closed = new HashSet<>();
-        goalState = new SearchNode(goal, null, null, boardSpace);
-        endPoint = null;
+    	 init();
         
         while(!open.isEmpty()){
             // Do one step of the search to check the front of the queue

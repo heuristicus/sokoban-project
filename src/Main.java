@@ -87,8 +87,8 @@ public class Main {
 	public static void solveBoardBidirectional(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
 
-        MemoSearchMethod forward = new AStar(start, goal, new Heuristic.ManhattanClosestHeuristic(), Direction.FORWARDS, USE_BOARD_EXPANSION);
-        MemoSearchMethod backward = new AStar(goal, start, new Heuristic.ManhattanClosestHeuristic(), Direction.BACKWARDS, USE_BOARD_EXPANSION);
+        MemoSearchMethod forward = new BestFirst(start, goal, new Heuristic.ManhattanClosestHeuristic(), Direction.FORWARDS, USE_BOARD_EXPANSION);
+        MemoSearchMethod backward = new BestFirst(goal, start, new Heuristic.ManhattanClosestHeuristic(), Direction.BACKWARDS, USE_BOARD_EXPANSION);
 
         SearchMethod bidirectional = new Bidirectional(forward, backward);
         
@@ -118,7 +118,7 @@ public class Main {
     public static void stdIn(){
         //		printExpandedBoards();
     	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
-    	solveBoard(start);
+    	solveBoardBidirectional(start);
     }
     
 

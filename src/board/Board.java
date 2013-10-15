@@ -848,7 +848,8 @@ public class Board {
     			//if the board is a locked state, just ignore it
 //    			if (!newBoard.isLockedState())
 //    			{
-				nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
+    			BoardAction action = new BoardAction(boxAction.first.action, finalPos);
+				nodes.add(new SearchNode(newBoard, parent, action, 1, true));
 //    			}
 //    			else
 //    			{

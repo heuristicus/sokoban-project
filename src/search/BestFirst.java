@@ -36,19 +36,22 @@ public class BestFirst extends MemoSearchMethod {
         this.goal = goal;
         this.boardSpace = boardSpace;
         
-        open = new PriorityQueue<>();
+        init();
+    }
+    
+    private void init()
+    {
+    	open = new PriorityQueue<>();
         closed = new HashSet<>();
         endPoint = null;
         
-        SearchNode first = new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace);
-        open.add(first);
+        open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
     }
 
     @Override
     public ArrayList<SearchNode> step() {
          
             SearchNode front = open.remove();
-            
             closed.add(front);
             ArrayList<SearchNode> successors = front.expand(searchDirection);
             
@@ -56,10 +59,10 @@ public class BestFirst extends MemoSearchMethod {
             // to look at others if the goal is present.
             for (SearchNode successor : successors) {
 
-                if (successor.getNodeState().isSolved()){
-                    endPoint = successor;
-                    return null;
-                }
+//                if (successor.getNodeState().isSolved()){
+//                    endPoint = successor;
+//                    return null;
+//                }
             }
             
             for (SearchNode successor : successors) {
@@ -73,10 +76,7 @@ public class BestFirst extends MemoSearchMethod {
     
     @Override
     public ArrayList<BoardAction> findPath() {
-        open = new PriorityQueue<>();
-        closed = new HashSet<>();
-        endPoint = null;
-        
+    	init();
         
         while (!open.isEmpty()){
            step();

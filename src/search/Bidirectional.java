@@ -50,23 +50,29 @@ public class Bidirectional extends SearchMethod {
     	}while(keyNode == null);
     	
     	//constructing BoardAction list
-    	ArrayList<BoardAction> result = new ArrayList<>();
     	
     	SearchNode forwardKey = pickFromQueue(forwards.getOpenList(),keyNode);
     	SearchNode backwardsKey = pickFromQueue(backwards.getOpenList(),keyNode);
-    	LinkedList<BoardAction> forwardList = new LinkedList<BoardAction>(forwardKey.actionUnwind());
-    	LinkedList<BoardAction> backwardList = new LinkedList<BoardAction>( backwardsKey.actionUnwind());
+    	ArrayList<BoardAction> forwardList = forwardKey.actionUnwind();
+    	ArrayList<BoardAction> backwardList = backwardsKey.actionUnwind();
     	
-    	//removing one of the two keys
-    	backwardList.removeLast();
+    	//shifting actions onto next state on backwardList
+//    	for (int i=0 ; i<backwardList.size() ; i++)
+//    	{
+//    		backwardList.get(i).action = backwardList.get(i+1).action;
+//    	}
+    	
+//    	backwardList.remove(backwardList.size()-1);
     	
     	//reverting backward sequence
     	Collections.reverse(backwardList);
     	
+    	
+    	
     	//merging the two lists
     	forwardList.addAll(backwardList);
     	
-    	return new ArrayList<>(forwardList);
+    	return forwardList;
     }
     
     public static SearchNode checkGoal(ArrayList<SearchNode> newNodes, Queue<SearchNode> openList)
