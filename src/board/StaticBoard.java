@@ -23,12 +23,13 @@ public class StaticBoard {
 	/** Warning, grid[y][x] is the value at the point (x,y)*/
 	public final Symbol[][] grid; 
 	public final List<Point> goals;
-    public final Map<Point, Map<Point, Integer> > pointToGoalCost;
-    public final Map<Point, Map<Point, Integer> > goalToPointCost;
+	/** Cost to get from a point to one of the boxes' initial position */
+	public final Map<Point, Map<Point, Integer>> pointToBoxCost;
+    public final Map<Point, Map<Point, Integer>> pointToGoalCost;
     public final Dimension mapDim;
 	
-	public static void init(Symbol[][] grid, List<Point> goals, Dimension boardDim) {
-		INSTANCE = new StaticBoard(grid, goals, boardDim);
+	public static void init(Symbol[][] grid, List<Point> goals, List<Point> boxSetup, Dimension boardDim) {
+		INSTANCE = new StaticBoard(grid, goals, boxSetup, boardDim);
 	}
 	
 	public static StaticBoard getInstance() {
@@ -36,23 +37,24 @@ public class StaticBoard {
 		return INSTANCE;
 	}
 	
-	private StaticBoard(Symbol[][] grid, List<Point> goals, Dimension boardDim) {
+	private StaticBoard(Symbol[][] grid, List<Point> goals, List<Point> boxSetup, Dimension boardDim) {
 		this.grid = grid;
 		this.goals = Collections.unmodifiableList(goals);
-        this.pointToGoalCost = new HashMap<>();
-        this.goalToPointCost = new HashMap<>();
+        this.pointToGoalCost = generatePathCosts(goals, true);
+        this.pointToBoxCost = generatePathCosts(boxSetup, false);
         this.mapDim = boardDim;
-        generatePathCosts();
+        
 	}
     
     /**
-     * Fills the goalDistanceCost map with a map for each point on the board. Each point
-     * maps to another map, which contains a mapping from goal points to integers
-     * representing the cost of getting to the given point from the given goal.
+     * Creates a cost mapFills with a map for each point on the board. Each point
+     * maps to another map, which contains a mapping from target points to integers
+     * representing the cost of getting to the given point from the given target.
      */
-    private void generatePathCosts(){
+    private Map<Point, Map<Point, Integer>> generatePathCosts(List<Point> targets, boolean pullMode) {
+    	Map<Point, Map<Point, Integer>> costMap = new HashMap<>();
     	
-        for (Point goal : goals) {
+        for (Point goal : targets) {
             Queue<WeightedPoint> open = new LinkedList<>();
             Set<Point> closed = new HashSet<>(); // A set is more efficient for search
             
@@ -63,20 +65,16 @@ public class StaticBoard {
                 closed.add(next.point);
                 Symbol currentSymbol = get(next.point); 
                 if (currentSymbol.isWalkable) {
-                // Only consider walkable positions
                     // Make sure the hashmap for this point is initialised
-                    Map<Point, Integer> currentCosts = pointToGoalCost.get(next.point);
+                    Map<Point, Integer> currentCosts = costMap.get(next.point);
                     if (currentCosts == null){
                         currentCosts = new HashMap<>();
-                        pointToGoalCost.put(next.point, currentCosts);
+                        costMap.put(next.point, currentCosts);
                     }
-                    
-                    // Put the goal node being checked along with the cost of getting to
-                    // this position from that goal into the map for this point.
 
                     // expand the neighbours of this point and add them to the
                     // open list if they have not yet been visited.
-                    List<WeightedPoint> neighbours = expandPoint(next); 
+                    List<WeightedPoint> neighbours = expandPoint(next, pullMode); 
                 	currentCosts.put(goal, next.cost);
                     
                     for (WeightedPoint neighbour : neighbours) {
@@ -87,23 +85,33 @@ public class StaticBoard {
                 }
             }
         }
+        
+        return costMap;
     }
     
     /**
-     * Flood fill expansion from a point
-     * The nodes to be expanded are the neighbours that have walkable tiles on both sides
+     * Flood fill expansion from a point. Returns the points that can be reached 
+     * using a the chosen exploration mode
      * @param p Origin point
+     * @param pullMode if true, you want to pull to the target, else you want to push
      * @return list of the nodes to be expanded
      */
-    private List<WeightedPoint> expandPoint(WeightedPoint p){
+    private List<WeightedPoint> expandPoint(WeightedPoint p, boolean pullMode){
         List<WeightedPoint> freeNeighbours = new ArrayList<>();
 		
         for (Action a : Action.values()) {
+        	// Reversing the actions is not important as we don't really care 
+        	// about the action itself, we just expand in every direction.
 			Point neighbour = SokobanUtil.applyActionToPoint(a, p.point);
 			
 			if (get(neighbour).isWalkable) {
-				Point farNeighbour = SokobanUtil.applyActionToPoint(a, neighbour);
-				if (get(farNeighbour).isWalkable) {
+				Point extraPoint;
+				// The player needs space behind the box, where he will be able to stay after pulling it
+				if (pullMode) extraPoint = SokobanUtil.applyActionToPoint(a, neighbour);
+				// The player needs space in front of the box to be able to push it
+				else extraPoint = SokobanUtil.applyActionToPoint(SokobanUtil.inverseAction(a), p.point);
+				
+				if (get(extraPoint).isWalkable) {
 					freeNeighbours.add(new WeightedPoint(neighbour, p.cost + 1));
 				}
 			}

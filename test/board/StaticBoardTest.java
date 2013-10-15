@@ -40,22 +40,24 @@ public class StaticBoardTest {
     public void tearDown() {
     }
     
-    private void testMinValueCostMap(String testFile, String expectedOutputFile, boolean debug) throws IOException {
+    private void testMinValueCostMap(String testFile, String expectedOutputFile, boolean pullMode, boolean debug) throws IOException {
     	TestUtil.initBoard(testFile);
 		StaticBoard sBoard = StaticBoard.getInstance();
 		String[] mapLines = sBoard.toString().split("\n");
+		Map<Point, Map<Point, Integer>> costMap = pullMode ? sBoard.pointToGoalCost : sBoard.pointToBoxCost;
 		
 		for( int y = 0; y < sBoard.grid.length; ++y ) {
 			StringBuilder currentLine = new StringBuilder(mapLines[y]);
 			for( int x = 0; x < sBoard.grid[y].length; ++x ) {
 				Point p = new Point(x, y);
 				if(sBoard.get(p) != Symbol.Wall) {
-					if (StaticBoard.isLocked(p)) {
+					if ((pullMode && StaticBoard.isLocked(p)) || (!pullMode && (StaticBoard.getInstance().pointToBoxCost.get(p) == null ||
+							StaticBoard.getInstance().pointToBoxCost.get(p).isEmpty()))) {
 						currentLine.setCharAt(x, 'X');
 					} else {
 						int minValue = Integer.MAX_VALUE;
-						for (Point key : sBoard.pointToGoalCost.get(p).keySet()) {
-							minValue = Math.min(minValue, sBoard.pointToGoalCost.get(p).get(key));
+						for (Point key : costMap.get(p).keySet()) {
+							minValue = Math.min(minValue, costMap.get(p).get(key));
 						}
 						currentLine.setCharAt(x, Character.forDigit(minValue, 30)); // After 9, it goes in ascii order from a
 					}
@@ -76,22 +78,24 @@ public class StaticBoardTest {
 		assertEquals(expectedOutput, Arrays.asList(mapLines));
     }
     
-    private void testMaxValueCostMap(String testFile, String expectedOutputFile, boolean debug) throws IOException {
+    private void testMaxValueCostMap(String testFile, String expectedOutputFile, boolean pullMode, boolean debug) throws IOException {
     	TestUtil.initBoard(testFile);
 		StaticBoard sBoard = StaticBoard.getInstance();
 		String[] mapLines = sBoard.toString().split("\n");
+		Map<Point, Map<Point, Integer>> costMap = pullMode ? sBoard.pointToGoalCost : sBoard.pointToBoxCost;
 		
 		for( int y = 0; y < sBoard.grid.length; ++y ) {
 			StringBuilder currentLine = new StringBuilder(mapLines[y]);
 			for( int x = 0; x < sBoard.grid[y].length; ++x ) {
 				Point p = new Point(x, y);
 				if(sBoard.get(p) != Symbol.Wall) {
-					if (StaticBoard.isLocked(p)) {
+					if ((pullMode && StaticBoard.isLocked(p)) || (!pullMode && (StaticBoard.getInstance().pointToBoxCost.get(p) == null ||
+							StaticBoard.getInstance().pointToBoxCost.get(p).isEmpty()))) {
 						currentLine.setCharAt(x, 'X');
 					} else {
 						int maxValue = -1;
-						for (Point key : sBoard.pointToGoalCost.get(p).keySet()) {
-							maxValue = Math.max(maxValue, sBoard.pointToGoalCost.get(p).get(key));
+						for (Point key : costMap.get(p).keySet()) {
+							maxValue = Math.max(maxValue, costMap.get(p).get(key));
 						}
 						currentLine.setCharAt(x, Character.forDigit(maxValue, 30)); // After 9, it goes in ascii order from a
 					}
@@ -161,20 +165,24 @@ public class StaticBoardTest {
 	
 	@Test
 	public void testCostMapExtremes() throws IOException {
-		testMinValueCostMap("../test100/test000.in", "test000.costs.map", false);
-		testMaxValueCostMap("../test100/test000.in", "test000.maxcosts.map", true);
+		testMinValueCostMap("../test100/test000.in", "test000.costs.map", true, false);
+		testMaxValueCostMap("../test100/test000.in", "test000.maxcosts.map", true, false);
+		testMinValueCostMap("../test100/test000.in", "test000.push.costs.map", false, false);
+		testMaxValueCostMap("../test100/test000.in", "test000.push.maxcosts.map", false, false);
 	}
 	
 	@Test
 	public void testCostMapExtremes1() throws IOException {
-		testMinValueCostMap("testCosts.map", "testCosts.expected.map", false);
-		testMaxValueCostMap("testCosts.map", "testCosts.max.expected.map", false);
+		testMinValueCostMap("testCosts.map", "testCosts.expected.map", true, false);
+		testMaxValueCostMap("testCosts.map", "testCosts.max.expected.map", true, false);
+		testMinValueCostMap("testCosts.map", "testCosts.push.expected.map", false, false);
+		testMaxValueCostMap("testCosts.map", "testCosts.push.max.expected.map", false, false);
 	}
 	
 	@Test
 	public void testCostMapExtremes2() throws IOException {
-		testMinValueCostMap("testCosts2.map", "testCosts2.expected.map", false);
-		testMaxValueCostMap("testCosts2.map", "testCosts2.max.expected.map", false);
+		testMinValueCostMap("testCosts2.map", "testCosts2.expected.map", true, false);
+		testMaxValueCostMap("testCosts2.map", "testCosts2.max.expected.map", true, false);
 	}
 	
 	
@@ -192,22 +200,41 @@ public class StaticBoardTest {
 	
 	@Test
 	public void displayCostMap() {
-		final String TEST_FILE = "../test100/test000.in";
+//		final String TEST_FILE = "../test100/test000.in";
 //		final String TEST_FILE = "tiny.map";
-		HackableBoard board = new HackableBoard(TestUtil.initBoard(TEST_FILE));
+		final String TEST_FILE = "MinMatchingTest1.map";
+		Board board = TestUtil.initBoard(TEST_FILE);
+		HackableBoard hb1 = new HackableBoard(board);
 		StaticBoard sBoard = StaticBoard.getInstance();
 		for( int y = 0; y < sBoard.grid.length; ++y ) {
 			for( int x = 0; x < sBoard.grid[y].length; ++x ) {
 				Point p = new Point(x, y);
 				if(sBoard.get(p) != Symbol.Wall) {
 					if (StaticBoard.isLocked(p)) {
-						board.set(p, Symbol.Mark);
+						hb1.set(p, Symbol.Mark);
 					}
 				}
 			}
 			
 		}
-		System.out.println(board.toString());
+		System.out.println("Pull exploration");
+		System.out.println(hb1.toString());
+		
+		HackableBoard hb2 = new HackableBoard(board);
+		for( int y = 0; y < sBoard.grid.length; ++y ) {
+			for( int x = 0; x < sBoard.grid[y].length; ++x ) {
+				Point p = new Point(x, y);
+				if(sBoard.get(p) != Symbol.Wall) {
+					if (StaticBoard.getInstance().pointToBoxCost.get(p) == null ||
+							StaticBoard.getInstance().pointToBoxCost.get(p).isEmpty()) {
+						hb2.set(p, Symbol.Mark);
+					}
+				}
+			}
+			
+		}
+		System.out.println("Push exploration");
+		System.out.println(hb2.toString());
 	}
 
 	@Test
