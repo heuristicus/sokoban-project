@@ -1,6 +1,5 @@
 package search;
 
-import board.Board;
 import java.util.ArrayList;
 import utilities.BoardAction;
 
@@ -30,14 +29,15 @@ public abstract class SearchMethod
      * to teleport, and so the individual motions of the player are considered.
      * @return A path from the start state to the goal state, in reverse order.
      */
-    public abstract ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace);
+    public abstract ArrayList<BoardAction> findPath();
     
     /**
      * A function to step through the search one 'level' at a time. This may
      * correspond to a single iteration of a search which uses a loop, or something
      * else if the search does not use a loop. Returns null by default, and should
      * be overwritten by any search method which may require the step functionality.
-     * @return 
+     * @return A list containing the successors of the front node, which were just
+     * added to the open list. If the goal was found, then null is returned.
      */
     public ArrayList<SearchNode> step(){
         return null;

@@ -8,44 +8,45 @@ import board.Board;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.PriorityQueue;
-import java.util.Queue;
-
-
 import utilities.BoardAction;
 
 /**
  *
  * @author michal
  */
-public class BestFirst extends SearchMethod {
+public class BestFirst extends MemoSearchMethod {
 
+    HashSet<SearchNode> closed;
+    Board start;
+    Board goal;
+    boolean boardSpace;
+    SearchNode goalState;
+    SearchNode endPoint;
     Heuristic<Board> h;
     Direction searchDirection;
     
-    public BestFirst(Heuristic<Board> h) {
-        this(h, Direction.FORWARDS);
+    public BestFirst(Board start, Board goal, Heuristic<Board> h, boolean boardSpace) {
+        this(start, goal, h, Direction.FORWARDS, boardSpace);
     }
     
-    public BestFirst(Heuristic<Board> h, Direction searchDirection){
+    public BestFirst(Board start, Board goal, Heuristic<Board> h, Direction searchDirection, boolean boardSpace){
         this.h = h;
         this.searchDirection = searchDirection;
+        this.start = start;
+        this.goal = goal;
+        this.boardSpace = boardSpace;
+        
+        open = new PriorityQueue<>();
+        closed = new HashSet<>();
+        endPoint = null;
+        
+        SearchNode first = new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace);
+        open.add(first);
     }
 
     @Override
     public ArrayList<SearchNode> step() {
-        return super.step(); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    @Override
-    public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
-        Queue<SearchNode> open = new PriorityQueue<>();
-        HashSet<SearchNode> closed = new HashSet<>();
-        
-        SearchNode first = new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace);
-        open.add(first);
-        
-        while (!open.isEmpty()){
-            
+         
             SearchNode front = open.remove();
             
             closed.add(front);
@@ -56,7 +57,8 @@ public class BestFirst extends SearchMethod {
             for (SearchNode successor : successors) {
 
                 if (successor.getNodeState().isSolved()){
-                    return successor.actionUnwind();
+                    endPoint = successor;
+                    return null;
                 }
             }
             
@@ -66,10 +68,29 @@ public class BestFirst extends SearchMethod {
                     open.add(successor);
                 }
             }
-            
+            return successors;
+    }
+    
+    @Override
+    public ArrayList<BoardAction> findPath() {
+        open = new PriorityQueue<>();
+        closed = new HashSet<>();
+        endPoint = null;
+        
+        
+        while (!open.isEmpty()){
+           step();
+           
+           if (endPoint != null)
+               return endPoint.actionUnwind();
+           
         }
         
         return null;
+    }
+
+    public SearchNode getEndPoint() {
+        return endPoint;
     }
     
 }
