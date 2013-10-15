@@ -50,6 +50,14 @@ public class AStar extends MemoSearchMethod {
         this.start = start;
         this.goal = goal;
         this.boardSpace = boardSpace;
+        
+        open = new PriorityQueue<>();
+        closed = new HashSet<>();
+        goalState = new SearchNode(goal, null, null, boardSpace);
+        endPoint = null;
+        
+        // Add the start state as a node with zero path cost
+        open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
     }
 
     @Override
@@ -107,8 +115,6 @@ public class AStar extends MemoSearchMethod {
         goalState = new SearchNode(goal, null, null, boardSpace);
         endPoint = null;
         
-        // Add the start state as a node with zero path cost
-        open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
         while(!open.isEmpty()){
             // Do one step of the search to check the front of the queue
             // and add successors to the open list.

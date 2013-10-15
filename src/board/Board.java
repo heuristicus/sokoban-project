@@ -837,7 +837,7 @@ public class Board {
     		Point pushPos = new Point(boxPos.x - 2*dx, boxPos.y - 2*dy);	//position where the player stands before pulling the box
     		Point finalPos = new Point(boxPos.x - dx, boxPos.y - dy);
 //    		if (get(pushPos).type != Symbol.Type.Box && get(pushPos) != Symbol.Wall)
-    		if (get(finalPos).isWalkable)
+    		if (get(pushPos).isWalkable)
     		{
     			//Generating new Board
     			Board newBoard = new Board(this);
@@ -846,14 +846,14 @@ public class Board {
     			newBoard.moveElement(boxPos, finalPos); //moving crate
     			
     			//if the board is a locked state, just ignore it
-    			if (!newBoard.isLockedState())
-    			{
-    				nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
-    			}
-    			else
-    			{
-    				++lockedStatesIgnored;
-    			}
+//    			if (!newBoard.isLockedState())
+//    			{
+				nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
+//    			}
+//    			else
+//    			{
+//    				++lockedStatesIgnored;
+//    			}
     		}
     	}
     	return nodes;

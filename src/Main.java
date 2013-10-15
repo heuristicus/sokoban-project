@@ -17,9 +17,12 @@ import utilities.BoardAction;
 import search.AStar;
 import search.BFSNoDuplication;
 import search.BestFirst;
+import search.Bidirectional;
 import search.Heuristic;
 import search.Heuristic.ManhattanClosestHeuristic;
+import search.MemoSearchMethod;
 import search.SearchMethod;
+import search.SearchMethod.Direction;
 import search.SearchNode;
 import utilities.SokobanUtil;
 import utilities.SokobanUtil.Action;
@@ -48,7 +51,7 @@ public class Main {
 //        boardExpand();
     }
 	    
-	    public static void solveBoard(Board start){
+	public static void solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
         SearchMethod search = new BestFirst(start, goal, new Heuristic.ManhattanClosestHeuristic(), USE_BOARD_EXPANSION);
@@ -80,11 +83,42 @@ public class Main {
         System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
         
     }
+	
+	public static void solveBoardBidirectional(Board start){
+        Board goal = SokobanUtil.getSolvedBoard(start);
+
+        MemoSearchMethod forward = new AStar(start, goal, new Heuristic.ManhattanClosestHeuristic(), Direction.FORWARDS, USE_BOARD_EXPANSION);
+        MemoSearchMethod backward = new AStar(goal, start, new Heuristic.ManhattanClosestHeuristic(), Direction.BACKWARDS, USE_BOARD_EXPANSION);
+
+        SearchMethod bidirectional = new Bidirectional(forward, backward);
+        
+        ArrayList<BoardAction> path = bidirectional.findPath();
+
+        List<Action> pathWithMoves = null;
+        if (USE_BOARD_EXPANSION)
+        {
+            try
+            {
+                pathWithMoves = start.generateFullActionList(path);
+            }
+    		catch (IllegalMoveException e)
+    		{
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+        }else
+        {
+            pathWithMoves = BoardAction.convertToActionList(path);
+        }
+//        System.out.println("Full path:");
+        System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
+        
+    }
     
     public static void stdIn(){
         //		printExpandedBoards();
     	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
-        solveBoard(start);
+    	solveBoard(start);
     }
     
 

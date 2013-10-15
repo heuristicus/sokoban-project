@@ -35,6 +35,13 @@ public class BestFirst extends MemoSearchMethod {
         this.start = start;
         this.goal = goal;
         this.boardSpace = boardSpace;
+        
+        open = new PriorityQueue<>();
+        closed = new HashSet<>();
+        endPoint = null;
+        
+        SearchNode first = new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace);
+        open.add(first);
     }
 
     @Override
@@ -70,8 +77,6 @@ public class BestFirst extends MemoSearchMethod {
         closed = new HashSet<>();
         endPoint = null;
         
-        SearchNode first = new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace);
-        open.add(first);
         
         while (!open.isEmpty()){
            step();
