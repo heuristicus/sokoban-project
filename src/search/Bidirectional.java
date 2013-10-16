@@ -4,12 +4,8 @@
  */
 package search;
 
-import board.Board;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
 import java.util.Queue;
 
 import utilities.BoardAction;
@@ -47,7 +43,7 @@ public class Bidirectional extends SearchMethod {
     		//doing step
     		newNodes = currentSide.step();
     		keyNode = checkGoal(newNodes, oppositeSide.getOpenList());
-    	}while(keyNode == null);
+    	} while(keyNode == null);
     	
     	//constructing BoardAction list
     	
