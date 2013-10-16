@@ -799,7 +799,6 @@ public class Board {
     		Point boxPos = boxAction.first.position;
     		Point pushPos = new Point(boxPos.x - dx, boxPos.y - dy);	//position where the player stands before pushing the box
     		Point finalPos = new Point(boxPos.x + dx, boxPos.y + dy);	//final position 
-//    		if (get(finalPos).type != Symbol.Type.Box && get(finalPos) != Symbol.Wall)
     		if (get(finalPos).isWalkable)
     		{
     			//Generating new Board
@@ -812,12 +811,9 @@ public class Board {
 				if (!newBoard.isLockedState())
 				{
 		    		nodes.add(new SearchNode(newBoard, parent, boxAction.first, 1, true));
-//		    		nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
 				}
 				else
 				{
-//					System.out.println("considered locked");
-//					System.out.println(newBoard.toString());
 					++lockedStatesIgnored;
 				}
     		}             
@@ -837,7 +833,7 @@ public class Board {
     		Point pushPos = new Point(boxPos.x - 2*dx, boxPos.y - 2*dy);	//position where the player stands before pulling the box
     		Point finalPos = new Point(boxPos.x - dx, boxPos.y - dy);
 //    		if (get(pushPos).type != Symbol.Type.Box && get(pushPos) != Symbol.Wall)
-    		if (get(finalPos).isWalkable)
+    		if (get(pushPos).isWalkable)
     		{
     			//Generating new Board
     			Board newBoard = new Board(this);
@@ -848,7 +844,7 @@ public class Board {
     			//if the board is a locked state, just ignore it
     			if (!newBoard.isLockedState())
     			{
-    				nodes.add(new SearchNode(newBoard, parent, boxAction.first, boxAction.second, true));
+    				nodes.add(new SearchNode(newBoard, parent, boxAction.first, 1, true));
     			}
     			else
     			{
