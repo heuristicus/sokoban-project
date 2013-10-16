@@ -13,12 +13,12 @@
 \usepackage{hyperref}
 \usepackage{moreverb}
 \usepackage{fancyvrb}
-\usepackage{algorithm2e}
+\usepackage[ruled]{algorithm2e}
 
 \bibliography{report}
 \defaultfontfeatures{Mapping=tex-text}
 \setromanfont[Ligatures={Common},Numbers={Lining}]{Linux Libertine}
-\setmonofont{Liberation Mono}
+%\setmonofont{Liberation Mono}   
 
 \newsavebox{\boxone}
 \newsavebox{\boxtwo}
@@ -134,7 +134,27 @@ The game has garnered some interest in the artificial intelligence (AI) communit
 a description of your approach to the problem and your method
 \section{Implementation}
 \begin{algorithm}
-\caption{Bi-directional search implementation}
+  \DontPrintSemicolon
+  \KwData{Search implementations forwards and backwards, initialised with start and goal.}
+  \KwResult{A list of tuples of (\texttt{point}, \texttt{int}) containing motion of boxes from start to goal.}
+
+  \Begin{
+    current $\longleftarrow$ forwards\;
+    opposite $\longleftarrow$ backwards\;
+    new $\longleftarrow \emptyset$\;
+    key $\longleftarrow $ \texttt{null}\;
+    \Repeat{key $\neq$ \texttt{null}}{
+      swap current and opposite\;
+      new $\longleftarrow$ current.step()\;
+      \lIf{node $\in$ new $\land$ node $\in$ opposite.open}{key $\longleftarrow$ node}
+    }
+    fkey $\longleftarrow$ forwards.open.get(key)\;
+    bkey $\longleftarrow$ backwards.open.get(key)\;
+    fActions $\longleftarrow$ fkey.unwind()\;
+    bActions $\longleftarrow$ bkey.unwind()\;
+    \Return merge(fActions, bActions.reverse())\;
+  }
+\caption{Bi-directional search}
 \end{algorithm}
 
 implementation details (if there are any important ones)
