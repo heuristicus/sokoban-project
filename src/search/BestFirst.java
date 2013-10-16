@@ -52,7 +52,10 @@ public class BestFirst extends MemoSearchMethod {
     public ArrayList<SearchNode> step() {
          
             SearchNode front = open.remove();
-            closed.add(front);
+            
+            if (!closed.contains(front))
+                closed.add(front);
+            
             ArrayList<SearchNode> successors = front.expand(searchDirection);
             
             for (SearchNode successor : successors) {
