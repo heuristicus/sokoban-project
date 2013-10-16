@@ -51,7 +51,7 @@ public class Main {
 //        boardExpand();
     }
 	    
-	public static void solveBoard(Board start){
+	public static List<Action> solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
         SearchMethod search = new BestFirst(start, goal, new Heuristic.ManhattanClosestHeuristic(), USE_BOARD_EXPANSION);
@@ -80,11 +80,11 @@ public class Main {
             pathWithMoves = BoardAction.convertToActionList(path);
         }
 //        System.out.println("Full path:");
-        System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
+        return pathWithMoves;
         
     }
 	
-	public static void solveBoardBidirectional(Board start){
+	public static List<Action> solveBoardBidirectional(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
 
         MemoSearchMethod forward = new BestFirst(start, goal, new Heuristic.ManhattanClosestHeuristic(), Direction.FORWARDS, USE_BOARD_EXPANSION);
@@ -111,21 +111,21 @@ public class Main {
             pathWithMoves = BoardAction.convertToActionList(path);
         }
 //        System.out.println("Full path:");
-        System.out.print(SokobanUtil.actionListAsString(pathWithMoves));
+        return pathWithMoves;
         
     }
     
     public static void stdIn(){
         //		printExpandedBoards();
     	Board start = Board.read(new BufferedReader(new InputStreamReader(System.in)));
-    	solveBoardBidirectional(start);
+    	System.out.print(SokobanUtil.actionListAsString(solveBoardBidirectional(start)));
     }
     
 
     
     public static void profile() throws IOException {
         Board startas = Board.read(Files.newBufferedReader(Paths.get("./maps/test/fullTest.map"), Charset.defaultCharset()));
-        solveBoard(startas);
+        System.out.print(SokobanUtil.actionListAsString(solveBoard(startas)));
     }
     
     public static void mainTest() throws IOException{
