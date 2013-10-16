@@ -1,4 +1,4 @@
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,15 +16,16 @@ import board.Board;
 public class FullTests {
 
 	@Test
-	public void test000() {
-		Board start = TestUtil.initBoard("../test100/test000.in");
+	public void test() {
+		Board start = TestUtil.initBoard("../test100/test012.in");
 		System.out.print(SokobanUtil.actionListAsString(Main.solveBoardBidirectional(start)));
 	}
 	
 	@Test
 	public void test100Maps() {
 		final int startMap = 0;
-		final int endMap = 10;
+		final int endMap = 20;
+		boolean abortOnException = false;
 		
 		final int nbTests = endMap - startMap;
 		Boolean[] results = new Boolean[nbTests];
@@ -44,6 +45,7 @@ public class FullTests {
 			} catch(Exception e) {
 				System.err.println("Exception on map " + (i + startMap) );
 				e.printStackTrace();
+				if (abortOnException) fail();
 			}
 			if (moves != null) {
 				System.out.println("Board " + (i + startMap) + ": " + SokobanUtil.actionListAsString(moves));
