@@ -1,6 +1,6 @@
 % Created 2013-07-29 Mon 20:04
 \documentclass[a4paper,11pt]{article}
-\usepackage[utf8]{inputenc}
+\listfiles
 \usepackage[T1]{fontenc}
 \usepackage{hyperref}
 \tolerance=1000
@@ -133,6 +133,38 @@ The game has garnered some interest in the artificial intelligence (AI) communit
 \subsection{Deadlock Detection}
 a description of your approach to the problem and your method
 \section{Implementation}
+In our implementation, we use several objects which allow for cleaner code and easier access to required data. The most basic part of the implementation is the \texttt{Board} class, which holds methods to deal with moving the player and accessing various information about the state of the board. The \texttt{Board} object holds a list of dynamic points, as well as a reference to the static map. The static map is implemented as a singleton, so all objects created have a reference to that same object. This reduces memory usage, as the static part of the map is not duplicated for each \texttt{Board} object.
+
+As we are using bi-directional search, the search methods have been implemented in a way that allows their usage in both a bi-directional and a single directional search. This is important as we do not perform only a single search to find the path to the goal. To achieve this, we use a \texttt{step} method to perform a single step of the search. This step, in the case of A* and best-first search, is to expand the front of the priority queue, and add the successors to the open lists, performing any relevant checks. The best-first search implementation is shown in Algorithm \ref{alg:bestfirst}.
+
+The search methods make use of a custom \texttt{SearchNode} class, which stores a parent node, a \texttt{Board} representing the state of that node, and a \texttt{BoardAction} object, which represents the action used to generate the board by a point object (the location of the pushed box) and an associated \texttt{Action} enum, which is one of $\{up, down, left, right\}$, and indicates the direction of the push. The \texttt{unwind} method of the \texttt{SearchNode} recurses up to the start node, and reconstructs the path from there to the node on which the method was called.
+\begin{algorithm}
+  \DontPrintSemicolon
+  \Fn{findPath}{
+    \While{open not empty}{
+      successors $\longleftarrow$ \step\;
+      \lIf{goal in successors}{\Return successors.get(goal).unwind()}
+    }
+  }
+  \Fn{step}{
+    front $\longleftarrow$ open.front()\;
+    successors $\longleftarrow$ front.expand()\;
+    closed.add(front)\;
+    \ForEach{node in successors}{
+      \If{node not in closed and node not in open}{
+        \tcp{open is a priority queue, nodes sorted by heuristic value}
+        node.costEstimate $\longleftarrow$ h(node.state, goal)\;
+        open.add(node)\;
+      }
+    }
+    \Return successors\;
+  }
+  
+  }
+\caption{Best-first search}
+\label{alg:bestfirst}
+\end{algorithm}
+
 \begin{algorithm}
   \DontPrintSemicolon
   \KwData{Search implementations forwards and backwards, initialised with start and goal.}
@@ -155,6 +187,7 @@ a description of your approach to the problem and your method
     \Return merge(fActions, bActions.reverse())\;
   }
 \caption{Bi-directional search}
+\label{alg:bidi}
 \end{algorithm}
 
 implementation details (if there are any important ones)
