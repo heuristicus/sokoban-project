@@ -25,17 +25,19 @@ public class FullTests {
 	public void test100Maps() {
 		final int startMap = 0;
 		final int endMap = 20;
-		boolean abortOnException = false;
+		final boolean abortOnException = false; 
+		final List<Integer> exceptList = Arrays.asList(12, 14); // Maps to ignore 
+		
 		
 		final int nbTests = endMap - startMap;
 		Boolean[] results = new Boolean[nbTests];
 		Map<Integer, String> times = new TreeMap<Integer, String>();
 		for (int i = 0; i < nbTests; ++i) {
+			if (exceptList.contains(i)) continue;
+			
 			Board start = TestUtil.initBoard(String.format("../test100/test%03d.in", i + startMap));
 			Board copy = new Board(start);
 			List<Action> moves = null;
-			
-
 			
 			try {
 				long startTime = System.nanoTime();
