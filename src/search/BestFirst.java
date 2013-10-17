@@ -54,6 +54,7 @@ public class BestFirst extends MemoSearchMethod {
         closed = new HashSet<>();
         endPoint = null;
         
+        // Add the start states as nodes with zero path cost
         for (Board start : startPoints)
         {
         	open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));

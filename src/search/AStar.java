@@ -5,10 +5,13 @@
 package search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.PriorityQueue;
 
+import search.SearchMethod.Direction;
 import utilities.BoardAction;
 import board.Board;
 import utilities.ProfilingUtil;
@@ -27,7 +30,7 @@ import utilities.ProfilingUtil;
 public class AStar extends MemoSearchMethod {
 
     Heuristic<Board> h;
-    Board start;
+    List<Board> startPoints;
     Board goal;
     SearchNode goalState;
     SearchNode endPoint;
@@ -45,10 +48,13 @@ public class AStar extends MemoSearchMethod {
     }
     
     public AStar(Board start, Board goal, Heuristic<Board> h, Direction searchDirection, boolean boardSpace){
-        super();
+    	this(Arrays.asList(start), goal, h, searchDirection, boardSpace);
+    }
+    
+    public AStar(List<Board> multipleStarts, Board goal, Heuristic<Board> h, Direction searchDirection, boolean boardSpace){
         this.h = h;
         this.searchDirection = searchDirection;
-        this.start = start;
+        this.startPoints = multipleStarts;
         this.goal = goal;
         this.boardSpace = boardSpace;
         
@@ -62,8 +68,11 @@ public class AStar extends MemoSearchMethod {
         goalState = new SearchNode(goal, null, null, boardSpace);
         endPoint = null;
         
-        // Add the start state as a node with zero path cost
-        open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
+        // Add the start states as nodes with zero path cost
+        for (Board start : startPoints)
+        {
+        	open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
+        }
     }
 
     @Override
