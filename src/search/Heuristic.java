@@ -32,8 +32,9 @@ public interface Heuristic<T> {
     	public static Symbol[] START_SYMBOLS = {Symbol.Box, Symbol.BoxOnGoal};
     	public static Symbol[] GOAL_SYMBOLS = {Symbol.Box, Symbol.BoxOnGoal};
     	
-    	
-        @Override
+
+
+		@Override
     	/** Returns an optimistic estimation of the coast to go from state start to state goal.
     	 * 	
     	 */
@@ -180,7 +181,7 @@ public interface Heuristic<T> {
     	
     	public MinMatching2Heuristic(boolean forwardMode) {
     		super();
-    		this.forwardMode = forwardMode;
+    		this.forwardMode = forwardMode;    		
     	}
     	
     	// TODO might not be needed if we just want the max instead of sorting the list

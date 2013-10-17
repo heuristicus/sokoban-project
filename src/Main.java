@@ -54,7 +54,7 @@ public class Main {
 	public static List<Action> solveBoard(Board start){
         Board goal = SokobanUtil.getSolvedBoard(start);
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
-        SearchMethod search = new BestFirst(start, goal, new Heuristic.ManhattanClosestHeuristic(), USE_BOARD_EXPANSION);
+        SearchMethod search = new BestFirst(start, goal, new Heuristic.MinMatching2Heuristic(true), USE_BOARD_EXPANSION);
 //		((AStar)search).printTrace = true;
 //        SearchMethod search = new AStar(new Heuristic.RealClosestHeuristic());
 //        SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
@@ -91,14 +91,6 @@ public class Main {
         Board goal = SokobanUtil.getSolvedBoard(start);
 
         MemoSearchMethod forward = new BestFirst(start, goal, new Heuristic.ManhattanClosestHeuristic(), Direction.FORWARDS, USE_BOARD_EXPANSION);
-       
-//        System.out.println("GOAL");
-//        System.out.println(goal);
-//        ArrayList<Board> debug = goal.generateAllPlayerPositions();
-//        System.out.println("PRINT");
-//        for (Board b : debug)
-//        	System.out.println(b);
-        //backward search is initialized with multiple solved states containing all available player positions.
         MemoSearchMethod backward = new BestFirst(goal.generateAllPlayerPositions(), start, new Heuristic.ManhattanClosestHeuristic(), Direction.BACKWARDS, USE_BOARD_EXPANSION);
 
         SearchMethod bidirectional = new Bidirectional(forward, backward);

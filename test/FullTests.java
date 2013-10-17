@@ -37,22 +37,27 @@ public class FullTests {
 		final int nbTests = endMap - startMap;
 		Boolean[] results = new Boolean[nbTests];
 		Map<Integer, String> times = new TreeMap<>();
+		int discardedSum = 0;
+		int openedSum = 0;
+		int expandedSum = 0;
+		long durationSum = 0;
 		for (int i = 0; i < nbTests; ++i) {
 //			if (exceptList.contains(i)) continue;
 			
 			Board start = TestUtil.initBoard(String.format("../test100/test%03d.in", i + startMap));
 			Board copy = new Board(start);
 			List<Action> moves = null;
-			
+			long duration = 0;
 			try {
 				long startTime = System.nanoTime();
                 ProfilingUtil.timeOut = startTime + TimeUnit.SECONDS.toNanos(timeOutSeconds);
 				moves = Main.solveBoardBidirectional(start);	
 				long endTime = System.nanoTime();
                 if (moves != null){
-                    times.put(i + startMap, String.format("%.2g",(endTime - startTime) / 10e9));
+                	duration = endTime - startTime;
+                    times.put(i + startMap, String.format("%.2g",(duration / 10e9)));
                 } else {
-                    System.out.println("Time limit exceeded for board " + i);
+                    System.out.println("Time limit exceeded for board " + (i+startMap));
                     times.put(i + startMap, ">" + timeOutSeconds);
                 }
 			} catch(Exception e) {
@@ -61,14 +66,23 @@ public class FullTests {
 				if (abortOnException) fail();
 			}
 			if (moves != null) {
-				System.out.println("Board " + (i + startMap) + ": " + SokobanUtil.actionListAsString(moves));
-				results[i] = copy.applyActionChained(moves, true).isSolved();				
+//				System.out.println("Board " + (i + startMap) + ": " + SokobanUtil.actionListAsString(moves));
+				results[i] = copy.applyActionChained(moves, true).isSolved();
+				if (results[i]) {
+					discardedSum += ProfilingUtil.discardedNodes;
+					openedSum += ProfilingUtil.openedNodes;
+					expandedSum += ProfilingUtil.expandedNodes;
+					durationSum += duration;
+					
+				}
 			} else {
 				results[i] = false;
 			}
-            System.out.println("Discarded nodes: " + ProfilingUtil.discardedNodes + "\n"
+            System.out.println("=== Board " + (i+startMap) + " ==========");
+            		System.out.println("Discarded nodes: " + ProfilingUtil.discardedNodes + "\n"
                     + "Opened nodes: " + ProfilingUtil.openedNodes + "\n"
                     + "Expanded nodes: " + ProfilingUtil.expandedNodes);
+            System.out.println("Time limit: " + timeOutSeconds);
             ProfilingUtil.reset();
 			
 		}
@@ -81,11 +95,18 @@ public class FullTests {
                 failed++;
         }
         System.out.println("Passed maps: " + passed + "\n"
-                + "Failed maps: " + failed);
+        		+ "Failed maps: " + failed);
+		
+		System.out.println(times);
+
+		 System.out.println("Avg Discarded nodes: " + discardedSum / passed + "\n"
+                 + "Avg Opened nodes: " + openedSum / passed + "\n"
+                 + "Avg Expanded nodes: " + expandedSum / passed + "\n"
+		 		 + "Avg Duration: " + String.format("%.2g",((durationSum / passed) / 10e9)));
+		
 		Boolean[] expected = new Boolean[nbTests];
 		Arrays.fill(expected, true);
 		assertArrayEquals(expected, results);
-		System.out.println(times);
 	}
 
 }
