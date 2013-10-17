@@ -14,6 +14,7 @@
 \usepackage{moreverb}
 \usepackage{fancyvrb}
 \usepackage[ruled]{algorithm2e}
+\usepackage{cuted}
 
 \bibliography{report}
 \defaultfontfeatures{Mapping=tex-text}
@@ -26,7 +27,7 @@
 \newsavebox{\boxfour}
 
 \title{Sokoban: Search in a complex domain}
-\author{Yann Chazzalon,  Nicolas Dossou-Gb{\'e}t{\'e}, Tony Chan Ki Hong and Michal Staniaszek}
+\author{Yann Chazallon,  Nicolas Dossou-Gb{\'e}t{\'e}, Tony Chan Ki Hong and Michal Staniaszek}
 \date{\today}
 
 \begin{document}
@@ -35,28 +36,39 @@
 
 \begin{abstract}
 The aims of the project is to develop an agent that can solve Sokoban. By now, 33 out of 100 sokoban maps have been solved with 12 in Sokoban 1, 6 in Sokoban 2, 3 in Sokoban 3, 10 in Sokoban 4, 2 in Sokoban 5.
-
 \end{abstract}
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{labelformat=empty}
   \centering
-  \subfloat[\centering Yann Chazallon\\ 91/01/16]{
+  \subfloat[][\centering Yann Chazallon\\ 91/01/16]{
     \includegraphics[width=.2\textwidth]{img/yann.jpg}
   }\quad
-  \subfloat[\centering Nicolas Dossou-Gb{\'e}t{\'e}\\ 89/09/26]{
+  \subfloat[][\centering Nicolas Dossou-Gb{\'e}t{\'e}\\ 89/09/26]{
     \includegraphics[width=.2\textwidth]{img/nicolas.jpg}
   }\quad
-  \subfloat[\centering Tony Chan Ki Hong\\ /07/25]{
+  \subfloat[][\centering Tony Chan Ki Hong\\ /07/25]{
     \includegraphics[width=.2\textwidth]{img/tony.jpg}
   }\quad
-  \subfloat[\centering Michal Staniaszek\\ 90/12/07]{
+  \subfloat[][\centering Michal Staniaszek\\ 90/12/07]{
     \includegraphics[width=.2\textwidth]{img/michal.jpg}
   }
 \end{figure}
 
 \section{Introduction}
-\emph{Sokoban} is a puzzle game which written in 1981 by Hiroyuki Imabayashi. First published in 1982, it is now a very popular game, with many clones available on the internet. The player controls a warehouse keeper (for which \emph{sokoban} is the Japanese word), whose job it is to push boxes onto goal locations on the map. The player can move in four directions (up, down, left or right) on the map, which is split into discrete cells. The player can push boxes, but is unable to pull them. To be able to push a box, the player must be adjacent to it, and there must be an empty space behind the box into which it can be pushed. Only one box can be moved at a time; if two boxes are contacting each other, pushing one box does not move the other. While there are many graphical implementations, there are also many text-based implementations which use symbols for representing parts of the board, an example of which is shown in Figure \ref{fig:mapex}.
+\emph{Sokoban} is a puzzle game which written in 1981 by Hiroyuki
+Imabayashi. First published in 1982, it is now a very popular game, with many
+clones available on the internet. The player controls a warehouse keeper (for
+which \emph{sokoban} is the Japanese word), whose job it is to push boxes onto
+goal locations on the map. The player can move in four directions (up, down,
+left or right) on the map, which is split into discrete cells. The player can
+push boxes, but is unable to pull them. To be able to push a box, the player
+must be adjacent to it, and there must be an empty space behind the box into
+which it can be pushed. Only one box can be moved at a time; if two boxes are
+contacting each other, pushing one box does not move the other. While there are
+many graphical implementations, there are also many text-based implementations
+which use symbols for representing parts of the board, an example of which is
+shown in Figure \ref{fig:mapex}.
 
 \begin{lrbox}{\boxone}
   \begin{minipage}{.25\textwidth}
@@ -118,16 +130,35 @@ The aims of the project is to develop an agent that can solve Sokoban. By now, 3
   \end{minipage}
 \end{lrbox}%
 
-\begin{figure}
+\begin{figure*}
   \subfloat[A basic map]{\usebox{\boxone}}
   \subfloat[Half solved]{\usebox{\boxtwo}}
   \subfloat[In an unsolvable state]{\usebox{\boxthree}}
   \subfloat[The solved map]{\usebox{\boxfour}}
   \caption{A typical \emph{Sokoban} map. The player is represented by \texttt{@}, or \texttt{+} when on a goal, boxes by \texttt{\$} or \texttt{*} on a goal, walls by \texttt{\#}, goals by a period, and empty space by a blank. The map in (c) is unsolvable, as the two boxes on the left are both against a wall. This is called a \emph{deadlock}.}
   \label{fig:mapex}
-\end{figure}
+\end{figure*}
 
-The game has garnered some interest in the artificial intelligence (AI) community due to the difficulty of finding automatic solutions. Games are an ideal platform for the development and testing of AI techniques, as game environments are much simpler and less (or not at all) noisy, and also have sets of simple rules for interaction with the world. Working in such environments allows for more control and closer investigation of the relevant parts of the problem that is being considered. \emph{Sokoban} in particular is an interesting problem due to its high branching factor, and the depth of the search trees that are generated when attempting to solve a problem. Even relatively simple problems can take upwards of 100 moves to solve, and more complex problems can exceed 500 moves, even in the optimal case. Additionally, it is possible to extend the search tree indefinitely---there is no time limit, and boxes can be pushed without restraint, so long as the push is valid. The branching factor is the total number of valid actions that can be applied to any box reachable from the player's current position. In the worst case, if there are $N$ boxes, all of which are accessible and can be pushed in any direction, the factor is $4N$ (each box can be pushed in 4 directions). Although in practice it is not possible to access all boxes, or push them in an arbitrary direction, but most maps have a large enough number of boxes that the branching factor has a large impact on the number of states expanded.
+The game has garnered some interest in the artificial intelligence (AI)
+community due to the difficulty of finding automatic solutions. Games are an
+ideal platform for the development and testing of AI techniques, as game
+environments are much simpler and less (or not at all) noisy, and also have sets
+of simple rules for interaction with the world. Working in such environments
+allows for more control and closer investigation of the relevant parts of the
+problem that is being considered. \emph{Sokoban} in particular is an interesting
+problem due to its high branching factor, and the depth of the search trees that
+are generated when attempting to solve a problem. Even relatively simple
+problems can take upwards of 100 moves to solve, and more complex problems can
+exceed 500 moves, even in the optimal case. Additionally, it is possible to
+extend the search tree indefinitely---there is no time limit, and boxes can be
+pushed without restraint, so long as the push is valid. The branching factor is
+the total number of valid actions that can be applied to any box reachable from
+the player's current position. In the worst case, if there are $N$ boxes, all of
+which are accessible and can be pushed in any direction, the factor is $4N$
+(each box can be pushed in 4 directions). Although in practice it is not
+possible to access all boxes, or push them in an arbitrary direction, but most
+maps have a large enough number of boxes that the branching factor has a large
+impact on the number of states expanded.
 
 \section{Method}
 
@@ -142,69 +173,95 @@ Concept to tackle the problem
 
 \subsection{Map Representation}
 
-According to the requirement, the map is recieved as a txt file with symbols representing different objects:
-#	wall
-@	player
-.	goal
-$	box
-+	player on goal
-*	box on goal
-
-They can be separated as two type of objects: Dynamic and Static. We have created two class "Board" and "Static Board" to store the objects respectively.
+According to the requirement, the map is recieved as a txt file with symbols
+representing different objects. They can be separated as two type of objects:
+Dynamic and Static. We have created two class "Board" and "Static Board" to
+store the objects respectively.
 
 \subsection{Deadlock Detection}
-The exists of Deadlock makes Sokoban even more hard to solve. As Player cannot pull a box, sometimes player may pushes the box into a position that the box can never reach the goal.
+The exists of Deadlock makes Sokoban even more hard to solve. As Player cannot
+pull a box, sometimes player may pushes the box into a position that the box can
+never reach the goal.
 
 Static Lock
 
-The meaning of static lock is that we cannot never push the box to the goal even without other boxes.
+The meaning of static lock is that we cannot never push the box to the goal even
+without other boxes.
 
-While recieving the map, the program will try to put a box on each goal and check the points that is reachable by the box by pull (i.e. do a BFS for each goal with reverse action). Reachable points are stored in a map for each goal. The cost for a box at Non-reachable points to a specific goal will be Positive infinity.
+While recieving the map, the program will try to put a box on each goal and
+check the points that is reachable by the box by pull (i.e. do a BFS for each
+goal with reverse action). Reachable points are stored in a map for each
+goal. The cost for a box at Non-reachable points to a specific goal will be
+Positive infinity.
 
 Dynamic Lock
 
-In this case, the point of a box is supposed to be reachable to some specific goal. However, there are some boxes blocking in the middle and it is impossible to remove that blocking box.
+In this case, the point of a box is supposed to be reachable to some specific
+goal. However, there are some boxes blocking in the middle and it is impossible
+to remove that blocking box.
 
-\subsection{Searching Method}
+\subsection{Search Method}
+Two-stage search
 
-
-\subsection{Heuristic Equation}
-
-a description of your approach to the problem and your method
+\subsection{Heuristics}
 \section{Implementation}
-In our implementation, we use several objects which allow for cleaner code and easier access to required data. The most basic part of the implementation is the \texttt{Board} class, which holds methods to deal with moving the player and accessing various information about the state of the board. The \texttt{Board} object holds a list of dynamic points, as well as a reference to the static map. The static map is implemented as a singleton, so all objects created have a reference to that same object. This reduces memory usage, as the static part of the map is not duplicated for each \texttt{Board} object.
+In our implementation, we use several objects which allow for cleaner code and
+easier access to required data. The most basic part of the implementation is the
+\texttt{Board} class, which holds methods to deal with moving the player and
+accessing various information about the state of the board. The \texttt{Board}
+object holds a list of dynamic points, as well as a reference to the static
+map. The static map is implemented as a singleton, so all objects created have a
+reference to that same object. This reduces memory usage, as the static part of
+the map is not duplicated for each \texttt{Board} object.
 
-As we are using bi-directional search, the search methods have been implemented in a way that allows their usage in both a bi-directional and a single directional search. This is important as we do not perform only a single search to find the path to the goal. To achieve this, we use a \texttt{step} method to perform a single step of the search. This step, in the case of A* and best-first search, is to expand the front of the priority queue, and add the successors to the open lists, performing any relevant checks. The best-first search implementation is shown in Algorithm \ref{alg:bestfirst}.
+As we are using bi-directional search, the search methods have been implemented
+in a way that allows their usage in both a bi-directional and a single
+directional search. This is important as we do not perform only a single search
+to find the path to the goal. To achieve this, we use a \texttt{step} method to
+perform a single step of the search. This step, in the case of A* and best-first
+search, is to expand the front of the priority queue, and add the successors to
+the open lists, performing any relevant checks. The best-first search
+implementation is shown in Algorithm \ref{alg:bestfirst}.
 
-The search methods make use of a custom \texttt{SearchNode} class, which stores a parent node, a \texttt{Board} representing the state of that node, and a \texttt{BoardAction} object, which represents the action used to generate the board by a point object (the location of the pushed box) and an associated \texttt{Action} enum, which is one of $\{up, down, left, right\}$, and indicates the direction of the push. The \texttt{unwind} method of the \texttt{SearchNode} recurses up to the start node, and reconstructs the path from there to the node on which the method was called.
-\begin{algorithm}
+The search methods make use of a custom \texttt{SearchNode} class, which stores
+a parent node, a \texttt{Board} representing the state of that node, and a
+\texttt{BoardAction} object, which represents the action used to generate the
+board by a point object (the location of the pushed box) and an associated
+\texttt{Action} enum, which is one of $\{up, down, left, right\}$, and indicates
+the direction of the push. The \texttt{unwind} method of the \texttt{SearchNode}
+recurses up to the start node, and reconstructs the path from there to the node
+on which the method was called.
+
+\begin{algorithm*}
   \DontPrintSemicolon
-  \Fn{findPath}{
-    \While{open not empty}{
-      successors $\longleftarrow$ \step\;
-      \lIf{goal in successors}{\Return successors.get(goal).unwind()}
+  \SetKwProg{Fn}{Function}{}{end}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \Input{An open list $O$, containing a start node $S$. A goal node $G$. A closed list $C$.}
+  \Output{A list of action, point tuples $(A,P)$, containing the path from $S$ to $G$.}
+  \Fn{findPath()}{
+    \While{$O \neq \emptyset$}{
+      successors $=$ step()\;
+      \lIf{$G \in $ successors}{\Return successors.get($G$).unwind()}
     }
   }
-  \Fn{step}{
-    front $\longleftarrow$ open.front()\;
-    successors $\longleftarrow$ front.expand()\;
+  \Fn{step()}{
+    front $=$ open.front()\;
+    successors $=$ front.expand()\;
     closed.add(front)\;
-    \ForEach{node in successors}{
-      \If{node not in closed and node not in open}{
-        \tcp{open is a priority queue, nodes sorted by heuristic value}
-        node.costEstimate $\longleftarrow$ h(node.state, goal)\;
-        open.add(node)\;
+    \ForEach{$n \in $ successors}{
+      \If{$n \notin C \land n \notin O$}{
+        \tcp{nodes in $O$ sorted by heuristic value}
+        $n$.costEstimate $=$ h($n$.state, $G$)\;
+        $O$.add($n$)\;
       }
     }
     \Return successors\;
   }
-  
-  }
 \caption{Best-first search}
 \label{alg:bestfirst}
-\end{algorithm}
+\end{algorithm*}
 
-\begin{algorithm}
+\begin{algorithm*}
   \DontPrintSemicolon
   \KwData{Search implementations forwards and backwards, initialised with start and goal.}
   \KwResult{A list of tuples of (\texttt{point}, \texttt{int}) containing motion of boxes from start to goal.}
@@ -227,14 +284,67 @@ The search methods make use of a custom \texttt{SearchNode} class, which stores 
   }
 \caption{Bi-directional search}
 \label{alg:bidi}
-\end{algorithm}
-
-implementation details (if there are any important ones)
+\end{algorithm*}
 \section{Evaluation}
 experimental evaluation and a thorough analysis of your results. This section should include:
 How well did your agent do on the different maps?
+\begin{figure}
+  \centering
+
+  \caption{timing for experimental results}
+  \label{fig:exptime}
+\end{figure}
 \section{Discussion}
-reflection section dealing with questions: How did you plan to solve the problem? How did you plan the work in the group? What other methods did you try out? What did work/ did not work? Why? How did you end up with the current approach? How did you measure the performance and success during the process? How would you solve it if you were asked to do it again given what you know now?
+During our first meeting, we discussed several ideas about how to solve the
+problem, based on brief readings of some previous work \cite{virkkala, jung}. We
+decided that in the ideal case we should attempt to implement some of the
+techniques mentioned in these papers to produce an effective solver. The first
+step we too was to create the foundations for the solver, by implementing a
+board representation and some search algorithms, which we knew we would need
+based on our discussions. Work was distributed by each group member choosing
+something to work on, and then working on the parts of the solver related to
+that. This worked reasonably well, but meant that some members did not fully
+understand the code that was being used, because they had no part in writing
+it. We attempted to amend this by commenting methods with enough information to
+understand what the method was \emph{supposed} to do. In order to check that
+important methods were doing what they were supposed to be doing, we used JUnit
+tests, running them whenever there were significant changes to the code to
+ensure that everything was working as expected.
+
+Our approach to developing the solver led to some problems. Because each member
+was working on a somewhat different task, we did not meet directly very often,
+which resulted in too little communication and only a vague idea of what we were
+aiming for. As such, we spent the first couple of weeks adding unnecessary code
+to the solver, which would be removed later. This left us with a solver which,
+at the milestone deadline, could solve the four basic maps, but nothing
+else. Once we started meeting more often, we were able to make progress on the
+solver, but most of the progress was fixing errors that were caused by
+misunderstandings of the intended use of methods, and various other bugs which
+could not be directly detected by the unit tests. Fixing these problems left us
+with little time to consider any more complex techniques that we could use to
+improve the solver, which negatively impacted on the final result.
+
+Our first approach to the problem was to use the motion of the player as the
+state expansion in an A* search implementation. This solver was able to complete
+very simple maps, but the size of the search space was far too large to solve
+any of the maps in the test set. Our second attempt was to use an expansion
+which considered all valid moves of boxes in a given board state. This reduced
+the search space to only those moves which were relevant to solving the
+problem. Once all bugs had been fixed, this version of the solver could solve a
+small number of maps in the test set, but continued to be hampered by
+slowness. This version was improved by using a more efficient equality check
+based on a string representation of the board, and a best-first search
+implementation. With this, we were able to solve approximately 15 of the maps
+from the online test set. The performance measure used during the process was
+the number of maps of the Kattis test set solved by the solver. Profiling was
+also used to judge the effects of more efficient implementations of parts of the
+solver.
+
+reflection section dealing with questions: How did you plan to solve the
+problem? How did you plan the work in the group? What other methods did you try
+out? What did work/ did not work? Why? How did you end up with the current
+approach? How did you measure the performance and success during the process?
+How would you solve it if you were asked to do it again given what you know now?
 
 \printbibliography
 
