@@ -17,7 +17,7 @@ public class FullTests {
 
 	@Test
 	public void test() {
-		Board start = TestUtil.initBoard("../test100/test012.in");
+		Board start = TestUtil.initBoard("../test100/test014.in");
 		System.out.print(SokobanUtil.actionListAsString(Main.solveBoardBidirectional(start)));
 	}
 	

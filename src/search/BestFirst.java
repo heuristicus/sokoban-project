@@ -6,7 +6,9 @@ package search;
 
 import board.Board;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.PriorityQueue;
 import utilities.BoardAction;
 
@@ -17,7 +19,7 @@ import utilities.BoardAction;
 public class BestFirst extends MemoSearchMethod {
 
     HashSet<SearchNode> closed;
-    Board start;
+    List<Board> startPoints;
     Board goal;
     boolean boardSpace;
     SearchNode goalState;
@@ -29,15 +31,21 @@ public class BestFirst extends MemoSearchMethod {
         this(start, goal, h, Direction.FORWARDS, boardSpace);
     }
     
+    
     public BestFirst(Board start, Board goal, Heuristic<Board> h, Direction searchDirection, boolean boardSpace){
+    	this(Arrays.asList(start), goal, h, searchDirection, boardSpace);
+    }
+    
+    public BestFirst(List<Board> multipleStarts, Board goal, Heuristic<Board> h, Direction searchDirection, boolean boardSpace){
         this.h = h;
         this.searchDirection = searchDirection;
-        this.start = start;
+        this.startPoints = multipleStarts;
         this.goal = goal;
         this.boardSpace = boardSpace;
         
         init();
     }
+    
     
     private void init()
     {
@@ -45,16 +53,17 @@ public class BestFirst extends MemoSearchMethod {
         closed = new HashSet<>();
         endPoint = null;
         
-        open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
+        for (Board start : startPoints)
+        {
+        	open.add(new SearchNode(start, null, null, 0, (int) h.utility(start, goal), boardSpace));
+        }
     }
 
     @Override
     public ArrayList<SearchNode> step() {
          
             SearchNode front = open.remove();
-            
-            if (!closed.contains(front))
-                closed.add(front);
+            closed.add(front);
             
             ArrayList<SearchNode> successors = front.expand(searchDirection);
             

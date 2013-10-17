@@ -886,30 +886,39 @@ public class Board {
     }
     
     
-    public ArrayList<Board> generateAllPlayerPositions(SearchNode parent)
+    public ArrayList<Board> generateAllPlayerPositions()
     {
-    	Map<Point, List<Action>> boxActionList = getBoxPushableDirections();
+    	Set<Point> accesPoints = getBoxAccessPoints();
     	
-    	ArrayList<Board> resultingBoards = new ArrayList<>();
-    	for (Point box : boxActionList.keySet())
+    	//generating one board for each free box side
+    	ArrayList<Board> boardsWithDuplicates = new ArrayList<>();
+    	for (Point accesPoint : accesPoints)
     	{
-    		List<Action> actions = boxActionList.get(box);
-    		for (Action action : actions)
-    		{
-	    		int dx = action.dx;	//push direction
-	    		int dy = action.dy;
-	    		Point playerPos = new Point(box.x - dx, box.y - dy);	//position where the player stands before pulling the box
-	    		if (get(playerPos).isWalkable)
-	    		{
-	    			//Generating new Board
-	    			Board newBoard = new Board(this);
-	    			
-	    			newBoard.moveElement(playerPosition, playerPos); //moving player to pushing point
-	    			resultingBoards.add(newBoard);
-	    		}
-    		}
+			//Generating new Board
+			Board newBoard = new Board(this);
+			
+			newBoard.moveElement(playerPosition, accesPoint); //moving player to pushing point
+			boardsWithDuplicates.add(newBoard);
     	}
-    	return resultingBoards;
+    	
+    	//removing duplicates
+    	ArrayList<Board> withoutDuplicates = new ArrayList<>();
+    	for (Board board : boardsWithDuplicates)
+    	{
+    		boolean duplicateFound = false;
+    		for (Board comp : withoutDuplicates)
+    		{
+    			if (board.equalsHash(comp))
+    			{
+    				duplicateFound = true;
+    				break;
+    			}
+    		}
+    		if (!duplicateFound)
+    			withoutDuplicates.add(board);
+    	}
+    	
+    	return withoutDuplicates;
     }
 
     
