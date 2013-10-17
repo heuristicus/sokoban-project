@@ -60,7 +60,10 @@ public class Main {
 //        SearchMethod search = new BestFirst(new Heuristic.ManhattanClosestHeuristic());
 //		((AStar)search).printTrace = true;
         ArrayList<BoardAction> path = search.findPath();
-
+        
+        if (path == null) // happens on timeout or failed search
+            return null;
+        
 //        System.out.println("Box movements:");
 //        System.out.println(SokobanUtil.actionListAsString(BoardAction.convertToActionList(pathas)));
         List<Action> pathWithMoves = null;
@@ -101,6 +104,8 @@ public class Main {
         SearchMethod bidirectional = new Bidirectional(forward, backward);
         
         ArrayList<BoardAction> path = bidirectional.findPath();
+        if (path == null) // happens on timeout or search fail
+            return null;
 
         List<Action> pathWithMoves = null;
         if (USE_BOARD_EXPANSION)

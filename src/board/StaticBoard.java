@@ -23,6 +23,7 @@ public class StaticBoard {
 	/** Warning, grid[y][x] is the value at the point (x,y)*/
 	public final Symbol[][] grid; 
 	public final List<Point> goals;
+	public final List<Point> initialBoxSetup;
 	/** Cost to get from a point to one of the boxes' initial position */
 	public final Map<Point, Map<Point, Integer>> pointToBoxCost;
     public final Map<Point, Map<Point, Integer>> pointToGoalCost;
@@ -40,6 +41,7 @@ public class StaticBoard {
 	private StaticBoard(Symbol[][] grid, List<Point> goals, List<Point> boxSetup, Dimension boardDim) {
 		this.grid = grid;
 		this.goals = Collections.unmodifiableList(goals);
+		this.initialBoxSetup = Collections.unmodifiableList(boxSetup);
         this.pointToGoalCost = generatePathCosts(goals, true);
         this.pointToBoxCost = generatePathCosts(boxSetup, false);
         this.mapDim = boardDim;
