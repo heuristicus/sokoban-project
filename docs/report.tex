@@ -34,7 +34,8 @@
 \maketitle
 
 \begin{abstract}
-  a brief summary of your project and obtained results
+The aims of the project is to develop an agent that can solve Sokoban. By now, 33 out of 100 sokoban maps have been solved with 12 in Sokoban 1, 6 in Sokoban 2, 3 in Sokoban 3, 10 in Sokoban 4, 2 in Sokoban 5.
+
 \end{abstract}
 
 \begin{figure}[!ht]
@@ -129,8 +130,46 @@
 The game has garnered some interest in the artificial intelligence (AI) community due to the difficulty of finding automatic solutions. Games are an ideal platform for the development and testing of AI techniques, as game environments are much simpler and less (or not at all) noisy, and also have sets of simple rules for interaction with the world. Working in such environments allows for more control and closer investigation of the relevant parts of the problem that is being considered. \emph{Sokoban} in particular is an interesting problem due to its high branching factor, and the depth of the search trees that are generated when attempting to solve a problem. Even relatively simple problems can take upwards of 100 moves to solve, and more complex problems can exceed 500 moves, even in the optimal case. Additionally, it is possible to extend the search tree indefinitely---there is no time limit, and boxes can be pushed without restraint, so long as the push is valid. The branching factor is the total number of valid actions that can be applied to any box reachable from the player's current position. In the worst case, if there are $N$ boxes, all of which are accessible and can be pushed in any direction, the factor is $4N$ (each box can be pushed in 4 directions). Although in practice it is not possible to access all boxes, or push them in an arbitrary direction, but most maps have a large enough number of boxes that the branching factor has a large impact on the number of states expanded.
 
 \section{Method}
+
+Concept to tackle the problem
+
+1. Read and Store the Map
+2. LockState Detection 
+3. Use Search Method to find solution
+4. Use Heuristic to evaluate node by giving value
+5. Expand node with highest Heuristic value first
+6. Find out and Output Result
+
 \subsection{Map Representation}
+
+According to the requirement, the map is recieved as a txt file with symbols representing different objects:
+#	wall
+@	player
+.	goal
+$	box
++	player on goal
+*	box on goal
+
+They can be separated as two type of objects: Dynamic and Static. We have created two class "Board" and "Static Board" to store the objects respectively.
+
 \subsection{Deadlock Detection}
+The exists of Deadlock makes Sokoban even more hard to solve. As Player cannot pull a box, sometimes player may pushes the box into a position that the box can never reach the goal.
+
+Static Lock
+
+The meaning of static lock is that we cannot never push the box to the goal even without other boxes.
+
+While recieving the map, the program will try to put a box on each goal and check the points that is reachable by the box by pull (i.e. do a BFS for each goal with reverse action). Reachable points are stored in a map for each goal. The cost for a box at Non-reachable points to a specific goal will be Positive infinity.
+
+Dynamic Lock
+
+In this case, the point of a box is supposed to be reachable to some specific goal. However, there are some boxes blocking in the middle and it is impossible to remove that blocking box.
+
+\subsection{Searching Method}
+
+
+\subsection{Heuristic Equation}
+
 a description of your approach to the problem and your method
 \section{Implementation}
 In our implementation, we use several objects which allow for cleaner code and easier access to required data. The most basic part of the implementation is the \texttt{Board} class, which holds methods to deal with moving the player and accessing various information about the state of the board. The \texttt{Board} object holds a list of dynamic points, as well as a reference to the static map. The static map is implemented as a singleton, so all objects created have a reference to that same object. This reduces memory usage, as the static part of the map is not duplicated for each \texttt{Board} object.
