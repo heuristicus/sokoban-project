@@ -139,4 +139,9 @@ public class StaticBoard {
 		return costs == null || costs.isEmpty();
 	}
 	
+	public static boolean isLockedBackwards(Point p) {
+		Map<Point, Integer> costs = getInstance().pointToBoxCost.get(p); 
+		return costs == null || costs.isEmpty();
+	}
+	
 }

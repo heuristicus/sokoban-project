@@ -25,6 +25,7 @@ import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
 import utilities.Pair;
+import utilities.ProfilingUtil;
 
 /**
  * Dynamic representation of the world.
@@ -46,7 +47,6 @@ public class Board {
     private String stringHash = null;
 	private String goalStringHash = null;
     /** Used only for profiling */
-    public static int lockedStatesIgnored = 0;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
@@ -720,6 +720,26 @@ public class Board {
     }
     
     
+    /**
+     * Checks if the state contains any locked box (statically or dynamically locked).
+     * A box locked on a goal is not considered locked.
+     * 
+     * @return If true, means that the state and its childs won't lead to any solution.
+     */
+    public boolean isLockedStateBackwards()
+    {
+    	for (Point p : mObjects.keySet())
+    	{
+    		if (!p.equals(playerPosition))			//escaping player
+    		{
+				if (StaticBoard.isLockedBackwards(p))			//if any of the boxes is locked, the state is locked
+					return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    
 	/** Used to check if a box is locked, statically (by walls, in a corner for example) or dynamically (by surrounding boxes configuration).
 	 * 	If called on a cell that's not containing a box, will return false.
 	 * 
@@ -823,7 +843,7 @@ public class Board {
 				{
 //					System.out.println("considered locked");
 //					System.out.println(newBoard.toString());
-					++lockedStatesIgnored;
+					++ProfilingUtil.discardedNodes;
 				}
     		}             
     	}
@@ -851,19 +871,47 @@ public class Board {
     			newBoard.moveElement(boxPos, finalPos); //moving crate
     			
     			//if the board is a locked state, just ignore it
-//    			if (!newBoard.isLockedState())
-//    			{
+    			if (!newBoard.isLockedStateBackwards())
+    			{
     			BoardAction action = new BoardAction(boxAction.first.action, finalPos);
 				nodes.add(new SearchNode(newBoard, parent, action, 1, true));
-//    			}
-//    			else
-//    			{
-//    				++lockedStatesIgnored;
-//    			}
+    			}
+    			else
+    			{
+    				++ProfilingUtil.discardedNodes;
+    			}
     		}
     	}
     	return nodes;
     }
+    
+    
+    public ArrayList<Board> generateAllPlayerPositions(SearchNode parent)
+    {
+    	Map<Point, List<Action>> boxActionList = getBoxPushableDirections();
+    	
+    	ArrayList<Board> resultingBoards = new ArrayList<>();
+    	for (Point box : boxActionList.keySet())
+    	{
+    		List<Action> actions = boxActionList.get(box);
+    		for (Action action : actions)
+    		{
+	    		int dx = action.dx;	//push direction
+	    		int dy = action.dy;
+	    		Point playerPos = new Point(box.x - dx, box.y - dy);	//position where the player stands before pulling the box
+	    		if (get(playerPos).isWalkable)
+	    		{
+	    			//Generating new Board
+	    			Board newBoard = new Board(this);
+	    			
+	    			newBoard.moveElement(playerPosition, playerPos); //moving player to pushing point
+	    			resultingBoards.add(newBoard);
+	    		}
+    		}
+    	}
+    	return resultingBoards;
+    }
+
     
     
     public Point getTopLeftPosition()

@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Queue;
 
 import utilities.BoardAction;
+import utilities.ProfilingUtil;
 
 /**
  *
@@ -43,6 +44,8 @@ public class Bidirectional extends SearchMethod {
     		//doing step
     		newNodes = currentSide.step();
     		keyNode = checkGoal(newNodes, oppositeSide.getOpenList());
+            if (ProfilingUtil.checkTimeOut())
+                return null;
     	} while(keyNode == null);
     	
     	//constructing BoardAction list
