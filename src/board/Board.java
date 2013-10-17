@@ -865,6 +865,55 @@ public class Board {
     }
     
     
+    public ArrayList<SearchNode> expandOnAllBoxSidesBackwards(SearchNode parent)
+    {
+    	//nasty conversion from Map<Point, List<Action>> to ArrayList<Pair<BoardAction, Integer> >
+    	Map<Point, List<Action>> boxActionList = getBoxPushableDirections();
+    	ArrayList<Pair<BoardAction, Integer> > specialList = new ArrayList<Pair<BoardAction, Integer> >();
+    	for (Point box : boxActionList.keySet())
+    	{
+    		for (Action action : boxActionList.get(box))
+    		{
+    			BoardAction boardAction = new BoardAction(action, box);
+    			specialList.add(new Pair<BoardAction, Integer>(boardAction, new Integer(1)));
+    		}
+    	}
+    	
+    	//same code as expandBoardSpaceBackwards()
+    	ArrayList<SearchNode> nodes = new ArrayList<>();
+    	for (Pair<BoardAction,Integer> boxAction : specialList)
+    	{
+    		int dx = boxAction.first.action.dx;	//push direction
+    		int dy = boxAction.first.action.dy;
+    		Point boxPos = boxAction.first.position;
+    		Point pushPos = new Point(boxPos.x - 2*dx, boxPos.y - 2*dy);	//position where the player stands before pulling the box
+    		Point finalPos = new Point(boxPos.x - dx, boxPos.y - dy);
+//    		if (get(pushPos).type != Symbol.Type.Box && get(pushPos) != Symbol.Wall)
+    		if (get(pushPos).isWalkable)
+    		{
+    			//Generating new Board
+    			Board newBoard = new Board(this);
+    			
+    			newBoard.moveElement(playerPosition, pushPos); //moving player to pushing point
+    			newBoard.moveElement(boxPos, finalPos); //moving crate
+    			
+    			//if the board is a locked state, just ignore it
+//    			if (!newBoard.isLockedState())
+//    			{
+    			BoardAction action = new BoardAction(boxAction.first.action, finalPos);
+				nodes.add(new SearchNode(newBoard, parent, action, 1, true));
+//    			}
+//    			else
+//    			{
+//    				++lockedStatesIgnored;
+//    			}
+    		}
+    	}
+    	return nodes;
+    }
+
+    
+    
     public Point getTopLeftPosition()
     {
     	if (floodFillRequired)
