@@ -169,12 +169,11 @@ public class SearchNode implements Comparable<SearchNode>{
     }
 
     /**
-     * Nodes are equal if they contain the same state, checked using the equals
-     * method of the Board class. This compares the states paying attention to the
-     * exact location of the player
-     * @param obj
-     * @return True if the object received is a SearchNode, and the nodeState
-     * which that node contains is equal to that which this node contains.
+     * Nodes are equal if they contain the same state
+     * 2 modes: 
+     * 	- boardSpaceExpansion mode: checks using {@link Board#equalsHash(Object)}
+     * (top left player position check)
+     *  - regular mode: checks using {@link Board#equals(Object)} (real player position check)
      */
     @Override
     public boolean equals(Object obj) {
@@ -206,5 +205,22 @@ public class SearchNode implements Comparable<SearchNode>{
     public String toString() {
         return this.nodeState.toString() + ", cost " + this.pathCost + ", estimated cost " + this.estimatedCost;
     }
+
+    /**
+     * Same as {@link SearchNode#equals(Object)}, except that in
+     * boardSpaceExpansion mode, the player location is totally irrelevant
+     * (not even the top left position)
+     */
+	public boolean goalEquals(SearchNode obj) {
+		if (obj instanceof SearchNode){
+            SearchNode node = (SearchNode)obj;
+            if (boardSpaceExpansion){
+            	return this.nodeState.equalsGoalHash(node.nodeState);
+	        } else {
+        		return this.nodeState.equals(node.nodeState);
+	        }
+        }
+        return false;
+	}
     
 }

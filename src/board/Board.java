@@ -44,6 +44,7 @@ public class Board {
     private ArrayList<Pair<BoardAction, Integer> > possibleActions = null;
     private boolean floodFillRequired = true;
     private String stringHash = null;
+	private String goalStringHash = null;
     /** Used only for profiling */
     public static int lockedStatesIgnored = 0;
 
@@ -1068,6 +1069,12 @@ public class Board {
         return stringHash;
     }
     
+    public String getGoalStringHash() {
+        if (goalStringHash == null)
+            makeStringHash();
+        return goalStringHash ;
+    }
+    
     public void makeStringHash(){
         Dimension boardDim = StaticBoard.getInstance().mapDim;
 //        System.out.println("Board dim " + boardDim.width + "," + boardDim.height);
@@ -1106,6 +1113,7 @@ public class Board {
         String hash = new String(base, 0, highestIndex + 1);
 //        System.out.println("Final hash " + hash);
         stringHash = hash;
+        goalStringHash = hash.replace('@', ' ');
     }
 
     /**
@@ -1168,5 +1176,13 @@ public class Board {
     	
     	return completeActionList;
     }
+
+	public boolean equalsGoalHash(Board obj) {
+		 if (obj instanceof Board){
+            Board other = (Board)obj;
+            return other.getGoalStringHash().equals(this.getGoalStringHash());
+        }
+        return false;
+	}
 }
 

@@ -169,54 +169,7 @@ public interface Heuristic<T> {
         
     }
     
-    public static class MinMatching3Heuristic implements Heuristic<Board> {
-    	
-    	@Override
-    	public float utility(Board start, Board unused) {
-    		
-    		List<Point> goals = StaticBoard.getInstance().goals;
-    		
-    		// Will contain for each box (i) the cost to reach each goal (j)
-    		double[][] costMatrix = new double[goals.size()][goals.size()];
-    		
-    		
-    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().pointToGoalCost;
-    		
-    		// Initialize the matrix
-    		int i = 0;
-    		for (Point p: start.getDynamicObjects().keySet()) {
-    			if (start.get(p).type != Symbol.Type.Box) continue;
-    			
-    			for (int j = 0; j < goals.size(); ++j) {
-    				Point goal = goals.get(j);
-    				
-    				Map<Point, Integer> m = costMap.get(p);
-    				if (m == null || m.get(goal) == null) {
-    					costMatrix[i][j] = Double.POSITIVE_INFINITY; 
-    				} else {
-    					costMatrix[i][j] = m.get(goal);
-    				}
-    			}
-    			++i;
-    		}
-    		
-    		// Resolution
-    		int[] solution = new HungarianAlgorithm(costMatrix).execute();
-    		int totalCost = 0;
-    		
-    		i = 0; 
-    		for (Point p: start.getDynamicObjects().keySet()) {
-    			if (start.get(p).type != Symbol.Type.Box) continue;
-    			if (solution[i] == -1) return Float.POSITIVE_INFINITY; // unassigned box
-    			totalCost += costMap.get(p).get(goals.get(solution[i]));
-    			++i; // Should be incremented in the same order as the first time and
-    				 // allow to keep track of the goal indices in the solution array
-    		}
-    		return totalCost;
-    	}
-    }
-    
-    /**
+     /**
      * MinMatching between the goals and the boxes
      * @return 
      * 	sum(cost_per_box_to_reach_goal).
