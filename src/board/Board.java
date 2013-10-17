@@ -25,6 +25,7 @@ import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
 import utilities.Pair;
+import utilities.ProfilingUtil;
 
 /**
  * Dynamic representation of the world.
@@ -46,7 +47,6 @@ public class Board {
     private String stringHash = null;
 	private String goalStringHash = null;
     /** Used only for profiling */
-    public static int lockedStatesIgnored = 0;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
@@ -843,7 +843,7 @@ public class Board {
 				{
 //					System.out.println("considered locked");
 //					System.out.println(newBoard.toString());
-					++lockedStatesIgnored;
+					++ProfilingUtil.discardedNodes;
 				}
     		}             
     	}
@@ -878,7 +878,7 @@ public class Board {
     			}
     			else
     			{
-    				++lockedStatesIgnored;
+    				++ProfilingUtil.discardedNodes;
     			}
     		}
     	}

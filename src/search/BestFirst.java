@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import utilities.BoardAction;
+import utilities.ProfilingUtil;
 
 /**
  *
@@ -56,8 +57,10 @@ public class BestFirst extends MemoSearchMethod {
             if (!closed.contains(front))
                 closed.add(front);
             
-            ArrayList<SearchNode> successors = front.expand(searchDirection);
+            ProfilingUtil.expandedNodes++;
             
+            ArrayList<SearchNode> successors = front.expand(searchDirection);
+            ProfilingUtil.openedNodes += successors.size();
             for (SearchNode successor : successors) {
                 if (!open.contains(successor) && !closed.contains(successor)){
                     successor.estimatedCost = (int) h.utility(successor.nodeState, goal);
@@ -88,6 +91,8 @@ public class BestFirst extends MemoSearchMethod {
                    return succ.actionUnwind();
                }
             }
+            if (ProfilingUtil.checkTimeOut())
+                return null;
         }
         
         return null;

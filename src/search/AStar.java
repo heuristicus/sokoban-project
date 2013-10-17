@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 
 import utilities.BoardAction;
 import board.Board;
+import utilities.ProfilingUtil;
 
 
 /**
@@ -72,9 +73,9 @@ public class AStar extends MemoSearchMethod {
             if (!closed.contains(front)){ // #TODO Is this check really necessary?
                 closed.add(front);
             }
-            
+            ProfilingUtil.expandedNodes++;
             ArrayList<SearchNode> successors = front.expand(searchDirection);
-            
+            ProfilingUtil.openedNodes += successors.size();
             for (SearchNode successor : successors) {
                 Iterator<SearchNode> it = open.iterator();
                 boolean inOpen = false;
@@ -128,6 +129,8 @@ public class AStar extends MemoSearchMethod {
                     return succ.actionUnwind();
                 }
             }
+            if(ProfilingUtil.checkTimeOut())
+                return null;
         }
         // Went through all nodes without finding the goal - there is no path.
         return null;
