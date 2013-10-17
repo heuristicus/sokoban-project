@@ -720,6 +720,26 @@ public class Board {
     }
     
     
+    /**
+     * Checks if the state contains any locked box (statically or dynamically locked).
+     * A box locked on a goal is not considered locked.
+     * 
+     * @return If true, means that the state and its childs won't lead to any solution.
+     */
+    public boolean isLockedStateBackwards()
+    {
+    	for (Point p : mObjects.keySet())
+    	{
+    		if (!p.equals(playerPosition))			//escaping player
+    		{
+				if (StaticBoard.isLockedBackwards(p))			//if any of the boxes is locked, the state is locked
+					return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    
 	/** Used to check if a box is locked, statically (by walls, in a corner for example) or dynamically (by surrounding boxes configuration).
 	 * 	If called on a cell that's not containing a box, will return false.
 	 * 
@@ -851,15 +871,15 @@ public class Board {
     			newBoard.moveElement(boxPos, finalPos); //moving crate
     			
     			//if the board is a locked state, just ignore it
-//    			if (!newBoard.isLockedState())
-//    			{
+    			if (!newBoard.isLockedStateBackwards())
+    			{
     			BoardAction action = new BoardAction(boxAction.first.action, finalPos);
 				nodes.add(new SearchNode(newBoard, parent, action, 1, true));
-//    			}
-//    			else
-//    			{
-//    				++lockedStatesIgnored;
-//    			}
+    			}
+    			else
+    			{
+    				++lockedStatesIgnored;
+    			}
     		}
     	}
     	return nodes;
@@ -899,15 +919,15 @@ public class Board {
     			newBoard.moveElement(boxPos, finalPos); //moving crate
     			
     			//if the board is a locked state, just ignore it
-//    			if (!newBoard.isLockedState())
-//    			{
+    			if (!newBoard.isLockedStateBackwards())
+    			{
     			BoardAction action = new BoardAction(boxAction.first.action, finalPos);
 				nodes.add(new SearchNode(newBoard, parent, action, 1, true));
-//    			}
-//    			else
-//    			{
-//    				++lockedStatesIgnored;
-//    			}
+    			}
+    			else
+    			{
+    				++lockedStatesIgnored;
+    			}
     		}
     	}
     	return nodes;
