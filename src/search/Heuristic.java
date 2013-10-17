@@ -176,14 +176,12 @@ public interface Heuristic<T> {
 	 * 	If no solution is found, returns Float.POSITIVE_INFINITY
      */
     public static class MinMatching2Heuristic implements Heuristic<Board> {
+    	boolean forwardMode;
     	
-//    	private static final Logger LOG = Logger.getLogger(MinMatching2Heuristic.class.getName());
-//    	{
-//    		Handler consoleHandler = new ConsoleHandler();
-//    		consoleHandler.setLevel(Level.FINER);
-//    		LOG.setLevel(Level.ALL);
-//    		LOG.addHandler(consoleHandler);
-//    	}
+    	public MinMatching2Heuristic(boolean forwardMode) {
+    		super();
+    		this.forwardMode = forwardMode;
+    	}
     	
     	// TODO might not be needed if we just want the max instead of sorting the list
     	private static Comparator<Map.Entry<Point, Integer>> candidatesPerGoalComparator = 
@@ -209,8 +207,15 @@ public interface Heuristic<T> {
 		 */
     	@Override
     	public float utility(Board start, Board goal) {
-    		List<Point> goals = StaticBoard.getInstance().goals;
-    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().pointToGoalCost;
+    		List<Point> goals;
+    		Map<Point, Map<Point, Integer>> costMap;
+    		if (forwardMode) { // We are pushing the boxes to the actual goals
+    			goals = StaticBoard.getInstance().goals;
+    			costMap = StaticBoard.getInstance().pointToGoalCost;
+    		} else { // We are pulling the boxes to their initial position
+    			goals = StaticBoard.getInstance().initialBoxSetup;
+    			costMap = StaticBoard.getInstance().pointToBoxCost;
+    		}
     		
     		List<Pair<Point, Map<Point, Integer>>> candidatesPerBox = new ArrayList<>(goals.size());
     		Map<Point, Integer> candidatesPerGoal = new HashMap<>(goals.size());
@@ -230,17 +235,9 @@ public interface Heuristic<T> {
     			
     		}
     		Collections.sort(candidatesPerBox, candidatesPerBoxComparator);
-//    		LOG.fine("Candidates per box, sorted: " + candidatesPerBox.toString());
-    		/* This array will contain the length of the path to reach each goal from
-    		 * the box considered to fit best.
-    		 * Not used yet :/ 
-    		 */
-//    		int[] estimatedCost = new int[goals.size()];
     		
     		int totalCost = 0;
     		for (Pair<Point, Map<Point, Integer>> pair : candidatesPerBox) {
-//    			LOG.fine("Looking for a match for (" + pair.first.x + "," + pair.first.y + 
-//    					"), " + pair.second.size() + " possibilities");
     			
     			List<Map.Entry<Point, Integer>> selectedCandidates = new ArrayList<>(pair.second.size());
     			for (Map.Entry<Point, Integer> entry : candidatesPerGoal.entrySet()) {
@@ -256,7 +253,6 @@ public interface Heuristic<T> {
     			
     			// Sorting the selected goals by number of candidates
     			Collections.sort(selectedCandidates, candidatesPerGoalComparator);
-//    			LOG.fine("Sorted list of possible goals: (" + selectedCandidates.toString());
     			
     			/* Finally: getting the selected goal. 
     			 * Here the method could be changed to try not to get the first, to ensure a 
@@ -265,9 +261,7 @@ public interface Heuristic<T> {
     			 * instead of sorting the array. */
     			Point selectedGoal = selectedCandidates.get(0).getKey();
     			
-//    			estimatedCost[goals.indexOf(selectedGoal)] = pair.second.get(selectedGoal);
     			totalCost += pair.second.get(selectedGoal);
-//    			totalCost += Math.pow(pair.second.get(selectedGoal), 2);
     			
     			// Update the data structures to not include the goal and the box anymore.
     			for (Point p : pair.second.keySet()) {
@@ -279,7 +273,6 @@ public interface Heuristic<T> {
     		}
 
     		// The value of the current state is based on the cost to reach all the goals
-    		
     		return totalCost;
 
     	}
