@@ -245,9 +245,9 @@ identified two classes of deadlocks:
 
 \subsubsection{Static deadlock}
 
-It's a deadlock caused by a wrong position of the box relative to the walls of
-the map. For example, pushing a box in a corner makes it impossible to be moved
-again. 
+This type of deadlock is caused by the position of the box relative to the 
+walls of the map. For example, pushing a box in a corner makes it impossible
+to be moved again and pushing a box through angled tunnels is impossible.
 
 We detect them using the static costmap, created and filled at the launch of
 the program. The positions for which we don't have any cost are the ones out
