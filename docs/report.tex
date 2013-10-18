@@ -68,18 +68,18 @@
 
 \section{Introduction}
 \emph{Sokoban} is a puzzle game which was written in 1981 by Hiroyuki
-Imabayashi. First published in 1982, it is now a very popular game, with many
-clones available on the internet. The player controls a warehouse keeper (for
-which \emph{sokoban} is the Japanese word), whose job it is to push boxes onto
-goal locations on the map. The player can move in four directions (up, down,
-left or right) on the map, which is split into discrete cells. The player can
-push boxes, but is unable to pull them. To be able to push a box, the player
-must be adjacent to it, and there must be an empty space behind the box into
-which it can be pushed. Only one box can be moved at a time; if two boxes are
-contacting each other, pushing one box does not move the other. While there are
-many graphical implementations, there are also many text-based implementations
-which use symbols for representing parts of the board, an example of which is
-shown in Figure \ref{fig:mapex}.
+Imabayashi. First published in 1982 \cite{sokoban}, it is now a very popular
+game, with many clones available on the internet. The player controls a
+warehouse keeper (for which \emph{sokoban} is the Japanese word), whose job it
+is to push boxes onto goal locations on the map. The player can move in four
+directions (up, down, left or right) on the map, which is split into discrete
+cells. The player can push boxes, but is unable to pull them. To be able to push
+a box, the player must be adjacent to it, and there must be an empty space
+behind the box into which it can be pushed. Only one box can be moved at a time;
+if two boxes are contacting each other, pushing one box does not move the
+other. While there are many graphical implementations, there are also many
+text-based implementations which use symbols for representing parts of the
+board, an example of which is shown in Figure \ref{fig:mapex}.
 
 \begin{lrbox}{\boxone}
   \begin{minipage}{.25\textwidth}
@@ -248,7 +248,10 @@ identified two classes of deadlocks:
 A static deadlock is a deadlock caused by the positioning of a box relative to
 the walls of the map. For example, pushing a box into a corner, or against a
 wall which ends in two corners makes it impossible for the box to be moved away
-from that position.
+from that position. This type of deadlock is caused by the position of the box
+relative to the walls of the map. For example, pushing a box in a corner makes
+it impossible to be moved again and pushing a box through angled tunnels is
+impossible.
 
 We detect them using the static costmap, created and filled at the launch of the
 program. The positions for which we do not have a cost are those out of reach of
@@ -574,7 +577,7 @@ remove the boxes on the intermediate positions even though this is unnecessary.
   \label{fig:passedtests}
 \end{table}
 
-\begin{table}
+\begin{table}[b]
   \centering
     \begin{tabular}{lcccc}
       Search method              &  Avg expanded  &  Avg opened  &  Avg rejected  &  Avg time  \\
