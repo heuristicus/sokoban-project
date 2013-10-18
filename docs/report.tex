@@ -12,6 +12,7 @@
 \usepackage{subfig}
 \usepackage{hyperref}
 \usepackage{moreverb}
+\usepackage{multirow}
 \usepackage{fancyvrb}
 \usepackage[ruled]{algorithm2e}
 \usepackage{cuted}
@@ -26,6 +27,10 @@
 \newsavebox{\boxthree}
 \newsavebox{\boxfour}
 
+\newsavebox{\mapss}
+\newsavebox{\mapff}
+\newsavebox{\mapnt}
+
 \title{Sokoban: Search in a complex domain}
 \author{Yann Chazallon,  Nicolas Dossou-Gb{\'e}t{\'e}, Tony Chan Ki Hong and Michal Staniaszek}
 \date{\today}
@@ -37,11 +42,11 @@
 \begin{abstract}
   In this report we describe our implementation of a \emph{Sokoban} solver. We
   use a two stage method to find the solution. A bi-directional best-first
-  search with the \textbf{\emph{HEURISTIC IMPLEMENTATION}} as a heuristic is
-  used to find the path of boxes on the map. This disjoint path is then linked
-  by using A* to find the path between successive box moves. The solver is
-  currently able to solve 47 of the 100 evaluation maps on Kattis, and 75 of the
-  100 maps in the simpler test set within the 11 second time limit.
+  search with manhattan distance as a heuristic is used to find the path of
+  boxes on the map. This disjoint path is then linked by using A* to find the
+  path between successive box moves. The solver is currently able to solve 47 of
+  the 100 evaluation maps on Kattis, and 81 of the 100 maps in the simpler test
+  set within the 11 second time limit.
 \end{abstract}
 
 \begin{figure}[!ht]
@@ -276,7 +281,7 @@ goal, regardless of how far it is from the start state. This results in a loss
 of optimality and completeness \cite{aima}, but can lead to a goal being found
 much faster than in the case of A*. Since we do not care about finding an
 optimal solution, and speed is of the essence in this problem, best-first search
-is more appropriate than A*. Our implementation is shown in Figure
+is more appropriate than A*. Our implementation is shown in Algorithm
 \ref{alg:bestfirst}.
 
 To further improve the speed of the search, we implemented a bi-directional
@@ -289,7 +294,7 @@ can be understood intuitively by considering a circle centred on the front node,
 with a radius $d$, with the goal node on the edge of the circle. The area inside
 this circle is very large compared to two smaller circles centred on the start
 and the goal meeting in the middle. Our implementation of bi-directional search
-is shown in Figure \ref{alg:bidi}.
+is shown in Algorithm \ref{alg:bidi}.
 
 Our approach involves splitting the problem into two distinct search
 problems. First, we find the actions required to move the boxes from the start
@@ -427,53 +432,97 @@ it's vertically locked if
 \section{Evaluation}
 experimental evaluation and a thorough analysis of your results. This section should include:
 How well did your agent do on the different maps?
+
+54: a box must be placed in a key position (\texttt{x}) before putting other boxes on their goals. 66: not many box movements to do, with a limited number of possiblities at a time, can be easily bruteforced. 93: No goal-box matching is done, so the boxes are stacked around the area with 3  and we run out of time.
+
 \begin{figure}
   \centering
+  \begin{tabular}{lccc}
+    & \multicolumn{3}{c}{Time limit}\\
+    \cline{2-4}
+    Search Method              &  5 sec  &  11 sec  &  15 sec  \\
+    \hline
+    A*                         &     12  &      15  &      16  \\
+    Best First                 &     56  &      60  &      64  \\
+    Bi-directional Best First  &     76  &      81  &      82  \\
+    Bi-directional A*          &     39  &      41  &      43  \\
+  \end{tabular}
 
-  \caption{timing for experimental results}
-  \label{fig:exptime}
+  \caption{The number of test cases solved out of 100 available in the offline
+    test set, running various search implementations with the manhattan distance
+    heuristic. Note the lack of large differences in the number of solved maps
+    with different time limits.}
+  \label{fig:passedtests}
 \end{figure}
 
 \begin{figure}
-  \begin{verbatim}
-  ###########
-  #  . . .  #
-  # . . . . #
-  ####### x #
-  #    $ $  #
-  #       # #
-  ###$####  #
-  #@ $   #$ #
-  ### $  $  #
-     ##     #
-      #######
-  \end{verbatim}
-  \caption{54: a box must be placed in a key position ($x$) before putting other boxes on their goals}
-\end{figure}
-\begin{figure}
-  \begin{verbatim}
-  #########
-  ##.$@ ###
-  ###.# ###
-  ###$#   #
-  #.$ #.# #
-  ##.$ $# #
-  #.$ # # #
-  ## #.$  #
-  #.$ #.###
-  ##.$ $###
-  #.$ # ###
-  ## $# ###
-  ## .# ###
-  ##    ###
-  #########
+  \centering
+  \begin{center}
+    \begin{tabular}{lcccc}
+      Search method              &  Avg expanded  &  Avg opened  &  Avg rejected  &  Avg time  \\
+      \hline
+      A*                         &          9149  &       33382  &         17929  &           3.4  \\
+      Best First                 &         10741  &       40473  &         19499  &           2.0  \\
+      Bi-directional Best First  &          3801  &       12727  &          4136  &           1.0  \\
+      Bi-directional A*          &          4591  &       16462  &          4340  &           2.0  \\
+    \end{tabular}
+  \end{center}
 
-  \end{verbatim}
-  \caption{66: not many box movements to do, with a limited number of possiblities at a time, can be easily bruteforced}
+  \caption{Some statistics for the search nodes, and the average solution time
+    in the tests in Figure \ref{fig:passedtests}. Expanded nodes are those nodes
+    whose successors have been generated. Opened nodes is the total number of
+    nodes placed onto the open list. Rejected nodes are successors not added to
+    the open list because they would generate locked states.}
+  \label{fig:timings}
 \end{figure}
-\begin{figure}
-  \begin{verbatim}
-  #################  
+
+\begin{lrbox}{\mapff}
+  \begin{minipage}{.25\textwidth}
+\centering
+\begin{BVerbatim}
+###########
+#  . . .  #
+# . . . . #
+####### x #
+#    $ $  #
+#       # #
+###$####  #
+#@ $   #$ #
+### $  $  #
+   ##     #
+    #######  
+\end{BVerbatim}
+  \end{minipage}
+\end{lrbox}%
+
+\begin{lrbox}{\mapss}
+  \begin{minipage}{.25\textwidth}
+\centering
+\begin{BVerbatim}
+#########
+##.$@ ###
+###.# ###
+###$#   #
+#.$ #.# #
+##.$ $# #
+#.$ # # #
+## #.$  #
+#.$ #.###
+##.$ $###
+#.$ # ###
+## $# ###
+## .# ###
+##    ###
+#########
+\end{BVerbatim}
+  \end{minipage}
+\end{lrbox}%
+
+\begin{lrbox}{\mapnt}
+  \begin{minipage}{.25\textwidth}
+\centering
+\begin{BVerbatim}
+#################  
 ####    @##  #  #  
 ###   $ ##      #  
 ##   $ ##    ## ###
@@ -487,8 +536,17 @@ How well did your agent do on the different maps?
    #######..*.#####
          ##...#    
           #####
-  \end{verbatim}
-  \caption{93: No goal-box matching is done, so the boxes are stacked around the area with 3 $*$ and we run out of time.}
+\end{BVerbatim}
+  \end{minipage}
+\end{lrbox}%
+
+
+\begin{figure}
+  \centering
+  \subfloat[Over 11 second threshold]{\usebox{\mapff}}
+  \subfloat[Fast solution]{\usebox{\mapss}}
+  \subfloat[Unsolved]{\usebox{\mapnt}}
+  \caption{Examples of edge cases for our solver. Maps 54 (a), 66 (b) and 93 (c) from the test set. (a) is a border case, solvable within 15 seconds, but not 11. \texttt{x} indicates a critical location. (b) is solved in only 0.09 seconds. (c) is not solved even with a 15 second time limit.}
 \end{figure}
 
 \section{Discussion}
