@@ -11,10 +11,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import utilities.Pair;
 import board.Board;
@@ -36,8 +32,9 @@ public interface Heuristic<T> {
     	public static Symbol[] START_SYMBOLS = {Symbol.Box, Symbol.BoxOnGoal};
     	public static Symbol[] GOAL_SYMBOLS = {Symbol.Box, Symbol.BoxOnGoal};
     	
-    	
-        @Override
+
+
+		@Override
     	/** Returns an optimistic estimation of the coast to go from state start to state goal.
     	 * 	
     	 */
@@ -110,9 +107,9 @@ public interface Heuristic<T> {
     			if (!startPt.equals(begin.getPlayerPosition()))
     			{
     				float bestDistance = Float.POSITIVE_INFINITY;
-    				if(StaticBoard.getInstance().goalDistanceCost.get(startPt) != null)
+    				if(StaticBoard.getInstance().pointToGoalCost.get(startPt) != null)
     				{
-	    				for (Integer dist : StaticBoard.getInstance().goalDistanceCost.get(startPt).values())
+	    				for (Integer dist : StaticBoard.getInstance().pointToGoalCost.get(startPt).values())
 	    				{	
 							bestDistance = Math.min(bestDistance, dist);
 	    				}
@@ -146,7 +143,7 @@ public interface Heuristic<T> {
         public float utility(Board start, Board goal) {
             float totalCost = 0;
             Map<Point, Symbol> dynamic = start.getDynamicObjects();
-            Map<Point, Map<Point, Integer> > pointCosts = StaticBoard.getInstance().goalDistanceCost;
+            Map<Point, Map<Point, Integer> > pointCosts = StaticBoard.getInstance().pointToGoalCost;
             // Go through each point in the dynamic portion of the map, ignoring the player.
             for (Point point : dynamic.keySet()) {
                 Symbol thisSymbol = start.get(point);
@@ -173,68 +170,19 @@ public interface Heuristic<T> {
         
     }
     
-    public static class MinMatching3Heuristic implements Heuristic<Board> {
-    	
-    	@Override
-    	public float utility(Board start, Board unused) {
-    		
-    		List<Point> goals = StaticBoard.getInstance().goals;
-    		
-    		// Will contain for each box (i) the cost to reach each goal (j)
-    		double[][] costMatrix = new double[goals.size()][goals.size()];
-    		
-    		
-    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().goalDistanceCost;
-    		
-    		// Initialize the matrix
-    		int i = 0;
-    		for (Point p: start.getDynamicObjects().keySet()) {
-    			if (start.get(p).type != Symbol.Type.Box) continue;
-    			
-    			for (int j = 0; j < goals.size(); ++j) {
-    				Point goal = goals.get(j);
-    				
-    				Map<Point, Integer> m = costMap.get(p);
-    				if (m == null || m.get(goal) == null) {
-    					costMatrix[i][j] = Double.POSITIVE_INFINITY; 
-    				} else {
-    					costMatrix[i][j] = m.get(goal);
-    				}
-    			}
-    			++i;
-    		}
-    		
-    		// Resolution
-    		int[] solution = new HungarianAlgorithm(costMatrix).execute();
-    		int totalCost = 0;
-    		
-    		i = 0; 
-    		for (Point p: start.getDynamicObjects().keySet()) {
-    			if (start.get(p).type != Symbol.Type.Box) continue;
-    			if (solution[i] == -1) return Float.POSITIVE_INFINITY; // unassigned box
-    			totalCost += costMap.get(p).get(goals.get(solution[i]));
-    			++i; // Should be incremented in the same order as the first time and
-    				 // allow to keep track of the goal indices in the solution array
-    		}
-    		return totalCost;
-    	}
-    }
-    
-    /**
+     /**
      * MinMatching between the goals and the boxes
      * @return 
      * 	sum(cost_per_box_to_reach_goal).
 	 * 	If no solution is found, returns Float.POSITIVE_INFINITY
      */
     public static class MinMatching2Heuristic implements Heuristic<Board> {
+    	boolean forwardMode;
     	
-//    	private static final Logger LOG = Logger.getLogger(MinMatching2Heuristic.class.getName());
-//    	{
-//    		Handler consoleHandler = new ConsoleHandler();
-//    		consoleHandler.setLevel(Level.FINER);
-//    		LOG.setLevel(Level.ALL);
-//    		LOG.addHandler(consoleHandler);
-//    	}
+    	public MinMatching2Heuristic(boolean forwardMode) {
+    		super();
+    		this.forwardMode = forwardMode;    		
+    	}
     	
     	// TODO might not be needed if we just want the max instead of sorting the list
     	private static Comparator<Map.Entry<Point, Integer>> candidatesPerGoalComparator = 
@@ -260,8 +208,15 @@ public interface Heuristic<T> {
 		 */
     	@Override
     	public float utility(Board start, Board goal) {
-    		List<Point> goals = StaticBoard.getInstance().goals;
-    		Map<Point, Map<Point, Integer>> costMap = StaticBoard.getInstance().goalDistanceCost;
+    		List<Point> goals;
+    		Map<Point, Map<Point, Integer>> costMap;
+    		if (forwardMode) { // We are pushing the boxes to the actual goals
+    			goals = StaticBoard.getInstance().goals;
+    			costMap = StaticBoard.getInstance().pointToGoalCost;
+    		} else { // We are pulling the boxes to their initial position
+    			goals = StaticBoard.getInstance().initialBoxSetup;
+    			costMap = StaticBoard.getInstance().pointToBoxCost;
+    		}
     		
     		List<Pair<Point, Map<Point, Integer>>> candidatesPerBox = new ArrayList<>(goals.size());
     		Map<Point, Integer> candidatesPerGoal = new HashMap<>(goals.size());
@@ -281,17 +236,9 @@ public interface Heuristic<T> {
     			
     		}
     		Collections.sort(candidatesPerBox, candidatesPerBoxComparator);
-//    		LOG.fine("Candidates per box, sorted: " + candidatesPerBox.toString());
-    		/* This array will contain the length of the path to reach each goal from
-    		 * the box considered to fit best.
-    		 * Not used yet :/ 
-    		 */
-//    		int[] estimatedCost = new int[goals.size()];
     		
     		int totalCost = 0;
     		for (Pair<Point, Map<Point, Integer>> pair : candidatesPerBox) {
-//    			LOG.fine("Looking for a match for (" + pair.first.x + "," + pair.first.y + 
-//    					"), " + pair.second.size() + " possibilities");
     			
     			List<Map.Entry<Point, Integer>> selectedCandidates = new ArrayList<>(pair.second.size());
     			for (Map.Entry<Point, Integer> entry : candidatesPerGoal.entrySet()) {
@@ -307,7 +254,6 @@ public interface Heuristic<T> {
     			
     			// Sorting the selected goals by number of candidates
     			Collections.sort(selectedCandidates, candidatesPerGoalComparator);
-//    			LOG.fine("Sorted list of possible goals: (" + selectedCandidates.toString());
     			
     			/* Finally: getting the selected goal. 
     			 * Here the method could be changed to try not to get the first, to ensure a 
@@ -316,9 +262,7 @@ public interface Heuristic<T> {
     			 * instead of sorting the array. */
     			Point selectedGoal = selectedCandidates.get(0).getKey();
     			
-//    			estimatedCost[goals.indexOf(selectedGoal)] = pair.second.get(selectedGoal);
     			totalCost += pair.second.get(selectedGoal);
-//    			totalCost += Math.pow(pair.second.get(selectedGoal), 2);
     			
     			// Update the data structures to not include the goal and the box anymore.
     			for (Point p : pair.second.keySet()) {
@@ -330,7 +274,6 @@ public interface Heuristic<T> {
     		}
 
     		// The value of the current state is based on the cost to reach all the goals
-    		
     		return totalCost;
 
     	}

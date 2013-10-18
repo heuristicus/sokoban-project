@@ -25,6 +25,7 @@ import utilities.SokobanUtil.Action;
 import board.Symbol.Type;
 import exceptions.IllegalMoveException;
 import utilities.Pair;
+import utilities.ProfilingUtil;
 
 /**
  * Dynamic representation of the world.
@@ -44,8 +45,8 @@ public class Board {
     private ArrayList<Pair<BoardAction, Integer> > possibleActions = null;
     private boolean floodFillRequired = true;
     private String stringHash = null;
+	private String goalStringHash = null;
     /** Used only for profiling */
-    public static int lockedStatesIgnored = 0;
 
 	private Board(Map<Point, Symbol> dynMap, Point playerPosition) {
 		this.mObjects = dynMap;
@@ -146,6 +147,7 @@ public class Board {
 		// in two steps.
 		Symbol[][] staticMap = new Symbol[tmpStrMap.size()][];
 		Map<Point, Symbol> dynamicMap = new HashMap<>();
+		List<Point> boxSetup = new ArrayList<>();
 		List<Point> goals = new ArrayList<>();
 		Point playerPosition = null;
 
@@ -167,6 +169,8 @@ public class Board {
 
 					if (s.type == Symbol.Type.Player) {
 						playerPosition = new Point(x, y);
+					} else if (s.type == Symbol.Type.Box){
+						boxSetup.add(new Point(x, y));
 					}
 				} else {
 					outRow[x] = s;
@@ -180,10 +184,11 @@ public class Board {
 			staticMap[y] = outRow;
 		}
 
+		
 		if (playerPosition == null)
 			throw new RuntimeException("Player position not detected");
-
-		StaticBoard.init(staticMap, goals, new Dimension(maxX, maxY));
+			
+		StaticBoard.init(staticMap, goals, boxSetup, new Dimension(maxX, maxY));
 		return new Board(dynamicMap, playerPosition);
 	}
 
@@ -418,7 +423,7 @@ public class Board {
         possibleActions = new ArrayList<>((mObjects.size() - 1) * 4);
         Queue<Pair<Point,Integer>> q = new LinkedList<>();
         // We start the fill at the player position, which has cost zero.
-        Pair<Point, Integer> start = new Pair(playerPosition, 0);
+        Pair<Point, Integer> start = new Pair<>(playerPosition, 0);
         // The queue stores points which we have not yet expanded.
 		q.add(start);
         HashSet<Point> accessible = new HashSet<>();
@@ -462,7 +467,7 @@ public class Board {
                             // Add the neighbour to the queue to be examined, with
                             // a cost that is one greater than the cost to get to the
                             // currently examined point
-                            q.add(new Pair(neighbours[i], next.second + 1));
+                            q.add(new Pair<>(neighbours[i], next.second + 1));
                             // See if the neighbour we are looking at is smaller than
                             // the current minimum (top leftmost) point.
                             minPoint = SokobanUtil.pointMin(minPoint, neighbours[i]);
@@ -473,7 +478,7 @@ public class Board {
                             // boxes along with the action that was applied to get to
                             // to that box. This is an action that we might be able to
                             // apply to the box, but we don't check that now.
-                            possibleActions.add(new Pair(new BoardAction(actionValues[i], neighbours[i]), next.second + 1));
+                            possibleActions.add(new Pair<>(new BoardAction(actionValues[i], neighbours[i]), next.second + 1));
 //                            System.out.println("Possible actions now " + possibleActions);
                         }
                     }
@@ -715,6 +720,26 @@ public class Board {
     }
     
     
+    /**
+     * Checks if the state contains any locked box (statically or dynamically locked).
+     * A box locked on a goal is not considered locked.
+     * 
+     * @return If true, means that the state and its childs won't lead to any solution.
+     */
+    public boolean isLockedStateBackwards()
+    {
+    	for (Point p : mObjects.keySet())
+    	{
+    		if (!p.equals(playerPosition))			//escaping player
+    		{
+				if (StaticBoard.isLockedBackwards(p))			//if any of the boxes is locked, the state is locked
+					return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    
 	/** Used to check if a box is locked, statically (by walls, in a corner for example) or dynamically (by surrounding boxes configuration).
 	 * 	If called on a cell that's not containing a box, will return false.
 	 * 
@@ -814,7 +839,9 @@ public class Board {
 				}
 				else
 				{
-					++lockedStatesIgnored;
+//					System.out.println("considered locked");
+//					System.out.println(newBoard.toString());
+					++ProfilingUtil.discardedNodes;
 				}
     		}             
     	}
@@ -842,18 +869,56 @@ public class Board {
     			newBoard.moveElement(boxPos, finalPos); //moving crate
     			
     			//if the board is a locked state, just ignore it
-    			if (!newBoard.isLockedState())
+    			if (!newBoard.isLockedStateBackwards())
     			{
-    				nodes.add(new SearchNode(newBoard, parent, boxAction.first, 1, true));
+                    BoardAction action = new BoardAction(boxAction.first.action, finalPos);
+                    nodes.add(new SearchNode(newBoard, parent, action, 1, true));
     			}
     			else
     			{
-    				++lockedStatesIgnored;
+    				++ProfilingUtil.discardedNodes;
     			}
     		}
     	}
     	return nodes;
     }
+    
+    
+    public ArrayList<Board> generateAllPlayerPositions()
+    {
+    	Set<Point> accesPoints = getBoxAccessPoints();
+    	
+    	//generating one board for each free box side
+    	ArrayList<Board> boardsWithDuplicates = new ArrayList<>();
+    	for (Point accesPoint : accesPoints)
+    	{
+			//Generating new Board
+			Board newBoard = new Board(this);
+			
+			newBoard.moveElement(playerPosition, accesPoint); //moving player to pushing point
+			boardsWithDuplicates.add(newBoard);
+    	}
+    	
+    	//removing duplicates
+    	ArrayList<Board> withoutDuplicates = new ArrayList<>();
+    	for (Board board : boardsWithDuplicates)
+    	{
+    		boolean duplicateFound = false;
+    		for (Board comp : withoutDuplicates)
+    		{
+    			if (board.equalsHash(comp))
+    			{
+    				duplicateFound = true;
+    				break;
+    			}
+    		}
+    		if (!duplicateFound)
+    			withoutDuplicates.add(board);
+    	}
+    	
+    	return withoutDuplicates;
+    }
+
     
     
     public Point getTopLeftPosition()
@@ -982,6 +1047,9 @@ public class Board {
     	return newBoard;
     }
     
+    /**
+     * Tests that the board is solved by checking that all the boxes are placed on goals.
+     */
     public boolean isSolved() {
     	for (Point dynObject : mObjects.keySet()) {
     		if (get(dynObject).type == Symbol.Type.Player) continue;
@@ -1005,6 +1073,12 @@ public class Board {
         if (stringHash == null)
             makeStringHash();
         return stringHash;
+    }
+    
+    public String getGoalStringHash() {
+        if (goalStringHash == null)
+            makeStringHash();
+        return goalStringHash ;
     }
     
     public void makeStringHash(){
@@ -1045,6 +1119,7 @@ public class Board {
         String hash = new String(base, 0, highestIndex + 1);
 //        System.out.println("Final hash " + hash);
         stringHash = hash;
+        goalStringHash = hash.replace('@', ' ');
     }
 
     /**
@@ -1078,15 +1153,14 @@ public class Board {
     	
     	boolean doubleCheck = true; // Double check mode: actually execute all the steps before adding them to the list.
     	
-    	
-    	SearchMethod aStar = new AStar(new Heuristic.DiagonalDistanceHeuristic());
     	List<Action> completeActionList = new ArrayList<>();
     	for (BoardAction bm : boxActions) { // loop through all the box actions
     		// Get the board state after that action.
     		intermediateBoard = currentBoard.prepareNextBoxMove(bm.action, bm.position, false);
     		if (! currentBoard.equals(intermediateBoard)) { // the player moved in-between. 
     			// get the list of moves made.
-    			ArrayList<BoardAction> foundPath = aStar.findPath(currentBoard, intermediateBoard, false);
+                SearchMethod aStar = new AStar(currentBoard, intermediateBoard, new Heuristic.DiagonalDistanceHeuristic(), false);
+    			ArrayList<BoardAction> foundPath = aStar.findPath();
     			
     			if (doubleCheck) {
     				currentBoard.applyActionChained(BoardAction.convertToActionList(foundPath), true);
@@ -1108,5 +1182,13 @@ public class Board {
     	
     	return completeActionList;
     }
+
+	public boolean equalsGoalHash(Board obj) {
+		 if (obj instanceof Board){
+            Board other = (Board)obj;
+            return other.getGoalStringHash().equals(this.getGoalStringHash());
+        }
+        return false;
+	}
 }
 

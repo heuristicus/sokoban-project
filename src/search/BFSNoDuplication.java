@@ -16,8 +16,18 @@ import utilities.BoardAction;
  */
 public class BFSNoDuplication extends SearchMethod {
     
+    Board start;
+    Board goal;
+    boolean boardSpace;            
+    
+    public BFSNoDuplication(Board start, Board goal, boolean boardSpace){
+        this.start = start;
+        this.goal = goal;
+        this.boardSpace = boardSpace;
+    }
+    
     @Override
-    public ArrayList<BoardAction> findPath(Board start, Board goal, boolean boardSpace) {
+    public ArrayList<BoardAction> findPath() {
             // Queue for nodes not yet checked.
             Queue<SearchNode> open = new LinkedList<>();
             // List of nodes which have already been checked, independent of the action taken to reach the state.
