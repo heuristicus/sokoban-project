@@ -34,7 +34,7 @@ public class ProfilingUtil {
      */
     public static boolean checkTimeOut(){
         if (useProfiling){
-            if (count++ == 20){
+             if (count++ == 20){
                 count = 0;
                 if (System.nanoTime() > timeOut)
                     return true;
