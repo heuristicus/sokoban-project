@@ -15,11 +15,10 @@
 \usepackage{multirow}
 \usepackage{fancyvrb}
 \usepackage[ruled]{algorithm2e}
-\usepackage{cuted}
 
 \bibliography{report}
 \defaultfontfeatures{Mapping=tex-text}
-%\setromanfont[Ligatures={Common},Numbers={Lining}]{Linux Libertine}
+\setromanfont[Ligatures={Common},Numbers={Lining}]{Linux Libertine}
 %\setmonofont{Liberation Mono}   
 
 \newsavebox{\boxone}
@@ -43,10 +42,11 @@
   In this report we describe our implementation of a \emph{Sokoban} solver. We
   use a two stage method to find the solution. A bi-directional best-first
   search with manhattan distance as a heuristic is used to find the path of
-  boxes on the map. This disjoint path is then linked by using A* to find the
-  path between successive box moves. The solver is currently able to solve 47 of
-  the 100 evaluation maps on Kattis, and 81 of the 100 maps in the simpler test
-  set within the 11 second time limit.
+  boxes on the map from their starting positions to the goals. This disjoint
+  path is then linked by using A* to find the path between successive box
+  moves. The solver is currently able to solve 47 of the 100 evaluation maps on
+  Kattis, and 81 of the 100 maps in the simpler test set within the 11 second
+  time limit.
 \end{abstract}
 
 \begin{figure}[!ht]
@@ -229,12 +229,13 @@ and where boxes are in the same positions are considered equal.
 
 The implementation of the board space equality check was done using string
 hashes. Each board generates two strings at its creation, one including the
-player, and one without, to be used for goal checks. This hash can be seen as a
-linear rather than grid based representation of the map, but having only the
-boxes and player's position, and whitespaces instead of the other elements. We
-chose this implementation because their generation and comparison is fast and
-trivial, and they can also be used in hashtables, delegating the repeated state
-detection to the Java API rather than a heavier custom method.
+player in the top leftmost position, for standard equality checks, and one
+without, to be used for goal checks. This hash can be seen as a linear rather
+than grid based representation of the map, but having only the boxes and
+player's position, and whitespaces instead of the other elements. We chose this
+implementation because their generation and comparison is fast and trivial, and
+they can also be used in hashtables, delegating the repeated state detection to
+the Java API rather than a heavier custom method.
 
 \subsection{Deadlock Detection}
 
@@ -248,14 +249,12 @@ identified two classes of deadlocks:
 A static deadlock is a deadlock caused by the positioning of a box relative to
 the walls of the map. For example, pushing a box into a corner, or against a
 wall which ends in two corners makes it impossible for the box to be moved away
-from that position. This type of deadlock is caused by the position of the box
-relative to the walls of the map. For example, pushing a box in a corner makes
-it impossible to be moved again and pushing a box through angled tunnels is
-impossible.
+from that position, and it is not possible to push a box through a tunnel which
+has a corner in it.
 
-We detect them using the static costmap, created and filled at the launch of the
-program. The positions for which we do not have a cost are those out of reach of
-the goals, and as a result those where a box will be deadlocked.
+We detect these locks using the static costmap, created and filled when the
+solver is launched. The positions for which we do not have a cost are those out
+of reach of the goals, and as a result those where a box will be deadlocked.
 
 \subsubsection{Dynamic deadlock}
 
@@ -268,18 +267,18 @@ Since this algorithm is used for pruning search branches, it is important to
 avoid false positives that could lead to losing solution states. The basic idea
 is that every box has two degrees of freedom, horizontal and vertical. If any of
 the boxes loses it's two degrees of freedom permanently then it is considered
-locked. Expanding a state containing such a box is pointless. We consider a
-degree of freedom to be locked if one of its sides is occupied, because we need
-to have a receiving space for the box and a space for the player to push from at
-the same time. For example, a box is horizontally locked if its left or right
-side are occupied. A wall results in a locked degree of freedom without any
-other consideration. In the case where the locking is caused by other boxes, it
-is necessary to consider whether these boxes are locked themselves. We can use
-the same criteria recursively on these locking boxes until we find a free box. A
-box is considered free as soon as it has a free degree of freedom. Since this
-describes a cyclic graph, we need to use a closed list to avoid infinite
-recursion. This is of course relevant to the algorithm, as box $A$ cannot
-unlock box $B$ if the freedom of $B$ freedom depends on that of $A$.
+locked.  We consider a degree of freedom to be locked if one of its sides is
+occupied, because we need to have a receiving space for the box and a space for
+the player to push from at the same time. For example, a box is horizontally
+locked if its left or right side are occupied. A wall results in a locked degree
+of freedom without any other consideration. In the case where the locking is
+caused by other boxes, it is necessary to consider whether these boxes are
+locked themselves. We can use the same criteria recursively on these locking
+boxes until we find a free box. A box is considered free as soon as it has a
+free degree of freedom. Since this describes a cyclic graph, we need to use a
+closed list to avoid infinite recursion. This is of course relevant to the
+algorithm, as box $A$ cannot unlock box $B$ if the freedom of $B$ freedom
+depends on that of $A$.
 
 Something that must be considered when using this algorithm is that a box
 dynamically locked on a goal should not trigger the pruning of the state for
@@ -307,7 +306,7 @@ each box, using the above formula.
 
 \subsubsection{Static Cost Evaluation}
 
-At the launch of the program, when initializing the static map, we compute the
+Upon launch of the solver, when initializing the static map, we compute the
 real cost from each goal to any reachable point of the map, by using a flood
 fill. This is used to look for unreachable points (for locked state detection),
 but also to obtain a better cost estimation for the heuristic, as the boxes must
@@ -316,7 +315,7 @@ with the manhattan distance heuristic, this heuristic returns the sum of the
 distances to the closest goal, but with a better approximation of these
 distances this time.
 
-\subsubsection{Min Matching}
+\subsubsection{Minimum Matching}
 
 This heuristic tries to match each box to a goal before estimating the distance
 between them.
@@ -330,69 +329,11 @@ unreachable.
 
 We tried a quick and dirty alternative based on the static costmap, that would
 avoid having to do heavy calculations. We ordered the boxes and goals by number
-of possible matches and attempted to make pair them in that order, returning
+of possible matches and attempted to pair them in that order, returning
 $+\infty$ if the matching failed.
 
 Early results were not convincing and the results with the other heuristics were
 better than expected, so we abandoned further development of this heuristic.
-
-\subsection{Search Method}
-The search methods form the core of the solver. Using them, we find a path
-between a starting board state and the goal state, where all boxes are on
-goals. We implemented three different search methods; A*, best-first search and
-bi-directional search. A* expands nodes in a specific order based on the value
-of a state evaluation function $f(s)=g(s)+h(s)$, where $s$ is some board
-state. The value $h(s)$ is the heuristic value of the state, and represents an
-estimate of how far the state $s$ is from the goal. The value of $g(s)$ depends
-on the path that was taken to reach this node---the longer the path, the higher
-the value. A* places states into a priority queue and expands them starting from
-nodes with a lower $f$ value; the lowest estimated total cost to a
-solution. This evaluation function means that so long as $h(s)$ is an
-underestimate (an \emph{admissible} heuristic) of the true cost to the goal
-state, A* is both optimal and complete, that is, it will always find a solution
-if one exists, and that solution will be optimal\cite{aima}.
-
-In best-first search, the cost to reach the current node is not considered in
-the expansion, and so the evaluation function simplifies to $f(s)=h(s)$. This
-results in the search always expanding the state with the lowest cost to the
-goal, regardless of how far it is from the start state. This results in a loss
-of optimality and completeness \cite{aima}, but can lead to a goal being found
-much faster than in the case of A*. Since we do not care about finding an
-optimal solution, and speed is of the essence in this problem, best-first search
-is more appropriate than A*. Our implementation is shown in Algorithm
-\ref{alg:bestfirst}.
-
-To further improve the speed of the search, we implemented a
-bi-directional search. While both A* and best-first search have a
-complexity of $\mathcal{O}(b^d)$, running two searches, one from the
-start state to the goal, and one from the goal state to the start,
-reduces this to $\mathcal{O}(b^{d/2})$ \cite{aima}, where $b$ is the
-branching factor, and $d$ is the solution depth. The search terminates
-when the frontiers of the two searches meet. This can be understood
-intuitively by considering a circle centred on the front node, with a
-radius $d$, with the goal node on the edge of the circle. The area
-inside this circle is very large compared to two smaller circles
-centred on the start and the goal meeting in the middle. 
-
-One could think that searching backwards consists only of inverting start and
-goal states, and using a different expansion method that pulls boxes instead of
-pushing them. In actual fact, when using backwards search we need to consider
-\emph{multiple} start states, as we do not know what area the player should be
-in after solving the map. Another detail to consider is that the algorithm we
-use to check for deadlocks are not usable as is. The cost map for static checks
-must be filled based on the reachability of box starting positions instead of
-goals, while the dynamic algorithm is completely irrelevant, as boxes can be
-pulled out of deadlocked states. Our implementation of bi-directional search is
-shown in Algorithm \ref{alg:bidi}.
-
-Our approach involves splitting the problem into two distinct search
-problems. First, we find the actions required to move the boxes from the start
-state to the goal state using a best-first bi-directional search. Once this
-intermediate path has been found, we run a series of A* searches to find the
-path of the player between each successive box movement, which gives us the
-final path from the start to the goal. When finding the player path, we consider
-boxes as immovable objects.
-
 
 \begin{algorithm}
   \DontPrintSemicolon
@@ -423,6 +364,67 @@ boxes as immovable objects.
 \label{alg:bestfirst}
 \end{algorithm}
 
+\subsection{Search Method}
+
+The search methods form the core of the solver. Using them, we find a path
+between a starting board state and the goal state, where all boxes are on
+goals. We implemented three different search methods; A*, best-first search and
+bi-directional search. A* expands nodes in a specific order based on the value
+of a state evaluation function $f(s)=g(s)+h(s)$, where $s$ is some board
+state. The value $h(s)$ is the heuristic value of the state, and represents an
+estimate of how far the state $s$ is from the goal. The value of $g(s)$ depends
+on the path that was taken to reach this node---the longer the path, the higher
+the value. A* places states into a priority queue and expands them starting from
+nodes with a lower $f$ value; the lowest estimated total cost to a
+solution. This evaluation function means that so long as $h(s)$ is an
+underestimate (an \emph{admissible} heuristic) of the true cost to the goal
+state, A* is both optimal and complete, that is, it will always find a solution
+if one exists, and that solution will be optimal\cite{aima}.
+
+In best-first search, the cost to reach the current node is not considered in
+the expansion, and so the evaluation function simplifies to $f(s)=h(s)$. This
+results in the search always expanding the state with the lowest cost to the
+goal, regardless of how far it is from the start state. In general, this results
+in a loss of optimality and completeness \cite{aima}. In our case, however, the
+search space limited by the use of a closed list and consideration of locked
+states. Best-first search can lead to a goal being found much faster than in the
+case of A* because it quickly goes to a large depth. Since we do not care about
+finding an optimal solution, and speed is of the essence in this problem,
+best-first search is more appropriate than A*. Our implementation is shown in
+Algorithm \ref{alg:bestfirst}.
+
+To further improve the speed of the search, we implemented a bi-directional
+search. While both A* and best-first search have a complexity of
+$\mathcal{O}(b^d)$, running two searches, one from the start state to the goal,
+and one from the goal state to the start, reduces this to $\mathcal{O}(b^{d/2})$
+\cite{aima}, where $b$ is the branching factor, and $d$ is the solution
+depth. The search terminates when the frontiers of the two searches meet. This
+can be understood intuitively by considering a circle centred on the front node,
+with a radius $d$, with the goal node on the edge of the circle. The area inside
+this circle is very large compared to two smaller circles centred on the start
+and the goal meeting in the middle.
+
+One could think that searching backwards consists only of inverting start and
+goal states, and using a different expansion method that pulls boxes instead of
+pushing them. In actual fact, when using backwards search we need to consider
+\emph{multiple} start states, as we do not know what area the player should be
+in after solving the map. Another detail to consider is that the algorithm we
+use to check for deadlocks are not usable as is. The cost map for static checks
+must be filled based on the reachability of box starting positions instead of
+goals, while the dynamic algorithm is completely irrelevant, as boxes can be
+pulled out of deadlocked states. Our implementation of bi-directional search is
+shown in Algorithm \ref{alg:bidi}.
+
+\subsubsection{Path Construction}
+Our approach involves splitting the problem into two distinct search
+problems. First, we find the actions required to move the boxes from the start
+state to the goal state using a best-first bi-directional search. Once this
+intermediate path has been found, we run a series of A* searches to find the
+path of the player between each successive box movement, which gives us the
+final path from the start to the goal. When finding the player path, we consider
+boxes as immovable objects.
+
+
 \section{Implementation}
 In our implementation, we use several objects which allow for cleaner code and
 easier access to required data. The most basic part of the implementation is the
@@ -432,26 +434,6 @@ object holds a list of dynamic points, as well as a reference to the static
 map. The static map is implemented as a singleton, so all objects created have a
 reference to that same object. This reduces memory usage, as the static part of
 the map is not duplicated for each \texttt{Board} object.
-
-As we are using bi-directional search, the search methods have been implemented
-in a way that allows their usage in both a bi-directional and a single
-directional search. This is important as we do not perform only a single search
-to find the path to the goal. To achieve this, we use a \texttt{step} method to
-perform a single step of the search. This step, in the case of A* and best-first
-search, is to expand the front of the priority queue, and add the successors to
-the open lists, performing any relevant checks. The best-first search
-implementation is shown in Algorithm \ref{alg:bestfirst}. Algorithm
-\ref{alg:bidi} shows our implementation of bi-directional search, which makes
-use of best-first search.
-
-The search methods make use of a custom \texttt{SearchNode} class, which stores
-a parent node, a \texttt{Board} representing the state of that node, and a
-\texttt{BoardAction} object, which represents the action used to generate the
-board by a point object (the location of the pushed box) and an associated
-\texttt{Action} enum, which is one of $\{up, down, left, right\}$, and indicates
-the direction of the push. The \texttt{unwind} method of the \texttt{SearchNode}
-recurses up to the start node, and reconstructs the path from there to the node
-on which the method was called.
 
 \begin{algorithm}
   \DontPrintSemicolon
@@ -477,6 +459,26 @@ on which the method was called.
 \caption{Bi-directional search}
 \label{alg:bidi}
 \end{algorithm}
+
+As we are using bi-directional search, the search methods have been implemented
+in a way that allows their usage in both a bi-directional and a single
+directional search. This is important as we do not perform only a single search
+to find the path to the goal. To achieve this, we use a \texttt{step} method to
+perform a single step of the search. This step, in the case of A* and best-first
+search, is to expand the front of the priority queue, and add the successors to
+the open lists, performing any relevant checks. The best-first search
+implementation is shown in Algorithm \ref{alg:bestfirst}. Algorithm
+\ref{alg:bidi} shows our implementation of bi-directional search, which makes
+use of best-first search.
+
+The search methods make use of a custom \texttt{SearchNode} class, which stores
+a parent node, a \texttt{Board} representing the state of that node, and a
+\texttt{BoardAction} object, which represents the action used to generate the
+board by a point object (the location of the pushed box) and an associated
+\texttt{Action} enum, which is one of $\{up, down, left, right\}$, and indicates
+the direction of the push. The \texttt{unwind} method of the \texttt{SearchNode}
+recurses up to the start node, and reconstructs the path from there to the node
+on which the method was called.
 
 
 \begin{algorithm}
@@ -536,11 +538,16 @@ searches. Average solution times for the bi-directional searches were also
 better than their single direction counterparts. The average number of nodes
 expanded per second was higher for the best-first searches, with 5370 per second
 for single direction, and 3800 for bi-directional, compared to 2700 and 2300 for
-the A* implementations. The reduction in total nodes expanded results in
-increased speed for the bi-directional searches.
+the A* implementations. We are not able to account for the significant
+difference in average nodes expanded per second by the best-first
+implementations. The reduction in total nodes expanded results in a reduction in
+the time to find a solution for the bi-directional searches. The large
+proportion of rejected nodes shows that our locked state detection is quite
+effective, but the inability of the solver to solve some maps indicates that
+improvements could be made in this area.
 
 While our solver can solve some maps very quickly, it has problems with
-others. Figure \ref{edgemap} shows some examples of various maps. Map 54 of the
+others. Figure \ref{fig:edgemap} shows some examples of various maps. Map 54 of the
 test set causes a problem due to the need to place a box in a key position very
 close to a goal, and not move it right until the end. This map is a border case
 which can be solved within 15 seconds, but not within 11. Map 66 is very easily
@@ -722,6 +729,13 @@ performance measure used during the process was the number of maps of the Kattis
 test set solved by the solver. Profiling was also used to judge the effects of
 more efficient implementations of parts of the solver.
 
+Having implemented the solver, there are several things that we would do
+differently if we were to do it again. First, we would start with a very simple
+implementation that worked, and then improve that, rather than starting with
+something which has a lot of functionality but does not actually solve
+anything. While we are satisfied with the results of our search methods,
+implementing a heuristic which better represents the actual path cost is
+something that we would pay more attention to.
 
 \printbibliography
 
