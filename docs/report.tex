@@ -378,15 +378,6 @@ on which the method was called.
 \label{alg:bidi}
 \end{algorithm}
 
-The dynamic lock algorithm we've implemented allows the detection of
-cases where boxes are locking each other. Since this algorithm is used
-for pruning search branches, it's important to avoid false positives
-that could lead to losing solution states. The basic idea is that
-every box has two degrees of freedom. If any of the boxes loses its
-two degree of freedom permanently then it's considered locked, and
-thus the state is not worth to be expanded. We consider a degree of
-freedom locked if the box is locked on one of its side, fox example
-it's vertically locked if 
 
 \begin{algorithm}
   \DontPrintSemicolon
