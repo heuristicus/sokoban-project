@@ -292,44 +292,45 @@ evaluation and cost with minimum matching.
 
 \subsubsection{Manhattan Distance}
 
-The Manhattan distance between two positions in a grid is the distance to be
-travelled to between them by using only vertical or horizontal movements.
+The Manhattan distance $d$ between two positions $a$ and $b$ in a grid is the
+number of junctions in the grid which must be crossed to reach one from the
+other by using only vertical or horizontal movements, computed by
 
-$$$ d(a,b) = |x_b - x_a | + |y_b - y_a | $$$
+\[ d(a,b) = |x_b - x_a | + |y_b - y_a | \]
 
 Our heuristic simply returns the sum of the distances to the closest goal for
-each box, using this formula.
+each box, using the above formula.
 
-\subsubsection{Static cost evaluation}
+\subsubsection{Static Cost Evaluation}
 
-At the launch of the program, when initializing the static map, we compute
-a the real cost from each goal to any reachable point of the map, by using
-flood fill. It's used to look for unreachable points (for the locked state
-detection), but also to have a better cost estimation for the heuristic.
-
-Just like the previous one, this heuristic returns the sum of the distances
-to the closest goal, but with a better approximation of these distances this
-time.
-
+At the launch of the program, when initializing the static map, we compute the
+real cost from each goal to any reachable point of the map, by using a flood
+fill. This is used to look for unreachable points (for locked state detection),
+but also to obtain a better cost estimation for the heuristic, as the boxes must
+take valid trajectories of motion and cannot ignore the presence of walls. As
+with the manhattan distance heuristic, this heuristic returns the sum of the
+distances to the closest goal, but with a better approximation of these
+distances this time.
 
 \subsubsection{Min Matching}
 
-This heuristic tries to match the goals and the boxes together before
-estimating the distance between them. 
+This heuristic tries to match each box to a goal before estimating the distance
+between them.
 
-We want to find the best assignment of boxes to goals that would minimize the
-sum of the distances between them. A good solution to this problem can be 
-obtained using the Hungarian method. But it also requires to recompute the
+We want to find an assignment of boxes to goals such that the sum of the
+distances between them is minimised. A good solution to this problem can be
+obtained using the Hungarian method. But it also requires recomputation of the
 distances from the boxes to the goals, because the boxes can block each other's
-paths, and can cause huge path modifications and even make goals unreachable.
+paths, which can necessitate path modifications and even make some goals
+unreachable.
 
 We tried a quick and dirty alternative based on the static costmap, that would
-avoid having to do heavy calculations. We just ordered the boxes and goals by 
-number of possible matches and try to make pairs in that order, returning 
-$+\infty$ when it fails.
+avoid having to do heavy calculations. We ordered the boxes and goals by number
+of possible matches and attempted to make pair them in that order, returning
+$+\infty$ if the matching failed.
 
-Early results were not convincing and the other heuristics' ones were better
-than expected, making us giving up trying further to finish this heuristic.
+Early results were not convincing and the results with the other heuristics were
+better than expected, so we abandoned further development of this heuristic.
 
 
 \subsection{Search Method}
@@ -342,11 +343,11 @@ state. The value $h(s)$ is the heuristic value of the state, and represents an
 estimate of how far the state $s$ is from the goal. The value of $g(s)$ depends
 on the path that was taken to reach this node---the longer the path, the higher
 the value. A* places states into a priority queue and expands them starting from
-nodes with a lower $f$ value; a shorter distance to the goal. This evaluation
-function means that so long as $h(s)$ is an underestimate (an \emph{admissible}
-heuristic) of the true cost to the goal state, A* is both optimal and complete,
-that is, it will always find a solution if one exists, and that solution will be
-optimal\cite{aima}.
+nodes with a lower $f$ value; the lowest estimated total cost to a
+solution. This evaluation function means that so long as $h(s)$ is an
+underestimate (an \emph{admissible} heuristic) of the true cost to the goal
+state, A* is both optimal and complete, that is, it will always find a solution
+if one exists, and that solution will be optimal\cite{aima}.
 
 In best-first search, the cost to reach the current node is not considered in
 the expansion, and so the evaluation function simplifies to $f(s)=h(s)$. This
@@ -495,12 +496,50 @@ on which the method was called.
 \end{algorithm}
 
 \section{Evaluation}
-experimental evaluation and a thorough analysis of your results. This section should include:
-How well did your agent do on the different maps?
+We evaluated our solver by running it on the 100 test maps provided. Table
+\ref{fig:passedtests} shows the number of maps successfully solved by different
+search implementations using the manhattan distance as a heuristic. Clearly,
+implementations with best-first search give the best results. Surprisingly, the
+single direction best-first search solves more maps in 5 seconds than
+bi-directional A* does in 15. This is most likely due to best-first search
+rapidly reaching the solution depth, whereas A* takes a long time to reach an
+equivalent depth due to its checking many possible paths through the
+space. Forwards A* performs badly, solving only 16 maps. Interestingly, all of
+the searches have very little change in terms of the required time to a
+solution---if the map can be solved at all by the search, then it will be solved
+very quickly. This is most likely due to the search getting stuck in certain
+situations which result in very long unfruitful paths due to insufficient
+pruning of useless states.
 
-54: a box must be placed in a key position (\texttt{x}) before putting other boxes on their goals. 66: not many box movements to do, with a limited number of possiblities at a time, can be easily bruteforced. 93: No goal-box matching is done, so the boxes are stacked around the area with 3  and we run out of time.
+Table \ref{fig:timings} shows more detailed information about each of the
+experiments. The number of nodes opened in total by the bi-directional searches
+is approximately half the number expanded by the single direction
+searches. Average solution times for the bi-directional searches were also
+better than their single direction counterparts. The average number of nodes
+expanded per second was higher for the best-first searches, with 5370 per second
+for single direction, and 3800 for bi-directional, compared to 2700 and 2300 for
+the A* implementations. The reduction in total nodes expanded results in
+increased speed for the bi-directional searches.
 
-\begin{figure}
+While our solver can solve some maps very quickly, it has problems with
+others. Figure \ref{edgemap} shows some examples of various maps. Map 54 of the
+test set causes a problem due to the need to place a box in a key position very
+close to a goal, and not move it right until the end. This map is a border case
+which can be solved within 15 seconds, but not within 11. Map 66 is very easily
+solved, as there are not many box movements to do. Each box, with the exception
+of one requires only a single movement to push it onto a goal and generate a
+valid solution. As we are using a box movement expansion, this makes the number
+of states the search must check very limited. Map 93 is not solved within 15
+seconds. This is due to a goal area in an area of the map which must be bypassed
+to solve the problem. We do not match boxes to goals, and so the boxes are
+pushed towards the intermediate goal area, and not moved out until absolutely
+necessary because they must be moved away from the goal, increasing the
+heuristic cost, to do so. The boxes on the right side of the map must also be
+moved onto the goals to allow the player to push boxes onto the goals. In
+addition, this is problematic for the reverse solver as it will attempt to
+remove the boxes on the intermediate positions even though this is unnecessary.
+
+\begin{table}
   \centering
   \begin{tabular}{lccc}
     & \multicolumn{3}{c}{Time limit}\\
@@ -518,11 +557,10 @@ How well did your agent do on the different maps?
     heuristic. Note the lack of large differences in the number of solved maps
     with different time limits.}
   \label{fig:passedtests}
-\end{figure}
+\end{table}
 
-\begin{figure}
+\begin{table}
   \centering
-  \begin{center}
     \begin{tabular}{lcccc}
       Search method              &  Avg expanded  &  Avg opened  &  Avg rejected  &  Avg time  \\
       \hline
@@ -531,15 +569,13 @@ How well did your agent do on the different maps?
       Bi-directional Best First  &          3801  &       12727  &          4136  &           1.0  \\
       Bi-directional A*          &          4591  &       16462  &          4340  &           2.0  \\
     \end{tabular}
-  \end{center}
-
   \caption{Some statistics for the search nodes, and the average solution time
-    in the tests in Figure \ref{fig:passedtests}. Expanded nodes are those nodes
+    in the tests in Table \ref{fig:passedtests}. Expanded nodes are those nodes
     whose successors have been generated. Opened nodes is the total number of
     nodes placed onto the open list. Rejected nodes are successors not added to
     the open list because they would generate locked states.}
   \label{fig:timings}
-\end{figure}
+\end{table}
 
 \begin{lrbox}{\mapff}
   \begin{minipage}{.25\textwidth}
@@ -611,7 +647,11 @@ How well did your agent do on the different maps?
   \subfloat[Over 11 second threshold]{\usebox{\mapff}}
   \subfloat[Fast solution]{\usebox{\mapss}}
   \subfloat[Unsolved]{\usebox{\mapnt}}
-  \caption{Examples of edge cases for our solver. Maps 54 (a), 66 (b) and 93 (c) from the test set. (a) is a border case, solvable within 15 seconds, but not 11. \texttt{x} indicates a critical location. (b) is solved in only 0.09 seconds. (c) is not solved even with a 15 second time limit.}
+  \caption{Examples of edge cases for our solver. Maps 54 (a), 66 (b) and 93 (c)
+    from the test set. (a) is a border case, solvable within 15 seconds, but not
+    11. \texttt{x} indicates a critical location. (b) is solved in only 0.09
+    seconds. (c) is not solved even with a 15 second time limit.}
+  \label{fig:edgemap}
 \end{figure}
 
 \section{Discussion}
@@ -619,7 +659,7 @@ During our first meeting, we discussed several ideas about how to solve the
 problem, based on brief readings of some previous work \cite{virkkala, jung}. We
 decided that in the ideal case we should attempt to implement some of the
 techniques mentioned in these papers to produce an effective solver. The first
-step we too was to create the foundations for the solver, by implementing a
+step we took was to create the foundations for the solver, by implementing a
 board representation and some search algorithms, which we knew we would need
 based on our discussions. Work was distributed by each group member choosing
 something to work on, and then working on the parts of the solver related to
