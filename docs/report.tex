@@ -433,6 +433,64 @@ How well did your agent do on the different maps?
   \caption{timing for experimental results}
   \label{fig:exptime}
 \end{figure}
+
+\begin{figure}
+  \begin{verbatim}
+  ###########
+  #  . . .  #
+  # . . . . #
+  ####### x #
+  #    $ $  #
+  #       # #
+  ###$####  #
+  #@ $   #$ #
+  ### $  $  #
+     ##     #
+      #######
+  \end{verbatim}
+  \caption{54: a box must be placed in a key position ($x$) before putting other boxes on their goals}
+\end{figure}
+\begin{figure}
+  \begin{verbatim}
+  #########
+  ##.$@ ###
+  ###.# ###
+  ###$#   #
+  #.$ #.# #
+  ##.$ $# #
+  #.$ # # #
+  ## #.$  #
+  #.$ #.###
+  ##.$ $###
+  #.$ # ###
+  ## $# ###
+  ## .# ###
+  ##    ###
+  #########
+
+  \end{verbatim}
+  \caption{66: not many box movements to do, with a limited number of possiblities at a time, can be easily bruteforced}
+\end{figure}
+\begin{figure}
+  \begin{verbatim}
+  #################  
+####    @##  #  #  
+###   $ ##      #  
+##   $ ##    ## ###
+#   $ ##    ##  # #
+#  $ ##    ##   $ #
+# $ ##    ##  # # #
+#  ##    ##  ## # #
+#       ##  ### # #
+####*  ##   ### # #
+   #**##          #
+   #######..*.#####
+         ##...#    
+          #####
+  \end{verbatim}
+  \caption{93: No goal-box matching is done, so the boxes are stacked around the area with 3 $*$ and we run out of time.}
+\end{figure}
+
 \section{Discussion}
 During our first meeting, we discussed several ideas about how to solve the
 problem, based on brief readings of some previous work \cite{virkkala, jung}. We
