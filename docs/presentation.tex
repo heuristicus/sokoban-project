@@ -1,0 +1,186 @@
+\documentclass{beamer}
+\usepackage[english]{babel}
+
+\usepackage[latin1]{inputenc}
+
+\usepackage{graphicx}
+\usepackage{cmbright}
+
+% Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
+%
+% In principle, this file can be redistributed and/or modified under
+% the terms of the GNU Public License, version 2.
+%
+% However, this file is supposed to be a template to be modified
+% for your own needs. For this reason, if you use this file as a
+% template and not specifically distribute it as part of a another
+% package/program, I grant the extra permission to freely copy and
+% modify this file as you see fit and even to delete this copyright
+% notice. 
+\mode<presentation>
+{
+  \usetheme{Amsterdam} % download from http://latex.simon04.net/beamerthemeAmsterdam.sty and put into the themes directory for beamer to use. You may need to run mktexlsr before you can compile it.
+  %\usefonttheme{serif}
+  % or ...
+
+  \setbeamercovered{transparent}
+  \beamertemplatenavigationsymbolsempty
+  % or whatever (possibly just delete it)
+}
+
+\setbeamertemplate{footline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertshortauthor % Get rid of short institute next to name
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+    \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+    \insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% show sections at the start of each section
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\makeatother
+\setbeamercovered{dynamic}
+\title[Sokoban] % (optional, use only with long paper titles)
+{Sokoban: Search in a complex domain}
+
+\author[Chazallon, Dossou-Gb{\'e}t{\'e}, Hong, Staniaszek]{Yann Chazallon,  Nicolas Dossou-Gb{\'e}t{\'e}, Tony Chan Ki Hong and Michal Staniaszek}
+
+\setcounter{tocdepth}{1}
+
+\date{\today}
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}
+
+   Problem: Sokoban
+  
+  \begin{itemize}
+  \item A puzzle game which written in 1981 by Hiroyuki Imabayashi
+  \item Control an agent to push boxes onto goal locations 
+  \item PSPACE-complete single agent search problem
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+   Why is it interesting
+
+  \begin{itemize}
+  \item It can be applied in real-life situation
+  \item High Branching factor: 4N where N = number of box
+  \item Depth of the search tree can be infinity
+  \end{itemize}
+
+\end{frame}
+
+\section{Methods}
+
+\begin{frame}
+  Map Representation
+  \begin{itemize}
+  \item Wall:  \: \#  \: \: \: \:    Player:  \:@   \: \:\: \: \:  \: \: \: \: \: \:     Player in goal:  \: +
+  \item Goal:  \: .	   \: \: \: \:     Box:  \: \$	 \:  \: \: \:  \: \: \: \: \: \: \: \:     Box in goal:  \: *
+  \item Recieve map as a txt file with symbols representing different objects
+  \item Static Objects in Static Board
+  \item Dynamic Objects + Static Objects in Board
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  Deadlock Detection
+  \begin{itemize}
+  \item Player cannot pull a box, may push box into lose state
+  \item Static Lock : push the box to the goal even without existance of other boxes
+  \item Dynamic Lock : some boxes blocking in the middle and impossible to remove the blocking box
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  Search Method
+  \begin{itemize}
+  \item A*
+  \item Best First
+  \item BFS
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  Heuristic Method
+  \begin{itemize}
+  \item first item
+  \item second item
+  \end{itemize}
+  \begin{enumerate}
+  \item list one
+  \item list two
+  \end{enumerate}
+\end{frame}
+
+\section{Implementation}
+\begin{frame}
+Object-Oriented Programming
+  \begin{itemize}
+  \item Board class - Stores the state of the board and methods to change Board State
+  \item Search class - Allow bi-directional search
+  \item SearchNode class
+  \item 
+  \end{itemize}
+\end{frame}
+
+\section{Evaluation}
+\begin{frame}
+  \begin{itemize}
+  \item first item
+  \item second item
+  \end{itemize}
+  \begin{enumerate}
+  \item list one
+  \item list two
+  \end{enumerate}
+\end{frame}
+
+\section{Discussion}
+\begin{frame}
+  \begin{itemize}
+  \item first item
+  \item second item
+  \end{itemize}
+  \begin{enumerate}
+  \item list one
+  \item list two
+  \end{enumerate}
+\end{frame}
+\end{document}
+
+
