@@ -18,7 +18,7 @@
 
 \bibliography{report}
 \defaultfontfeatures{Mapping=tex-text}
-\setromanfont[Ligatures={Common},Numbers={Lining}]{Linux Libertine}
+%\setromanfont[Ligatures={Common},Numbers={Lining}]{Linux Libertine}
 %\setmonofont{Liberation Mono}   
 
 \newsavebox{\boxone}
@@ -332,28 +332,38 @@ on which the method was called.
 \label{alg:bidi}
 \end{algorithm*}
 
+The dynamic lock algorithm we've implemented allows the detection of
+cases where boxes are locking each other. Since this algorithm is used
+for pruning search branches, it's important to avoid false positives
+that could lead to losing solution states. The basic idea is that
+every box has two degrees of freedom. If any of the boxes loses its
+two degree of freedom permanently then it's considered locked, and
+thus the state is not worth to be expanded. We consider a degree of
+freedom locked if the box is locked on one of its side, fox example
+it's vertically locked if 
 
 \begin{algorithm*}
   \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{}{end}
   \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
-  \Input{A box position $B$.}
-  \Output{A boolean representing whether or not the box at point $B$ is locked.}
+  \Input{box position $B$.}
+  \Output{boolean representing whether or not the box at point $B$ is locked.}
   \If{B is on goal}{
     \Return false
   }
-  closed $\longleftarrow \emptyset$
-  \return isMovable($B$, $closed$)
+  closed $\longleftarrow \{\emptyset\}$\;
+  \Return isMovable($B$, $closed$)
 
   \Fn{isMovable(Point $P$, Set $closed$)}{
-    \If{$P =$ WALL}
+    \uIf{$P =$ WALL}{
       \Return false
-    \ElseIf{$P =$ BOX}{
-      \If{$P \in closed$}{
+      }
+    \uElseIf{$P =$ BOX}{
+      \uIf{$P \in closed$}{
 	closed.add(P)\;
 	\Return false
       }\Else{
-      \Return ((isMovable(P.left, closed) \and (isMovable(P.right, closed)) \or ((isMovable(P.up, closed) \and (isMovable(P.down, closed))
+      \Return ((isMovable(P.left, closed) $\land$ (isMovable(P.right, closed)) $\lor$ \\((isMovable(P.up, closed) $\land$ (isMovable(P.down, closed))
       }
     }\Else{
        \Return true
