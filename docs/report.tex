@@ -253,6 +253,51 @@ detect. We only considered the most basic ones
 
 \subsection{Heuristics}
 
+We tried a few different heuristics: simple manhattan distance, static cost
+evaluation and cost with minimum matching.
+
+\subsubsection{Manhattan Distance}
+
+The Manhattan distance between two positions in a grid is the distance to be
+travelled to between them by using only vertical or horizontal movements.
+
+$$$ d(a,b) = |x_b - x_a | + |y_b - y_a | $$$
+
+Our heuristic simply returns the sum of the distances to the closest goal for
+each box, using this formula.
+
+\subsubsection{Static cost evaluation}
+
+At the launch of the program, when initializing the static map, we compute
+a the real cost from each goal to any reachable point of the map, by using
+flood fill. It's used to look for unreachable points (for the locked state
+detection), but also to have a better cost estimation for the heuristic.
+
+Just like the previous one, this heuristic returns the sum of the distances
+to the closest goal, but with a better approximation of these distances this
+time.
+
+
+\subsubsection{Min Matching}
+
+This heuristic tries to match the goals and the boxes together before
+estimating the distance between them. 
+
+We want to find the best assignment of boxes to goals that would minimize the
+sum of the distances between them. A good solution to this problem can be 
+obtained using the Hungarian method. But it also requires to recompute the
+distances from the boxes to the goals, because the boxes can block each other's
+paths, and can cause huge path modifications and even make goals unreachable.
+
+We tried a quick and dirty alternative based on the static costmap, that would
+avoid having to do heavy calculations. We just ordered the boxes and goals by 
+number of possible matches and try to make pairs in that order, returning 
+$+\infty$ when it fails.
+
+Early results were not convincing and the other heuristics' ones were better
+than expected, making us giving up trying further to finish this heuristic.
+
+
 \subsection{Search Method}
 The search methods form the core of the solver. Using them, we find a path
 between a starting board state and the goal state, where all boxes are on
