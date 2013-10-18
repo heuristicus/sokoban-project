@@ -79,6 +79,64 @@
 \section{Introduction}
 
 \begin{frame}
+
+   Problem: Sokoban
+  
+  \begin{itemize}
+  \item A puzzle game which written in 1981 by Hiroyuki Imabayashi
+  \item Control an agent to push boxes onto goal locations 
+  \item PSPACE-complete single agent search problem
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+   Why is it interesting
+
+  \begin{itemize}
+  \item It can be applied in real-life situation
+  \item High Branching factor: 4N where N = number of box
+  \item Depth of the search tree can be infinity
+  \end{itemize}
+
+\end{frame}
+
+\section{Methods}
+
+\begin{frame}
+  Map Representation
+  \begin{itemize}
+  \item Wall:  \: \#  \: \: \: \:    Player:  \:@   \: \:\: \: \:  \: \: \: \: \: \:     Player in goal:  \: +
+  \item Goal:  \: .	   \: \: \: \:     Box:  \: \$	 \:  \: \: \:  \: \: \: \: \: \: \: \:     Box in goal:  \: *
+  \item Recieve map as a txt file with symbols representing different objects
+  \item Static Objects in Static Board
+  \item Dynamic Objects + Static Objects in Board
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  Deadlock Detection
+  \begin{itemize}
+  \item Player cannot pull a box, may push box into lose state
+  \item Static Lock : push the box to the goal even without existance of other boxes
+  \item Dynamic Lock : some boxes blocking in the middle and impossible to remove the blocking box
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  Search Method
+  \begin{itemize}
+  \item A*
+  \item Best First
+  \item BFS
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  Heuristic Method
   \begin{itemize}
   \item first item
   \item second item
@@ -89,28 +147,17 @@
   \end{enumerate}
 \end{frame}
 
-\section{Methods}
-\begin{frame}
-  \begin{itemize}
-  \item first item
-  \item second item
-  \end{itemize}
-  \begin{enumerate}
-  \item list one
-  \item list two
-  \end{enumerate}
-\end{frame}
 \section{Implementation}
 \begin{frame}
+Object-Oriented Programming
   \begin{itemize}
-  \item first item
-  \item second item
+  \item Board class - Stores the state of the board and methods to change Board State
+  \item Search class - Allow bi-directional search
+  \item SearchNode class
+  \item 
   \end{itemize}
-  \begin{enumerate}
-  \item list one
-  \item list two
-  \end{enumerate}
 \end{frame}
+
 \section{Evaluation}
 \begin{frame}
   \begin{itemize}
@@ -122,6 +169,7 @@
   \item list two
   \end{enumerate}
 \end{frame}
+
 \section{Discussion}
 \begin{frame}
   \begin{itemize}
