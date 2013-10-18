@@ -178,10 +178,49 @@ deadlocks. A heuristic is required to drive the search towards the goal.
 
 \subsection{Map Representation}
 
-According to the requirement, the map is recieved as a txt file with symbols
-representing different objects. They can be separated as two type of objects:
-Dynamic and Static. We have created two class "Board" and "Static Board" to
-store the objects respectively.
+To be able to solve a \emph{Sokoban} map, it is necessary to have a map
+representation which can be manipulated and used to gain information about the
+state of the board. The representation of the state is required by any search
+method in order to be able to generate successor states and find a path to the
+goal state. Our map representation uses a two-level model, where dynamic objects
+(boxes and the player) are separated from the static part of the map, that is,
+the goals, empty space, and walls. By separating these two parts of the map, we
+are able to reduce the storage space required for each board, as the static map
+is represented only once. When move validity must be checked, the dynamic
+objects are ``collapsed'' onto the static map.
+
+The static map also stores a costmap which relates each position on the board to
+a set of costs to reach each goal. The costmap is calculated by doing a flood
+fill which attempts to pull a single box from each goal to all points on the
+map, with no other boxes present. This gives an optimistic estimate of the
+number of steps required to move a box from any position on the map to any goal
+when the map is populated with boxes, as in practice the path of the box may be
+obstructed by other boxes.
+
+Functionality for checking board equality is also required to be able to perform
+search, as it is necessary to check whether states have been visited previously
+in order to prevent unnecessary re-evaluation of states. Our map representation
+has different types of equality based on the state expansion procedure being
+used.
+
+The state expansion defines how successors of a given state are generated. The
+player space expansion is based on the motion of the player alone; the player
+can move up, down, left or right, and so the maximum number of successors is
+4. In this expansion, exact equality is used---the position of all dynamic
+objects on the board is checked, and the player and all boxes must be in exactly
+the same locations for the boards to be equal.
+
+The board space expansion is based on the motion of all boxes in the state. With
+this expansion, the maximum number of successors is $4M$, where $M$ is the
+number of boxes which can be reached by the player, as each box could be pushed
+in one of four possible directions. To determine the successor states of this
+state, it is first necessary to find all the positions which are accessible by
+the player. This is done by starting a flood fill from the current player
+position and finding points at which a box can be accessed. With this expansion,
+the board equality no longer checks the exact location of the player. Instead,
+the top leftmost position accessible by the player is used to represent the
+player. This means that states in which the player has the same accessible area,
+and where boxes are in the same positions are considered equal.
 
 \subsection{Deadlock Detection}
 The exists of Deadlock makes Sokoban even more hard to solve. As Player cannot
@@ -206,9 +245,9 @@ goal. However, there are some boxes blocking in the middle and it is impossible
 to remove that blocking box.
 
 \subsection{Search Method}
-Two-stage search
 
 \subsection{Heuristics}
+
 \section{Implementation}
 In our implementation, we use several objects which allow for cleaner code and
 easier access to required data. The most basic part of the implementation is the
