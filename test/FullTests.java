@@ -30,7 +30,7 @@ public class FullTests {
 		final boolean abortOnException = false; 
 //		final List<Integer> exceptList = Arrays.asList(12, 14); // Maps to ignore 
         // How long to run search before timing out
-        int timeOutSeconds = 5;
+        int timeOutSeconds = 15;
         ProfilingUtil.useProfiling = true;
 
         System.out.println("Time limit: " + timeOutSeconds);
@@ -51,11 +51,12 @@ public class FullTests {
 			try {
 				long startTime = System.nanoTime();
                 ProfilingUtil.timeOut = startTime + TimeUnit.SECONDS.toNanos(timeOutSeconds);
-				moves = Main.solveBoardBidirectional(start);	
+				moves = Main.solveBoard(start);	
+//				moves = Main.solveBoardBidirectional(start);	
 				long endTime = System.nanoTime();
                 if (moves != null){
                 	duration = endTime - startTime;
-                    times.put(i + startMap, String.format("%.2g",(duration / 10e9)));
+                    times.put(i + startMap, String.format("%.2g",(duration / 1e9)));
                 } else {
                     times.put(i + startMap, ">" + timeOutSeconds);
                 }
@@ -102,7 +103,7 @@ public class FullTests {
 		 System.out.println("Avg Discarded nodes: " + discardedSum / passed + "\n"
                  + "Avg Opened nodes: " + openedSum / passed + "\n"
                  + "Avg Expanded nodes: " + expandedSum / passed + "\n"
-		 		 + "Avg Duration (non-timeout): " + String.format("%.2g",((durationSum / passed) / 10e9)));
+		 		 + "Avg Duration (non-timeout): " + String.format("%.2g",((durationSum / passed) / 1e9)));
 		
 		Boolean[] expected = new Boolean[nbTests];
 		Arrays.fill(expected, true);

@@ -43,7 +43,7 @@ public class BestFirst extends MemoSearchMethod {
         this.startPoints = multipleStarts;
         this.goal = goal;
         this.boardSpace = boardSpace;
-        
+        this.goalState = new SearchNode(goal, null, null, 0, 0, boardSpace);
         init();
     }
     

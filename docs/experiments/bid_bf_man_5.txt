@@ -1,0 +1,537 @@
+Time limit: 5
+=== Board 0 ==========
+Discarded nodes: 2604
+Opened nodes: 10730
+Expanded nodes: 2169
+Time: 0.16
+=== Board 1 ==========
+Discarded nodes: 2423
+Opened nodes: 7779
+Expanded nodes: 2735
+Time: 0.032
+=== Board 2 ==========
+Discarded nodes: 612
+Opened nodes: 2464
+Expanded nodes: 765
+Time: 0.018
+=== Board 3 ==========
+Discarded nodes: 574
+Opened nodes: 1763
+Expanded nodes: 668
+Time: 0.0058
+=== Board 4 ==========
+Discarded nodes: 6095
+Opened nodes: 26484
+Expanded nodes: 7646
+Time: 0.18
+=== Board 5 ==========
+Discarded nodes: 242
+Opened nodes: 5654
+Expanded nodes: 822
+Time: 0.033
+=== Board 6 ==========
+Discarded nodes: 21480
+Opened nodes: 75895
+Expanded nodes: 30596
+Time: >5
+=== Board 7 ==========
+Discarded nodes: 342
+Opened nodes: 2679
+Expanded nodes: 772
+Time: 0.0055
+=== Board 8 ==========
+Discarded nodes: 1335
+Opened nodes: 4101
+Expanded nodes: 1320
+Time: 0.0086
+=== Board 9 ==========
+Discarded nodes: 7203
+Opened nodes: 18255
+Expanded nodes: 4920
+Time: 0.063
+=== Board 10 ==========
+Discarded nodes: 17197
+Opened nodes: 33436
+Expanded nodes: 10042
+Time: >5
+=== Board 11 ==========
+Discarded nodes: 8775
+Opened nodes: 28032
+Expanded nodes: 7552
+Time: 0.16
+=== Board 12 ==========
+Discarded nodes: 6
+Opened nodes: 199
+Expanded nodes: 77
+Time: 0.0011
+=== Board 13 ==========
+Discarded nodes: 271
+Opened nodes: 2220
+Expanded nodes: 520
+Time: 0.013
+=== Board 14 ==========
+Discarded nodes: 8752
+Opened nodes: 26032
+Expanded nodes: 7121
+Time: >5
+=== Board 15 ==========
+Discarded nodes: 1709
+Opened nodes: 9417
+Expanded nodes: 2756
+Time: 0.043
+=== Board 16 ==========
+Discarded nodes: 1585
+Opened nodes: 14226
+Expanded nodes: 3738
+Time: 0.069
+=== Board 17 ==========
+Discarded nodes: 1735
+Opened nodes: 8653
+Expanded nodes: 1946
+Time: 0.046
+=== Board 18 ==========
+Discarded nodes: 8917
+Opened nodes: 18362
+Expanded nodes: 6385
+Time: 0.066
+=== Board 19 ==========
+Discarded nodes: 5525
+Opened nodes: 11826
+Expanded nodes: 2389
+Time: 0.084
+=== Board 20 ==========
+Discarded nodes: 690
+Opened nodes: 2402
+Expanded nodes: 689
+Time: 0.0088
+=== Board 21 ==========
+Discarded nodes: 577
+Opened nodes: 1546
+Expanded nodes: 459
+Time: 0.0043
+=== Board 22 ==========
+Discarded nodes: 11528
+Opened nodes: 35819
+Expanded nodes: 11352
+Time: >5
+=== Board 23 ==========
+Discarded nodes: 388
+Opened nodes: 872
+Expanded nodes: 345
+Time: 0.0012
+=== Board 24 ==========
+Discarded nodes: 3301
+Opened nodes: 11908
+Expanded nodes: 3983
+Time: 0.067
+=== Board 25 ==========
+Discarded nodes: 235
+Opened nodes: 1161
+Expanded nodes: 290
+Time: 0.0022
+=== Board 26 ==========
+Discarded nodes: 16780
+Opened nodes: 82313
+Expanded nodes: 27924
+Time: >5
+=== Board 27 ==========
+Discarded nodes: 675
+Opened nodes: 5850
+Expanded nodes: 1531
+Time: 0.029
+=== Board 28 ==========
+Discarded nodes: 5045
+Opened nodes: 22460
+Expanded nodes: 3916
+Time: 0.18
+=== Board 29 ==========
+Discarded nodes: 3320
+Opened nodes: 11693
+Expanded nodes: 2828
+Time: 0.052
+=== Board 30 ==========
+Discarded nodes: 2950
+Opened nodes: 25192
+Expanded nodes: 11157
+Time: 0.060
+=== Board 31 ==========
+Discarded nodes: 4528
+Opened nodes: 16367
+Expanded nodes: 4685
+Time: 0.063
+=== Board 32 ==========
+Discarded nodes: 241
+Opened nodes: 1052
+Expanded nodes: 324
+Time: 0.0022
+=== Board 33 ==========
+Discarded nodes: 215
+Opened nodes: 1695
+Expanded nodes: 563
+Time: 0.0057
+=== Board 34 ==========
+Discarded nodes: 225
+Opened nodes: 1630
+Expanded nodes: 474
+Time: 0.0070
+=== Board 35 ==========
+Discarded nodes: 683
+Opened nodes: 4772
+Expanded nodes: 1374
+Time: 0.015
+=== Board 36 ==========
+Discarded nodes: 17894
+Opened nodes: 33413
+Expanded nodes: 9999
+Time: 0.15
+=== Board 37 ==========
+Discarded nodes: 8
+Opened nodes: 506
+Expanded nodes: 127
+Time: 0.0010
+=== Board 38 ==========
+Discarded nodes: 8818
+Opened nodes: 30711
+Expanded nodes: 9559
+Time: 0.19
+=== Board 39 ==========
+Discarded nodes: 17456
+Opened nodes: 46277
+Expanded nodes: 10021
+Time: >5
+=== Board 40 ==========
+Discarded nodes: 6891
+Opened nodes: 26597
+Expanded nodes: 6426
+Time: >5
+=== Board 41 ==========
+Discarded nodes: 3230
+Opened nodes: 7088
+Expanded nodes: 2415
+Time: 0.023
+=== Board 42 ==========
+Discarded nodes: 77
+Opened nodes: 1290
+Expanded nodes: 377
+Time: 0.0059
+=== Board 43 ==========
+Discarded nodes: 648
+Opened nodes: 2820
+Expanded nodes: 774
+Time: 0.0063
+=== Board 44 ==========
+Discarded nodes: 2960
+Opened nodes: 26319
+Expanded nodes: 4980
+Time: 0.41
+=== Board 45 ==========
+Discarded nodes: 427
+Opened nodes: 1561
+Expanded nodes: 601
+Time: 0.0031
+=== Board 46 ==========
+Discarded nodes: 2490
+Opened nodes: 10661
+Expanded nodes: 3439
+Time: 0.034
+=== Board 47 ==========
+Discarded nodes: 238
+Opened nodes: 2373
+Expanded nodes: 471
+Time: 0.0079
+=== Board 48 ==========
+Discarded nodes: 3611
+Opened nodes: 9891
+Expanded nodes: 4112
+Time: 0.034
+=== Board 49 ==========
+Discarded nodes: 5119
+Opened nodes: 13872
+Expanded nodes: 3392
+Time: 0.056
+=== Board 50 ==========
+Discarded nodes: 15508
+Opened nodes: 38747
+Expanded nodes: 8798
+Time: >5
+=== Board 51 ==========
+Discarded nodes: 3070
+Opened nodes: 6993
+Expanded nodes: 1559
+Time: 0.030
+=== Board 52 ==========
+Discarded nodes: 6919
+Opened nodes: 17883
+Expanded nodes: 6134
+Time: 0.037
+=== Board 53 ==========
+Discarded nodes: 1313
+Opened nodes: 4139
+Expanded nodes: 1117
+Time: 0.011
+=== Board 54 ==========
+Discarded nodes: 14184
+Opened nodes: 39205
+Expanded nodes: 8219
+Time: >5
+=== Board 55 ==========
+Discarded nodes: 17697
+Opened nodes: 59770
+Expanded nodes: 9639
+Time: >5
+=== Board 56 ==========
+Discarded nodes: 306
+Opened nodes: 1250
+Expanded nodes: 449
+Time: 0.0019
+=== Board 57 ==========
+Discarded nodes: 27088
+Opened nodes: 63814
+Expanded nodes: 14826
+Time: >5
+=== Board 58 ==========
+Discarded nodes: 34129
+Opened nodes: 71420
+Expanded nodes: 28014
+Time: >5
+=== Board 59 ==========
+Discarded nodes: 49
+Opened nodes: 571
+Expanded nodes: 165
+Time: 0.0015
+=== Board 60 ==========
+Discarded nodes: 144
+Opened nodes: 2371
+Expanded nodes: 456
+Time: 0.0091
+=== Board 61 ==========
+Discarded nodes: 358
+Opened nodes: 3198
+Expanded nodes: 999
+Time: 0.0051
+=== Board 62 ==========
+Discarded nodes: 135
+Opened nodes: 879
+Expanded nodes: 212
+Time: 0.0019
+=== Board 63 ==========
+Discarded nodes: 8188
+Opened nodes: 36863
+Expanded nodes: 9620
+Time: >5
+=== Board 64 ==========
+Discarded nodes: 13468
+Opened nodes: 31101
+Expanded nodes: 5250
+Time: >5
+=== Board 65 ==========
+Discarded nodes: 458
+Opened nodes: 2260
+Expanded nodes: 863
+Time: 0.0039
+=== Board 66 ==========
+Discarded nodes: 70
+Opened nodes: 459
+Expanded nodes: 134
+Time: 0.00088
+=== Board 67 ==========
+Discarded nodes: 3062
+Opened nodes: 9986
+Expanded nodes: 2277
+Time: 0.051
+Exception on map 68
+java.lang.NullPointerException
+	at utilities.BoardAction.convertToActionList(BoardAction.java:21)
+	at board.Board.generateFullActionList(Board.java:1168)
+	at Main.solveBoardBidirectional(Main.java:107)
+	at FullTests.test100Maps(FullTests.java:54)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:47)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:44)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:271)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:70)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:50)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:238)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:63)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:236)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:53)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:229)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:309)
+	at org.eclipse.jdt.internal.junit4.runner.JUnit4TestReference.run(JUnit4TestReference.java:50)
+	at org.eclipse.jdt.internal.junit.runner.TestExecution.run(TestExecution.java:38)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:467)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:683)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.run(RemoteTestRunner.java:390)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.main(RemoteTestRunner.java:197)
+=== Board 68 ==========
+Discarded nodes: 7497
+Opened nodes: 33608
+Expanded nodes: 4107
+Time: null
+=== Board 69 ==========
+Discarded nodes: 6716
+Opened nodes: 18926
+Expanded nodes: 6852
+Time: 0.085
+=== Board 70 ==========
+Discarded nodes: 4660
+Opened nodes: 8161
+Expanded nodes: 2069
+Time: 0.034
+=== Board 71 ==========
+Discarded nodes: 16872
+Opened nodes: 43526
+Expanded nodes: 16262
+Time: >5
+=== Board 72 ==========
+Discarded nodes: 33292
+Opened nodes: 71678
+Expanded nodes: 20559
+Time: >5
+=== Board 73 ==========
+Discarded nodes: 42
+Opened nodes: 368
+Expanded nodes: 97
+Time: 0.00064
+=== Board 74 ==========
+Discarded nodes: 377
+Opened nodes: 801
+Expanded nodes: 312
+Time: 0.0028
+=== Board 75 ==========
+Discarded nodes: 16165
+Opened nodes: 58241
+Expanded nodes: 18459
+Time: >5
+=== Board 76 ==========
+Discarded nodes: 4283
+Opened nodes: 15609
+Expanded nodes: 4445
+Time: 0.041
+=== Board 77 ==========
+Discarded nodes: 6978
+Opened nodes: 28361
+Expanded nodes: 5797
+Time: >5
+=== Board 78 ==========
+Discarded nodes: 242
+Opened nodes: 2364
+Expanded nodes: 455
+Time: 0.0085
+=== Board 79 ==========
+Discarded nodes: 88
+Opened nodes: 476
+Expanded nodes: 111
+Time: 0.0013
+=== Board 80 ==========
+Discarded nodes: 7930
+Opened nodes: 17983
+Expanded nodes: 5743
+Time: 0.13
+=== Board 81 ==========
+Discarded nodes: 1738
+Opened nodes: 9296
+Expanded nodes: 2322
+Time: 0.057
+=== Board 82 ==========
+Discarded nodes: 6906
+Opened nodes: 14940
+Expanded nodes: 2928
+Time: 0.088
+=== Board 83 ==========
+Discarded nodes: 58
+Opened nodes: 1159
+Expanded nodes: 235
+Time: 0.0025
+=== Board 84 ==========
+Discarded nodes: 28
+Opened nodes: 1072
+Expanded nodes: 167
+Time: 0.0028
+=== Board 85 ==========
+Discarded nodes: 193
+Opened nodes: 3072
+Expanded nodes: 680
+Time: 0.0080
+=== Board 86 ==========
+Discarded nodes: 19999
+Opened nodes: 40420
+Expanded nodes: 18043
+Time: 0.30
+=== Board 87 ==========
+Discarded nodes: 15804
+Opened nodes: 51166
+Expanded nodes: 14566
+Time: >5
+=== Board 88 ==========
+Discarded nodes: 13543
+Opened nodes: 43252
+Expanded nodes: 7539
+Time: >5
+=== Board 89 ==========
+Discarded nodes: 24
+Opened nodes: 1455
+Expanded nodes: 276
+Time: 0.0064
+=== Board 90 ==========
+Discarded nodes: 6289
+Opened nodes: 13272
+Expanded nodes: 3089
+Time: 0.094
+=== Board 91 ==========
+Discarded nodes: 8386
+Opened nodes: 20717
+Expanded nodes: 3936
+Time: 0.38
+=== Board 92 ==========
+Discarded nodes: 51
+Opened nodes: 761
+Expanded nodes: 174
+Time: 0.0014
+=== Board 93 ==========
+Discarded nodes: 4627
+Opened nodes: 26788
+Expanded nodes: 4572
+Time: >5
+=== Board 94 ==========
+Discarded nodes: 456
+Opened nodes: 2015
+Expanded nodes: 640
+Time: 0.0031
+=== Board 95 ==========
+Discarded nodes: 3409
+Opened nodes: 28366
+Expanded nodes: 2891
+Time: >5
+=== Board 96 ==========
+Discarded nodes: 19894
+Opened nodes: 54102
+Expanded nodes: 15267
+Time: >5
+=== Board 97 ==========
+Discarded nodes: 401
+Opened nodes: 1290
+Expanded nodes: 539
+Time: 0.0020
+=== Board 98 ==========
+Discarded nodes: 1586
+Opened nodes: 5008
+Expanded nodes: 1705
+Time: 0.0076
+=== Board 99 ==========
+Discarded nodes: 436
+Opened nodes: 1658
+Expanded nodes: 309
+Time: 0.0049
+Passed maps: 76
+Failed maps: 24
+{0=0.16, 1=0.032, 2=0.018, 3=0.0058, 4=0.18, 5=0.033, 6=>5, 7=0.0055, 8=0.0086, 9=0.063, 10=>5, 11=0.16, 12=0.0011, 13=0.013, 14=>5, 15=0.043, 16=0.069, 17=0.046, 18=0.066, 19=0.084, 20=0.0088, 21=0.0043, 22=>5, 23=0.0012, 24=0.067, 25=0.0022, 26=>5, 27=0.029, 28=0.18, 29=0.052, 30=0.060, 31=0.063, 32=0.0022, 33=0.0057, 34=0.0070, 35=0.015, 36=0.15, 37=0.0010, 38=0.19, 39=>5, 40=>5, 41=0.023, 42=0.0059, 43=0.0063, 44=0.41, 45=0.0031, 46=0.034, 47=0.0079, 48=0.034, 49=0.056, 50=>5, 51=0.030, 52=0.037, 53=0.011, 54=>5, 55=>5, 56=0.0019, 57=>5, 58=>5, 59=0.0015, 60=0.0091, 61=0.0051, 62=0.0019, 63=>5, 64=>5, 65=0.0039, 66=0.00088, 67=0.051, 69=0.085, 70=0.034, 71=>5, 72=>5, 73=0.00064, 74=0.0028, 75=>5, 76=0.041, 77=>5, 78=0.0085, 79=0.0013, 80=0.13, 81=0.057, 82=0.088, 83=0.0025, 84=0.0028, 85=0.0080, 86=0.30, 87=>5, 88=>5, 89=0.0064, 90=0.094, 91=0.38, 92=0.0014, 93=>5, 94=0.0031, 95=>5, 96=>5, 97=0.0020, 98=0.0076, 99=0.0049}
+Avg Discarded nodes: 2701
+Avg Opened nodes: 8588
+Avg Expanded nodes: 2493
+Avg Duration (non-timeout): 0.050

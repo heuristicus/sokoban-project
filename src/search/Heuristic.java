@@ -92,30 +92,41 @@ public interface Heuristic<T> {
     	
     }
     
+    /**
+     * Returns the sum of the distances from each box to the closest target (goal or initial box position,
+     * depending on the heuristic initialization */
     public static class RealClosestHeuristic implements Heuristic<Board>
     {
-        @Override
-    	/** Returns an optimistic estimation of the coast to go from state start to state goal.
-    	 * 	
-    	 */
+    	private final Map<Point, Map<Point, Integer>> costMap;
+    	
+        public RealClosestHeuristic(boolean forwardMode) {
+        	if (forwardMode) {
+        		costMap = StaticBoard.getInstance().pointToGoalCost;
+        	} else {
+        		costMap = StaticBoard.getInstance().pointToBoxCost;
+        	}
+		}
+
+		@Override
+    	/** Returns an optimistic estimation of the cost to go from state start to state goal. */
     	public float utility(Board begin, Board end)
     	{		
             Map<Point, Symbol> start = begin.getDynamicObjects();
     		float estimation = 0;
     		for (Point startPt : start.keySet())
     		{
-    			if (!startPt.equals(begin.getPlayerPosition()))
-    			{
-    				float bestDistance = Float.POSITIVE_INFINITY;
-    				if(StaticBoard.getInstance().pointToGoalCost.get(startPt) != null)
-    				{
-	    				for (Integer dist : StaticBoard.getInstance().pointToGoalCost.get(startPt).values())
-	    				{	
-							bestDistance = Math.min(bestDistance, dist);
-	    				}
-    				}
-    				estimation += bestDistance;
-    			}	
+    			if (startPt.equals(begin.getPlayerPosition())) continue; // only boxes are considered
+    			if(costMap.get(startPt) != null || costMap.get(startPt).isEmpty()) 
+    				return Float.POSITIVE_INFINITY; // unreachable
+	
+    			// Get the min distance from the current point to any of the goals
+    			float bestDistance = Float.POSITIVE_INFINITY;
+				for (Integer dist : costMap.get(startPt).values())
+				{	
+					bestDistance = Math.min(bestDistance, dist);
+				}
+				
+				estimation += bestDistance;
     		}
     		return estimation;
     	}
