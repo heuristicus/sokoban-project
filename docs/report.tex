@@ -331,6 +331,38 @@ on which the method was called.
 \caption{Bi-directional search}
 \label{alg:bidi}
 \end{algorithm*}
+
+
+\begin{algorithm*}
+  \DontPrintSemicolon
+  \SetKwProg{Fn}{Function}{}{end}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \Input{A box position $B$.}
+  \Output{A boolean representing whether or not the box at point $B$ is locked.}
+  \If{B is on goal}{
+    \Return false
+  }
+  closed $\longleftarrow \emptyset$
+  \return isMovable($B$, $closed$)
+
+  \Fn{isMovable(Point $P$, Set $closed$)}{
+    \If{$P =$ WALL}
+      \Return false
+    \ElseIf{$P =$ BOX}{
+      \If{$P \in closed$}{
+	closed.add(P)\;
+	\Return false
+      }\Else{
+      \Return ((isMovable(P.left, closed) \and (isMovable(P.right, closed)) \or ((isMovable(P.up, closed) \and (isMovable(P.down, closed))
+      }
+    }\Else{
+       \Return true
+    }
+  }
+\caption{Single box dynamic lock detection}
+\label{alg:singledynamiclock}
+\end{algorithm*}
+
 \section{Evaluation}
 experimental evaluation and a thorough analysis of your results. This section should include:
 How well did your agent do on the different maps?
