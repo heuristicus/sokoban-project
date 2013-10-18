@@ -168,13 +168,13 @@ impact on the number of states expanded.
 
 \section{Method}
 
-In order to implement a solver, several parts are required. There must be
-functionality which can read string-based map representations into a manipulable
-object. It must be possible to move boxes and the player on this map
-representation. A search method which, given a start and goal state, must be
-able to find a path between the states, or indicate that a path does not
-exist. In addition, the solver must be able to deal with both static and dynamic
-deadlocks. A heuristic is required to drive the search towards the goal.
+The solver should be able to read string-based map representations into a
+manipulable object. It must be possible to move boxes and the player on this map
+representation. In addition, the solver must be able to deal with both static
+and dynamic deadlocks. A heuristic is required to drive the search towards the
+goal. Finally, a search method is required, which, given a start and goal state,
+must be able to find a path between the states, or indicate that a path does not
+exist.
 
 \subsection{Map Representation}
 
@@ -221,6 +221,8 @@ the board equality no longer checks the exact location of the player. Instead,
 the top leftmost position accessible by the player is used to represent the
 player. This means that states in which the player has the same accessible area,
 and where boxes are in the same positions are considered equal.
+
+hashing!
 
 \subsection{Deadlock Detection}
 The exists of Deadlock makes Sokoban even more hard to solve. As Player cannot
@@ -350,8 +352,6 @@ board by a point object (the location of the pushed box) and an associated
 the direction of the push. The \texttt{unwind} method of the \texttt{SearchNode}
 recurses up to the start node, and reconstructs the path from there to the node
 on which the method was called.
-
-
 
 \begin{algorithm}
   \DontPrintSemicolon
