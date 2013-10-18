@@ -1,4 +1,4 @@
-% Created 2013-07-29 Mon 20:04
+%Created 2013-07-29 Mon 20:04
 \documentclass[a4paper,11pt]{article}
 \listfiles
 \usepackage[T1]{fontenc}
@@ -67,7 +67,7 @@
 \end{figure}
 
 \section{Introduction}
-\emph{Sokoban} is a puzzle game which written in 1981 by Hiroyuki
+\emph{Sokoban} is a puzzle game which was written in 1981 by Hiroyuki
 Imabayashi. First published in 1982, it is now a very popular game, with many
 clones available on the internet. The player controls a warehouse keeper (for
 which \emph{sokoban} is the Japanese word), whose job it is to push boxes onto
@@ -285,7 +285,8 @@ for the recursion to work for nearby boxes.
 
 One last thing to keep in mind is that this algorithm is not suitable for
 backwards expansion, as it is highly reliant on the dynamic aspects and
-constraints of \emph{pushing} boxes.
+constraints of \emph{pushing} boxes. The implementation is given in Algorithm
+\ref{alg:dynamiclocks}.
 
 
 \subsection{Heuristics}
@@ -358,17 +359,28 @@ optimal solution, and speed is of the essence in this problem, best-first search
 is more appropriate than A*. Our implementation is shown in Algorithm
 \ref{alg:bestfirst}.
 
-To further improve the speed of the search, we implemented a bi-directional
-search. While both A* and best-first search have a complexity of
-$\mathcal{O}(b^d)$, running two searches, one from the start state to the goal,
-and one from the goal state to the start, reduces this to $\mathcal{O}(b^{d/2})$
-\cite{aima}, where $b$ is the branching factor, and $d$ is the solution
-depth. The search terminates when the frontiers of the two searches meet. This
-can be understood intuitively by considering a circle centred on the front node,
-with a radius $d$, with the goal node on the edge of the circle. The area inside
-this circle is very large compared to two smaller circles centred on the start
-and the goal meeting in the middle. Our implementation of bi-directional search
-is shown in Algorithm \ref{alg:bidi}.
+To further improve the speed of the search, we implemented a
+bi-directional search. While both A* and best-first search have a
+complexity of $\mathcal{O}(b^d)$, running two searches, one from the
+start state to the goal, and one from the goal state to the start,
+reduces this to $\mathcal{O}(b^{d/2})$ \cite{aima}, where $b$ is the
+branching factor, and $d$ is the solution depth. The search terminates
+when the frontiers of the two searches meet. This can be understood
+intuitively by considering a circle centred on the front node, with a
+radius $d$, with the goal node on the edge of the circle. The area
+inside this circle is very large compared to two smaller circles
+centred on the start and the goal meeting in the middle. 
+
+One could think that searching backwards consists only of inverting start and
+goal states, and using a different expansion method that pulls boxes instead of
+pushing them. In actual fact, when using backwards search we need to consider
+\emph{multiple} start states, as we do not know what area the player should be
+in after solving the map. Another detail to consider is that the algorithm we
+use to check for deadlocks are not usable as is. The cost map for static checks
+must be filled based on the reachability of box starting positions instead of
+goals, while the dynamic algorithm is completely irrelevant, as boxes can be
+pulled out of deadlocked states. Our implementation of bi-directional search is
+shown in Algorithm \ref{alg:bidi}.
 
 Our approach involves splitting the problem into two distinct search
 problems. First, we find the actions required to move the boxes from the start
@@ -378,7 +390,6 @@ path of the player between each successive box movement, which gives us the
 final path from the start to the goal. When finding the player path, we consider
 boxes as immovable objects.
 
-One could think that ab
 
 \begin{algorithm}
   \DontPrintSemicolon
@@ -471,29 +482,32 @@ on which the method was called.
   \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
   \Input{box position $B$.}
   \Output{boolean representing whether or not the box at point $B$ is locked.}
+  
+  \Fn{isLocked(Point $B$)}{
   \If{B is on goal}{
     \Return false
   }
   closed $\longleftarrow \{\emptyset\}$\;
-  \Return isMovable($B$, $closed$)
-
+  \Return $\lnot$ isMovable($B$, $closed$)
+  }
+  
   \Fn{isMovable(Point $P$, Set $closed$)}{
     \uIf{$P =$ WALL}{
       \Return false
       }
     \uElseIf{$P =$ BOX}{
       \uIf{$P \in closed$}{
-	closed.add(P)\;
 	\Return false
       }\Else{
-      \Return ((isMovable(P.left, closed) $\land$ (isMovable(P.right, closed)) $\lor$ \\((isMovable(P.up, closed) $\land$ (isMovable(P.down, closed))
+        closed.add(P)\;
+        \Return ((isMovable(P.left, closed) $\land$ (isMovable(P.right, closed)) $\lor$ \\((isMovable(P.up, closed) $\land$ (isMovable(P.down, closed))
       }
     }\Else{
-       \Return true
+       \Return true \tcp{free space}
     }
   }
 \caption{Single box dynamic lock detection}
-\label{alg:singledynamiclock}
+\label{alg:dynamiclocks}
 \end{algorithm}
 
 \section{Evaluation}
