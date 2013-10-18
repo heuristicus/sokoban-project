@@ -227,7 +227,14 @@ the top leftmost position accessible by the player is used to represent the
 player. This means that states in which the player has the same accessible area,
 and where boxes are in the same positions are considered equal.
 
-hashing!
+The implementation of the board space equality check was done using string
+hashes. Each board generates two strings at its creation, one including the
+player, and one without, to be used for goal checks. This hash can be seen as a
+linear rather than grid based representation of the map, but having only the
+boxes and player's position, and whitespaces instead of the other elements. We
+chose this implementation because their generation and comparison is fast and
+trivial, and they can also be used in hashtables, delegating the repeated state
+detection to the Java API rather than a heavier custom method.
 
 \subsection{Deadlock Detection}
 
@@ -238,57 +245,50 @@ identified two classes of deadlocks:
 
 \subsubsection{Static deadlock}
 
-It's a deadlock caused by a wrong position of the box relative to the walls of
-the map. For example, pushing a box in a corner makes it impossible to be moved
-again. 
+A static deadlock is a deadlock caused by the positioning of a box relative to
+the walls of the map. For example, pushing a box into a corner, or against a
+wall which ends in two corners makes it impossible for the box to be moved away
+from that position.
 
-We detect them using the static costmap, created and filled at the launch of
-the program. The positions for which we don't have any cost are the ones out
-of reach from the goals, and therefore the ones where a box will be in a 
-deadlock situation.
+We detect them using the static costmap, created and filled at the launch of the
+program. The positions for which we do not have a cost are those out of reach of
+the goals, and as a result those where a box will be deadlocked.
 
 \subsubsection{Dynamic deadlock}
 
-They are deadlock created by the position of a box relative to all the
-other ones. They have many possible manifestations and thus are much
-harder to detect. Some implementations relies on matching a
-dictionnary of known locked patterns, our approach is more generic and
-logical.
+Dynamic deadlocks are created by the positioning of a box relative to all the
+others. They have many possible manifestations and thus are much harder to
+detect. While some implementations rely on matching a dictionary of known locked
+patterns, our approach is more generic and logical.
 
-Since this algorithm is used for pruning search branches, it's
-important to avoid false positives that could lead to losing solution
-states. The basic idea is that every box has two degrees of freedom,
-horizontal and vertical. If any of the boxes loses its two degree of
-freedom permanently then it's considered locked, and thus the state is
-not worth to be expanded. We consider a degree of freedom to be locked
-if one of its side is occupied, because we need to have a receiving
-space for the box and a space for the player to push from at the same
-time. For example, a box is horizontally locked if its left or right
-side are occupied. A wall results in a locked degree of freedom
-without any other consideration. In the case where other boxes only
-are locking a degree of freedom, it's necessary to consider if these
-boxes are locked themselves. We can use the same criteria recursively
-on these locking boxes until we find a free box. A box is considered
-free as soon as it has a free degree of freedom. Since this describes
-a cyclic graph, we need to use a closed list to avoid infinite
-recursion. This is of course algorithmically meaningful, since box $A$
-cannot unlock box $B$ if box $B$ freedom depends on box $A$.
+Since this algorithm is used for pruning search branches, it is important to
+avoid false positives that could lead to losing solution states. The basic idea
+is that every box has two degrees of freedom, horizontal and vertical. If any of
+the boxes loses it's two degrees of freedom permanently then it is considered
+locked. Expanding a state containing such a box is pointless. We consider a
+degree of freedom to be locked if one of its sides is occupied, because we need
+to have a receiving space for the box and a space for the player to push from at
+the same time. For example, a box is horizontally locked if its left or right
+side are occupied. A wall results in a locked degree of freedom without any
+other consideration. In the case where the locking is caused by other boxes, it
+is necessary to consider whether these boxes are locked themselves. We can use
+the same criteria recursively on these locking boxes until we find a free box. A
+box is considered free as soon as it has a free degree of freedom. Since this
+describes a cyclic graph, we need to use a closed list to avoid infinite
+recursion. This is of course relevant to the algorithm, as box $A$ cannot
+unlock box $B$ if the freedom of $B$ freedom depends on that of $A$.
 
-A particularity of using this algorithm is that a box dynamically
-locked on a goal should not trigger the prunning of the state for
-obvious reasons. Yet these boxes must still be considered locked in
-order for the recursion to work for nearby boxes.
+Something that must be considered when using this algorithm is that a box
+dynamically locked on a goal should not trigger the pruning of the state for
+obvious reasons. However, these boxes must still be considered locked in order
+for the recursion to work for nearby boxes.
 
-One last thing to keep in mind is that this
-algorithm is not suitable for backwards expansion, since it's highly
-relying on the dynamic aspects and constraints of \emph{pushing}
-boxes.
+One last thing to keep in mind is that this algorithm is not suitable for
+backwards expansion, as it is highly reliant on the dynamic aspects and
+constraints of \emph{pushing} boxes.
 
 
 \subsection{Heuristics}
-
-We tried a few different heuristics: simple manhattan distance, static cost
-evaluation and cost with minimum matching.
 
 \subsubsection{Manhattan Distance}
 
@@ -331,7 +331,6 @@ $+\infty$ if the matching failed.
 
 Early results were not convincing and the results with the other heuristics were
 better than expected, so we abandoned further development of this heuristic.
-
 
 \subsection{Search Method}
 The search methods form the core of the solver. Using them, we find a path
@@ -378,6 +377,8 @@ intermediate path has been found, we run a series of A* searches to find the
 path of the player between each successive box movement, which gives us the
 final path from the start to the goal. When finding the player path, we consider
 boxes as immovable objects.
+
+One could think that ab
 
 \begin{algorithm}
   \DontPrintSemicolon
@@ -704,7 +705,6 @@ performance measure used during the process was the number of maps of the Kattis
 test set solved by the solver. Profiling was also used to judge the effects of
 more efficient implementations of parts of the solver.
 
-How would you solve it if you were asked to do it again given what you know now?
 
 \printbibliography
 
