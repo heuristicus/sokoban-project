@@ -168,13 +168,13 @@ impact on the number of states expanded.
 
 \section{Method}
 
-In order to implement a solver, several parts are required. There must be
-functionality which can read string-based map representations into a manipulable
-object. It must be possible to move boxes and the player on this map
-representation. A search method which, given a start and goal state, must be
-able to find a path between the states, or indicate that a path does not
-exist. In addition, the solver must be able to deal with both static and dynamic
-deadlocks. A heuristic is required to drive the search towards the goal.
+The solver should be able to read string-based map representations into a
+manipulable object. It must be possible to move boxes and the player on this map
+representation. In addition, the solver must be able to deal with both static
+and dynamic deadlocks. A heuristic is required to drive the search towards the
+goal. Finally, a search method is required, which, given a start and goal state,
+must be able to find a path between the states, or indicate that a path does not
+exist.
 
 \subsection{Map Representation}
 
@@ -222,6 +222,8 @@ the top leftmost position accessible by the player is used to represent the
 player. This means that states in which the player has the same accessible area,
 and where boxes are in the same positions are considered equal.
 
+hashing!
+
 \subsection{Deadlock Detection}
 The exists of Deadlock makes Sokoban even more hard to solve. As Player cannot
 pull a box, sometimes player may pushes the box into a position that the box can
@@ -244,9 +246,82 @@ In this case, the point of a box is supposed to be reachable to some specific
 goal. However, there are some boxes blocking in the middle and it is impossible
 to remove that blocking box.
 
-\subsection{Search Method}
-
 \subsection{Heuristics}
+
+\subsection{Search Method}
+The search methods form the core of the solver. Using them, we find a path
+between a starting board state and the goal state, where all boxes are on
+goals. We implemented three different search methods; A*, best-first search and
+bi-directional search. A* expands nodes in a specific order based on the value
+of a state evaluation function $f(s)=g(s)+h(s)$, where $s$ is some board
+state. The value $h(s)$ is the heuristic value of the state, and represents an
+estimate of how far the state $s$ is from the goal. The value of $g(s)$ depends
+on the path that was taken to reach this node---the longer the path, the higher
+the value. A* places states into a priority queue and expands them starting from
+nodes with a lower $f$ value; a shorter distance to the goal. This evaluation
+function means that so long as $h(s)$ is an underestimate (an \emph{admissible}
+heuristic) of the true cost to the goal state, A* is both optimal and complete,
+that is, it will always find a solution if one exists, and that solution will be
+optimal\cite{aima}.
+
+In best-first search, the cost to reach the current node is not considered in
+the expansion, and so the evaluation function simplifies to $f(s)=h(s)$. This
+results in the search always expanding the state with the lowest cost to the
+goal, regardless of how far it is from the start state. This results in a loss
+of optimality and completeness \cite{aima}, but can lead to a goal being found
+much faster than in the case of A*. Since we do not care about finding an
+optimal solution, and speed is of the essence in this problem, best-first search
+is more appropriate than A*. Our implementation is shown in Figure
+\ref{alg:bestfirst}.
+
+To further improve the speed of the search, we implemented a bi-directional
+search. While both A* and best-first search have a complexity of
+$\mathcal{O}(b^d)$, running two searches, one from the start state to the goal,
+and one from the goal state to the start, reduces this to $\mathcal{O}(b^{d/2})$
+\cite{aima}, where $b$ is the branching factor, and $d$ is the solution
+depth. The search terminates when the frontiers of the two searches meet. This
+can be understood intuitively by considering a circle centred on the front node,
+with a radius $d$, with the goal node on the edge of the circle. The area inside
+this circle is very large compared to two smaller circles centred on the start
+and the goal meeting in the middle. Our implementation of bi-directional search
+is shown in Figure \ref{alg:bidi}.
+
+Our approach involves splitting the problem into two distinct search
+problems. First, we find the actions required to move the boxes from the start
+state to the goal state using a best-first bi-directional search. Once this
+intermediate path has been found, we run a series of A* searches to find the
+path of the player between each successive box movement, which gives us the
+final path from the start to the goal. When finding the player path, we consider
+boxes as immovable objects.
+
+\begin{algorithm}
+  \DontPrintSemicolon
+  \SetKwProg{Fn}{Function}{}{end}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \Input{An open list $O$, containing a start node $S$. A goal node $G$. A closed list $C$.}
+  \Output{A list of action, point tuples $(A,P)$, containing the path from $S$ to $G$.}
+  \Fn{findPath()}{
+    \While{$O \neq \emptyset$}{
+      successors $=$ step()\;
+      \lIf{$G \in $ successors}{\Return successors.get($G$).unwind()}
+    }
+  }
+  \Fn{step()}{
+    front $=$ open.front()\;
+    successors $=$ front.expand()\;
+    closed.add(front)\;
+    \ForEach{$n \in $ successors}{
+      \If{$n \notin C \land n \notin O$}{
+        \tcp{nodes in $O$ sorted by heuristic value}
+        $n$.costEstimate $=$ h($n$.state, $G$)\;
+        $O$.add($n$)\;
+      }
+    }
+    \Return successors\;
+  }
+\caption{Best-first search}
+\label{alg:bestfirst}
+\end{algorithm}
 
 \section{Implementation}
 In our implementation, we use several objects which allow for cleaner code and
@@ -278,36 +353,7 @@ the direction of the push. The \texttt{unwind} method of the \texttt{SearchNode}
 recurses up to the start node, and reconstructs the path from there to the node
 on which the method was called.
 
-\begin{algorithm*}
-  \DontPrintSemicolon
-  \SetKwProg{Fn}{Function}{}{end}
-  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
-  \Input{An open list $O$, containing a start node $S$. A goal node $G$. A closed list $C$.}
-  \Output{A list of action, point tuples $(A,P)$, containing the path from $S$ to $G$.}
-  \Fn{findPath()}{
-    \While{$O \neq \emptyset$}{
-      successors $=$ step()\;
-      \lIf{$G \in $ successors}{\Return successors.get($G$).unwind()}
-    }
-  }
-  \Fn{step()}{
-    front $=$ open.front()\;
-    successors $=$ front.expand()\;
-    closed.add(front)\;
-    \ForEach{$n \in $ successors}{
-      \If{$n \notin C \land n \notin O$}{
-        \tcp{nodes in $O$ sorted by heuristic value}
-        $n$.costEstimate $=$ h($n$.state, $G$)\;
-        $O$.add($n$)\;
-      }
-    }
-    \Return successors\;
-  }
-\caption{Best-first search}
-\label{alg:bestfirst}
-\end{algorithm*}
-
-\begin{algorithm*}
+\begin{algorithm}
   \DontPrintSemicolon
   \KwData{Search implementations forwards and backwards, initialised with start and goal.}
   \KwResult{A list of tuples of (\texttt{point}, \texttt{int}) containing motion of boxes from start to goal.}
@@ -330,7 +376,7 @@ on which the method was called.
   }
 \caption{Bi-directional search}
 \label{alg:bidi}
-\end{algorithm*}
+\end{algorithm}
 
 The dynamic lock algorithm we've implemented allows the detection of
 cases where boxes are locking each other. Since this algorithm is used
@@ -342,7 +388,7 @@ thus the state is not worth to be expanded. We consider a degree of
 freedom locked if the box is locked on one of its side, fox example
 it's vertically locked if 
 
-\begin{algorithm*}
+\begin{algorithm}
   \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{}{end}
   \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
@@ -371,7 +417,7 @@ it's vertically locked if
   }
 \caption{Single box dynamic lock detection}
 \label{alg:singledynamiclock}
-\end{algorithm*}
+\end{algorithm}
 
 \section{Evaluation}
 experimental evaluation and a thorough analysis of your results. This section should include:
@@ -423,15 +469,15 @@ small number of maps in the test set, but continued to be hampered by
 slowness. This version was improved by using a more efficient equality check
 based on a string representation of the board, and a best-first search
 implementation. With this, we were able to solve approximately 15 of the maps
-from the online test set. The performance measure used during the process was
-the number of maps of the Kattis test set solved by the solver. Profiling was
-also used to judge the effects of more efficient implementations of parts of the
-solver.
+from the online test set. Our current approach was reached by our need to
+improve the speed of the algorithm, and we thought that rather than using
+improved heuristics, changing the search algorithm would be more effective. We
+implemented a minimum matching heuristic, but the additional complexity resulted
+in the search taking longer despite the improved heuristic estimates. The
+performance measure used during the process was the number of maps of the Kattis
+test set solved by the solver. Profiling was also used to judge the effects of
+more efficient implementations of parts of the solver.
 
-reflection section dealing with questions: How did you plan to solve the
-problem? How did you plan the work in the group? What other methods did you try
-out? What did work/ did not work? Why? How did you end up with the current
-approach? How did you measure the performance and success during the process?
 How would you solve it if you were asked to do it again given what you know now?
 
 \printbibliography

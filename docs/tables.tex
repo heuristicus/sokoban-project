@@ -1,0 +1,85 @@
+% Created 2013-10-18 ven. 17:58
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{soul}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\providecommand{\alert}[1]{\textbf{#1}}
+
+\title{tables}
+\author{yann}
+\date{\today}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs Org-mode version 7.9.3f}}
+
+\begin{document}
+
+\maketitle
+
+\setcounter{tocdepth}{3}
+\tableofcontents
+\vspace*{1cm}
+\section{solved maps}
+\label{sec-1}
+\subsection{Manhattan}
+\label{sec-1-1}
+
+
+
+\begin{center}
+\begin{tabular}{lrrr}
+ Search Method              &  5 sec  &  11 sec  &  15 sec  \\
+\hline
+ A*                         &     12  &      15  &      16  \\
+ Best First                 &     56  &      60  &      64  \\
+ Bi-directional Best First  &     76  &      81  &      82  \\
+ Bi-directional A*          &     39  &      41  &      43  \\
+\end{tabular}
+\end{center}
+\subsection{realcost}
+\label{sec-1-2}
+
+
+
+\begin{center}
+\begin{tabular}{lrrr}
+ Search Method              &  5 sec  &  11 sec  &  15 sec  \\
+\hline
+ A*                         &         &          &          \\
+ Best First                 &         &          &          \\
+ Bi-directional Best First  &     46  &      51  &      55  \\
+ Bi-directional A*          &         &          &          \\
+\end{tabular}
+\end{center}
+\section{expanded nodes}
+\label{sec-2}
+\subsection{manhattan}
+\label{sec-2-1}
+
+
+
+\begin{center}
+\begin{tabular}{lrrrr}
+ Search method              &  Avg expanded  &  Avg opened  &  Avg rejected  &  Average time  \\
+\hline
+ A*                         &          9149  &       33382  &         17929  &           3.4  \\
+ Best First                 &         10741  &       40473  &         19499  &           2.0  \\
+ Bi-directional Best First  &          3801  &       12727  &          4136  &           0.1  \\
+ Bi-directional A*          &          4591  &       16462  &          4340  &           2.0  \\
+\end{tabular}
+\end{center}
+
+\end{document}

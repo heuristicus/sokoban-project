@@ -1,0 +1,30 @@
+* solved maps
+
+** Manhattan
+
+| Search Method             | 5 sec | 11 sec | 15 sec |
+|---------------------------+-------+--------+--------|
+| A*                        |    12 |     15 |     16 |
+| Best First                |    56 |     60 |     64 |
+| Bi-directional Best First |    76 |     81 |     82 |
+| Bi-directional A*         |    39 |     41 |     43 |   
+
+** realcost
+
+| Search Method             | 5 sec | 11 sec | 15 sec |
+|---------------------------+-------+--------+--------|
+| A*                        |       |        |        |
+| Best First                |       |        |        |
+| Bi-directional Best First |  46   |     51 |     55 |
+| Bi-directional A*         |       |        |        |
+
+* expanded nodes
+
+** manhattan
+
+| Search method             | Avg expanded | Avg opened | Avg rejected | Average time |
+|---------------------------+--------------+------------+--------------+--------------|
+| A*                        |         9149 |      33382 |        17929 |          3.4 |
+| Best First                |        10741 |      40473 |        19499 |          2.0 |
+| Bi-directional Best First |         3801 |      12727 |         4136 |          0.1 |
+| Bi-directional A*         |         4591 |      16462 |         4340 |          2.0 |
