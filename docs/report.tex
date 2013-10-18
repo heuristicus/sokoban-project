@@ -35,7 +35,13 @@
 \maketitle
 
 \begin{abstract}
-The aims of the project is to develop an agent that can solve Sokoban. By now, 33 out of 100 sokoban maps have been solved with 12 in Sokoban 1, 6 in Sokoban 2, 3 in Sokoban 3, 10 in Sokoban 4, 2 in Sokoban 5.
+  In this report we describe our implementation of a \emph{Sokoban} solver. We
+  use a two stage method to find the solution. A bi-directional best-first
+  search with the \textbf{\emph{HEURISTIC IMPLEMENTATION}} as a heuristic is
+  used to find the path of boxes on the map. This disjoint path is then linked
+  by using A* to find the path between successive box moves. The solver is
+  currently able to solve 47 of the 100 evaluation maps on Kattis, and 75 of the
+  100 maps in the simpler test set within the 11 second time limit.
 \end{abstract}
 
 \begin{figure}[!ht]
@@ -162,14 +168,13 @@ impact on the number of states expanded.
 
 \section{Method}
 
-Concept to tackle the problem
-
-1. Read and Store the Map
-2. LockState Detection 
-3. Use Search Method to find solution
-4. Use Heuristic to evaluate node by giving value
-5. Expand node with highest Heuristic value first
-6. Find out and Output Result
+In order to implement a solver, several parts are required. There must be
+functionality which can read string-based map representations into a manipulable
+object. It must be possible to move boxes and the player on this map
+representation. A search method which, given a start and goal state, must be
+able to find a path between the states, or indicate that a path does not
+exist. In addition, the solver must be able to deal with both static and dynamic
+deadlocks. A heuristic is required to drive the search towards the goal.
 
 \subsection{Map Representation}
 
@@ -221,7 +226,9 @@ to find the path to the goal. To achieve this, we use a \texttt{step} method to
 perform a single step of the search. This step, in the case of A* and best-first
 search, is to expand the front of the priority queue, and add the successors to
 the open lists, performing any relevant checks. The best-first search
-implementation is shown in Algorithm \ref{alg:bestfirst}.
+implementation is shown in Algorithm \ref{alg:bestfirst}. Algorithm
+\ref{alg:bidi} shows our implementation of bi-directional search, which makes
+use of best-first search.
 
 The search methods make use of a custom \texttt{SearchNode} class, which stores
 a parent node, a \texttt{Board} representing the state of that node, and a
