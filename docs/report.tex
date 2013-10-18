@@ -223,26 +223,31 @@ player. This means that states in which the player has the same accessible area,
 and where boxes are in the same positions are considered equal.
 
 \subsection{Deadlock Detection}
-The exists of Deadlock makes Sokoban even more hard to solve. As Player cannot
-pull a box, sometimes player may pushes the box into a position that the box can
-never reach the goal.
 
-Static Lock
+A deadlocked state is a state from which further expansions can never give a
+solution. If they are detected early, they can be removed from the search tree,
+pruning big sections of it and making the game much easier to solve. We 
+identified two classes of deadlocks:
 
-The meaning of static lock is that we cannot never push the box to the goal even
-without other boxes.
+\subsubsection{Static deadlock}
 
-While recieving the map, the program will try to put a box on each goal and
-check the points that is reachable by the box by pull (i.e. do a BFS for each
-goal with reverse action). Reachable points are stored in a map for each
-goal. The cost for a box at Non-reachable points to a specific goal will be
-Positive infinity.
+It's a deadlock caused by a wrong position of the box relative to the walls of
+the map. For example, pushing a box in a corner makes it impossible to be moved
+again. 
 
-Dynamic Lock
+We detect them using the static costmap, created and filled at the launch of
+the program. The positions for which we don't have any cost are the ones out
+of reach from the goals, and therefore the ones where a box will be in a 
+deadlock situation.
 
-In this case, the point of a box is supposed to be reachable to some specific
-goal. However, there are some boxes blocking in the middle and it is impossible
-to remove that blocking box.
+\subsubsection{Dynamic deadlock}
+
+They are deadlock created by the position of a box relative to all the other
+ones. They have many possible manifestations and thus are much harder to 
+detect. We only considered the most basic ones
+
+\emph{YANN EXPLAIN HERE!}
+
 
 \subsection{Heuristics}
 
