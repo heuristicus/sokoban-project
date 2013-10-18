@@ -227,7 +227,14 @@ the top leftmost position accessible by the player is used to represent the
 player. This means that states in which the player has the same accessible area,
 and where boxes are in the same positions are considered equal.
 
-hashing!
+The implementation of the equality check was done using string hashes. Each 
+board generates two strings at its creation, one for each possible type of 
+comparison. This hash can be seen as a linear rather than grid based 
+representation of the map, but having only the boxes and player's position, 
+and whitespaces instead of the other elements. We chose that implementation
+because their generation and comparison is fast and trivial, and they can 
+also be used in hashtables, delegating the repeated state detection to the 
+Java API
 
 \subsection{Deadlock Detection}
 
@@ -287,15 +294,11 @@ boxes.
 
 \subsection{Heuristics}
 
-We tried a few different heuristics: simple manhattan distance, static cost
-evaluation and cost with minimum matching.
-
 \subsubsection{Manhattan Distance}
 
 The Manhattan distance between two positions in a grid is the distance to be
-travelled to between them by using only vertical or horizontal movements.
-
-$$$ d(a,b) = |x_b - x_a | + |y_b - y_a | $$$
+travelled to between them by using only vertical or horizontal movements:
+$ d(a,b) = |x_b - x_a | + |y_b - y_a | $
 
 Our heuristic simply returns the sum of the distances to the closest goal for
 each box, using this formula.
@@ -328,8 +331,8 @@ avoid having to do heavy calculations. We just ordered the boxes and goals by
 number of possible matches and try to make pairs in that order, returning 
 $+\infty$ when it fails.
 
-Early results were not convincing and the other heuristics' ones were better
-than expected, making us giving up trying further to finish this heuristic.
+The early results were not convincing and the other heuristics' ones were better
+than expected, so we gave up trying further to finish this heuristic.
 
 
 \subsection{Search Method}
@@ -666,7 +669,6 @@ performance measure used during the process was the number of maps of the Kattis
 test set solved by the solver. Profiling was also used to judge the effects of
 more efficient implementations of parts of the solver.
 
-How would you solve it if you were asked to do it again given what you know now?
 
 \printbibliography
 
