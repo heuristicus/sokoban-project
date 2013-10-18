@@ -244,11 +244,40 @@ deadlock situation.
 
 \subsubsection{Dynamic deadlock}
 
-They are deadlock created by the position of a box relative to all the other
-ones. They have many possible manifestations and thus are much harder to 
-detect. We only considered the most basic ones
+They are deadlock created by the position of a box relative to all the
+other ones. They have many possible manifestations and thus are much
+harder to detect. Some implementations relies on matching a
+dictionnary of known locked patterns, our approach is more generic and
+logical.
 
-\emph{YANN EXPLAIN HERE!}
+Since this algorithm is used for pruning search branches, it's
+important to avoid false positives that could lead to losing solution
+states. The basic idea is that every box has two degrees of freedom,
+horizontal and vertical. If any of the boxes loses its two degree of
+freedom permanently then it's considered locked, and thus the state is
+not worth to be expanded. We consider a degree of freedom to be locked
+if one of its side is occupied, because we need to have a receiving
+space for the box and a space for the player to push from at the same
+time. For example, a box is horizontally locked if its left or right
+side are occupied. A wall results in a locked degree of freedom
+without any other consideration. In the case where other boxes only
+are locking a degree of freedom, it's necessary to consider if these
+boxes are locked themselves. We can use the same criteria recursively
+on these locking boxes until we find a free box. A box is considered
+free as soon as it has a free degree of freedom. Since this describes
+a cyclic graph, we need to use a closed list to avoid infinite
+recursion. This is of course algorithmically meaningful, since box $A$
+cannot unlock box $B$ if box $B$ freedom depends on box $A$.
+
+A particularity of using this algorithm is that a box dynamically
+locked on a goal should not trigger the prunning of the state for
+obvious reasons. Yet these boxes must still be considered locked in
+order for the recursion to work for nearby boxes.
+
+One last thing to keep in mind is that this
+algorithm is not suitable for backwards expansion, since it's highly
+relying on the dynamic aspects and constraints of \emph{pushing}
+boxes.
 
 
 \subsection{Heuristics}
