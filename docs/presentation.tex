@@ -138,13 +138,10 @@
 \begin{frame}
   Heuristic Method
   \begin{itemize}
-  \item first item
-  \item second item
+  \item Mahattan Distance
+  \item Static Cost Evaluation
+  \item Minimum Matching
   \end{itemize}
-  \begin{enumerate}
-  \item list one
-  \item list two
-  \end{enumerate}
 \end{frame}
 
 \section{Implementation}
@@ -154,20 +151,51 @@ Object-Oriented Programming
   \item Board class - Stores the state of the board and methods to change Board State
   \item Search class - Allow bi-directional search
   \item SearchNode class
-  \item 
   \end{itemize}
 \end{frame}
 
 \section{Evaluation}
 \begin{frame}
-  \begin{itemize}
-  \item first item
-  \item second item
-  \end{itemize}
-  \begin{enumerate}
-  \item list one
-  \item list two
-  \end{enumerate}
+\begin{table}
+  \centering
+  \begin{tabular}{lccc}
+    & \multicolumn{3}{c}{Time limit}\\
+    \cline{2-4}
+    Search Method              &  5 sec  &  11 sec  &  15 sec  \\
+    \hline
+    A*                         &     12  &      15  &      16  \\
+    Best First                 &     56  &      60  &      64  \\
+    Bi-directional Best First  &     76  &      81  &      82  \\
+    Bi-directional A*          &     39  &      41  &      43  \\
+  \end{tabular}
+
+  \caption{The number of test cases solved out of 100 available in the offline
+    test set, running various search implementations with the manhattan distance
+    heuristic. Note the lack of large differences in the number of solved maps
+    with different time limits.}
+  \label{fig:passedtests}
+\end{table}
+\end{frame}
+
+
+\begin{frame}
+\begin{table}[b]
+  \centering
+    \begin{tabular}{lcccc}
+      Search method              &  Avg expanded  &  Avg opened  &  Avg rejected  &  Avg time  \\
+      \hline
+      A*                         &          9149  &       33382  &         17929  &           3.4  \\
+      Best First                 &         10741  &       40473  &         19499  &           2.0  \\
+      Bi-directional Best First  &          3801  &       12727  &          4136  &           1.0  \\
+      Bi-directional A*          &          4591  &       16462  &          4340  &           2.0  \\
+    \end{tabular}
+  \caption{Some statistics for the search nodes, and the average solution time
+    in the tests in Table \ref{fig:passedtests}. Expanded nodes are those nodes
+    whose successors have been generated. Opened nodes is the total number of
+    nodes placed onto the open list. Rejected nodes are successors not added to
+    the open list because they would generate locked states.}
+  \label{fig:timings}
+\end{table}
 \end{frame}
 
 \section{Discussion}
