@@ -147,10 +147,11 @@ XXXXXXXX#######
   \begin{columns}
     \begin{column}{.5\textwidth}
       \begin{itemize}
-        \item not using any pattern dictionary
-        \item algorithm exploring a graph of dependencies
-        \item should never return false positives
-        \item side-effect: able to detect corner locks (redundancy with static check)
+        \item Not using any pattern dictionary
+        \item First implementation was building a graph of dependencies
+        \item Then improved to explore implicit graph
+        \item Should never return false positives
+        \item Side-effect: able to detect corner locks (redundancy with static check)
       \end{itemize}
     \end{column}
     \begin{column}{.5\textwidth}
@@ -189,6 +190,7 @@ XXXXXXXX#######
   \item Previous attempts at improving heuristics failed
   \item Improving search seemed to be a better option
   \item Reduces the complexity from $\mathcal{O}(b^d)$ to $\mathcal{O}(b^{d/2})$
+  \item Need to use multiple initial states for the reverse search
   \end{itemize}
 \end{frame}
 
