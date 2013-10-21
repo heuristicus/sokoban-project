@@ -91,7 +91,7 @@
   Sokoban is a puzzle game first published in 1982
   \begin{itemize}
     \item The goal is to push boxes onto goal locations in a map
-    \item Movements in cardinal directions
+    \item Player can move up, down, left or right
     \item Boxes can only be pushed into empty spaces
     \item Can only move one box at a time
   \end{itemize}
@@ -99,9 +99,10 @@
 
 \begin{frame}{Why is it interesting?}
   \begin{itemize}
-  \item Application of AI to games can lead to investigation of new techniques
-  \item High branching factor comparable to chess
-  \item Solution depth much deeper than any chess game, can be infinite
+  \item AI in games---investigate techniques in simple environments
+  \item High branching factor comparable to chess, based on possible box moves
+  \item Solution depth much deeper than any chess game
+  \item Solutions can be arbitrarily long due to repeated motions
   \end{itemize}
 \end{frame}
 
@@ -188,7 +189,7 @@ XXXXXXXX#######
     \begin{column}{.5\textwidth}
       \begin{block}{Dynamic Lock Test Map}
         \centering
-        \includegraphics[width=0.8\textwidth]{dynamic.png}
+        \includegraphics[width=0.6\textwidth]{dynamic.png}
       \end{block}
     \end{column}
   \end{columns}
@@ -373,10 +374,19 @@ XXXXXXXX#######
 \end{frame}
 
 \section{Conclusions}
-\begin{frame}
-  
+\begin{frame}{Conclusions}
+  \begin{itemize}
+  \item Focus on search more than heuristic
+  \item Took a long time to get a simple solver
+  \item A* is good, but application dependent
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Questions}
+  \begin{center}
+    \Huge{?}
+  \end{center}
+
 \end{frame}
 
 \end{document}
-
-
