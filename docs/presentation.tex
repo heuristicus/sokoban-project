@@ -4,7 +4,7 @@
 \usepackage[latin1]{inputenc}
 
 \usepackage{graphicx}
-\usepackage{cmbright}
+% \usepackage{cmbright}
 \usepackage{fancyvrb}
 \usepackage{subfig}
 \usepackage{caption}
@@ -127,7 +127,16 @@ XXXXXXXX#######
   \begin{columns}
     \begin{column}{.5\textwidth}
       \begin{itemize}
-        \item
+        \item Two layers
+        \begin{itemize}
+          \item Static (walls, goals): singleton
+          \item Dynamic (player, boxes): search space
+        \end{itemize}
+        \item Static cost map calculated at launch
+        \begin{itemize}
+          \item Cost from each point to each goal
+          \item Cost from each point to each initial box position
+        \end{itemize}
       \end{itemize}
     \end{column}
     \begin{column}{.5\textwidth}
@@ -139,11 +148,32 @@ XXXXXXXX#######
   \end{columns}
 \end{frame}
 
-\begin{frame}{Heuristics}
-  
+\begin{frame}{Board hashing and equality}
+  \begin{itemize}
+    \item Hash: array of chars: \texttt{blank}, \texttt{\$} and \texttt{@}
+    \item 2 versions: with and without player position
+    \item Used for getHash(), getHashCode(), equals()
+    \item 3 types of equality checks used:
+    \begin{itemize}
+      \item Without player position: check if state is goal
+      \item With top leftmost player position: repeated state checks
+      \item Exact player position: during the actual path reconstitution
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
-\begin{lrbox}{\maplock}
+\begin{frame}{Heuristics}
+  \begin{itemize}
+    \item First heuristic: Manhattan distances
+    \item Other unsuccessful attempts:
+    \begin{itemize}
+      \item Real cost
+      \item Pseudo MinMatching
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{lrbox}{\maplocked}
   \begin{minipage}{.25\textwidth}
 \centering
 \begin{BVerbatim}
@@ -170,7 +200,7 @@ XXXXXXXX#######
     \begin{column}{.5\textwidth}
       \begin{block}{Dynamic Lock Test Map}
         \centering
-        \usebox{\maplock}
+        \usebox{\maplocked}
       \end{block}
     \end{column}
   \end{columns}
