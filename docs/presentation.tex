@@ -12,6 +12,8 @@
 \newsavebox{\mapss}
 \newsavebox{\mapff}
 \newsavebox{\mapnt}
+\newsavebox{\maplocked}
+\newsavebox{\mapstatic}
 
 % Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
 %
@@ -99,21 +101,80 @@
 \begin{frame}{Why is it interesting?}
   \begin{itemize}
   \item Application of AI to games can lead to investigation of new techniques
-  \item High branching factor of maximum 
+  \item High branching factor of maximum $4N$
   \end{itemize}
 \end{frame}
 
 \section{Development Process}
 
+
+\begin{lrbox}{\mapstatic}
+  \begin{minipage}{.25\textwidth}
+\centering
+\begin{BVerbatim}
+###XXXXX#######
+#X#XXXXX#X210X#
+#X#######6321X#
+#Xcba98765432X#
+#########XXXXX#
+XXXXXXXX#######
+\end{BVerbatim}
+  \end{minipage}
+\end{lrbox}%
+
+
 \begin{frame}{Board Representation}
-  \begin{itemize}
-    \item Two-level representation with static and dynamic objects
-    \item 
-  \end{itemize}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+        \item
+      \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{block}{Static Lock and Cost Map}
+        \centering
+        \usebox{\mapstatic}
+      \end{block}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Heuristics}
   
+\end{frame}
+
+\begin{lrbox}{\maplock}
+  \begin{minipage}{.25\textwidth}
+\centering
+\begin{BVerbatim}
+##############
+#$     $$    #
+#  $$        #
+#$ $$     #  #
+#       #$$  #
+#   $#    $$ #
+#  #$      ###
+#          .+#
+##############
+\end{BVerbatim}
+  \end{minipage}
+\end{lrbox}%
+
+\begin{frame}{Locked State Detection}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+        \item
+      \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{block}{Dynamic Lock Test Map}
+        \centering
+        \usebox{\maplock}
+      \end{block}
+    \end{column}
+  \end{columns}
+
 \end{frame}
 
 \begin{frame}{Player Space Search}
