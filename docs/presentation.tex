@@ -5,6 +5,13 @@
 
 \usepackage{graphicx}
 \usepackage{cmbright}
+\usepackage{fancyvrb}
+\usepackage{subfig}
+\usepackage{caption}
+
+\newsavebox{\mapss}
+\newsavebox{\mapff}
+\newsavebox{\mapnt}
 
 % Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
 %
@@ -79,158 +86,192 @@
 \section{Introduction}
 
 \begin{frame}
+  \begin{itemize}
+    \item
+  \end{itemize}
+\end{frame} 
 
-   Problem: Sokoban
+\section{Development Process}
+
+\begin{frame}{Board Representation}
+  \begin{itemize}
+    \item Two-level representation with static and dynamic objects
+    \item 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Heuristics}
   
+\end{frame}
+
+\begin{frame}{Player Space Search}
   \begin{itemize}
-  \item A puzzle game which written in 1981 by Hiroyuki Imabayashi
-  \item Control an agent to push boxes onto goal locations 
-  \item PSPACE-complete single agent search problem
+  \item
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-
-   Why is it interesting
-
+\begin{frame}{Board Space Search}
   \begin{itemize}
-  \item It can be applied in real-life situation
-  \item High Branching factor: 4N where N = number of box
-  \item Depth of the search tree can be infinity
-  \end{itemize}
-
-\end{frame}
-
-\section{Methods}
-
-\begin{frame}
-  Map Representation
-  \begin{itemize}
-  \item Wall:  \: \#  \: \: \: \:    Player:  \:@   \: \:\: \: \:  \: \: \: \: \: \:     Player in goal:  \: +
-  \item Goal:  \: .	   \: \: \: \:     Box:  \: \$	 \:  \: \: \:  \: \: \: \: \: \: \: \:     Box in goal:  \: *
-  \item Recieve map as a txt file with symbols representing different objects
-  \item Static Objects in Static Board
-  \item Dynamic Objects + Static Objects in Board
-  \end{itemize}
-
-\end{frame}
-
-\begin{frame}
-  Deadlock Detection
-  \begin{itemize}
-  \item Player cannot pull a box, may push box into lose state
-  \item Static Lock : push the box to the goal even without existance of other boxes
-  \item Dynamic Lock : some boxes blocking in the middle and impossible to remove the blocking box
-
+  \item
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  Search Method
+\begin{frame}{Bi-directional Search}
   \begin{itemize}
-  \item A*
-  \item Best First
-  \item BFS
-  \end{itemize}
-
-\end{frame}
-
-\begin{frame}
-  Heuristic Method
-  \begin{itemize}
-  \item Mahattan Distance
-  \item Static Cost Evaluation
-  \item Minimum Matching
+  \item
   \end{itemize}
 \end{frame}
 
-\section{Implementation}
-\begin{frame}
-Object-Oriented Programming
-  \begin{itemize}
-  \item Board class - Stores the state of the board and methods to change Board State
-  \item Search class - Allow bi-directional search
-  \item SearchNode class
-  \end{itemize}
-\end{frame}
+\begin{lrbox}{\mapff}
+  \begin{minipage}{.25\textwidth}
+\centering
+\begin{BVerbatim}
+###########
+#  . . .  #
+# . . . . #
+####### x #
+#    $ $  #
+#       # #
+###$####  #
+#@ $   #$ #
+### $  $  #
+   ##     #
+    #######  
+\end{BVerbatim}
+  \end{minipage}
+\end{lrbox}%
+
+\begin{lrbox}{\mapss}
+  \begin{minipage}{.25\textwidth}
+\centering
+\small{
+\begin{BVerbatim}
+#########
+##.$@ ###
+###.# ###
+###$#   #
+#.$ #.# #
+##.$ $# #
+#.$ # # #
+## #.$  #
+#.$ #.###
+##.$ $###
+#.$ # ###
+## $# ###
+## .# ###
+##    ###
+#########
+\end{BVerbatim}
+}
+  \end{minipage}
+\end{lrbox}%
+
+\begin{lrbox}{\mapnt}
+  \begin{minipage}{.25\textwidth}
+\centering
+\small{
+\begin{BVerbatim}
+#################  
+####    @##  #  #  
+###   $ ##      #  
+##   $ ##    ## ###
+#   $ ##    ##  # #
+#  $ ##    ##   $ #
+# $ ##    ##  # # #
+#  ##    ##  ## # #
+#       ##  ### # #
+####*  ##   ### # #
+   #**##          #
+   #######..*.#####
+         ##...#    
+          #####
+\end{BVerbatim}
+}
+  \end{minipage}
+\end{lrbox}%
+
+
+
 
 \section{Evaluation}
-\begin{frame}
-\begin{table}
-  \centering
-  \begin{tabular}{lccc}
-    & \multicolumn{3}{c}{Time limit}\\
-    \cline{2-4}
-    Search Method              &  5 sec  &  11 sec  &  15 sec  \\
-    \hline
-    A*                         &     12  &      15  &      16  \\
-    Best First                 &     56  &      60  &      64  \\
-    Bi-directional Best First  &     76  &      81  &      82  \\
-    Bi-directional A*          &     39  &      41  &      43  \\
-  \end{tabular}
 
-  \caption{The number of test cases solved out of 100 available in the offline
-    test set, running various search implementations with the manhattan distance
-    heuristic. Note the lack of large differences in the number of solved maps
-    with different time limits.}
-  \label{fig:passedtests}
-\end{table}
-\end{frame}
-
-
-\begin{frame}
-\begin{table}[b]
-  \centering
-    \begin{tabular}{lcccc}
-      Search method              &  Avg expanded  &  Avg opened  &  Avg rejected  &  Avg time  \\
+\begin{frame}{Method Comparison}
+  \begin{table}
+    \centering
+    \begin{tabular}{lccc}
+      & \multicolumn{3}{c}{Time limit}\\
+      \cline{2-4}
+      Search Method              &  5 sec  &  11 sec  &  15 sec  \\
       \hline
-      A*                         &          9149  &       33382  &         17929  &           3.4  \\
-      Best First                 &         10741  &       40473  &         19499  &           2.0  \\
-      Bi-directional Best First  &          3801  &       12727  &          4136  &           1.0  \\
-      Bi-directional A*          &          4591  &       16462  &          4340  &           2.0  \\
+      A*                         &     12  &      15  &      16  \\
+      Best First                 &     56  &      60  &      64  \\
+      Bi-directional Best First  &     76  &      81  &      82  \\
+      Bi-directional A*          &     39  &      41  &      43  \\
     \end{tabular}
-  \caption{Some statistics for the search nodes, and the average solution time
-    in the tests in Table \ref{fig:passedtests}. Expanded nodes are those nodes
-    whose successors have been generated. Opened nodes is the total number of
-    nodes placed onto the open list. Rejected nodes are successors not added to
-    the open list because they would generate locked states.}
-  \label{fig:timings}
-\end{table}
-\end{frame}
-
-\section{Discussion}
-\begin{frame}
-Things that we can do better
+  \end{table}
   \begin{itemize}
-  \item Members may not fully understand the code
-  \item Didn't meet too often
-  \item Only have a vague idea
- 
+  \item No significant difference in number of maps solved with different limits
+  \item Is the search going in the right direction?
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-Initial Idea
-  \begin{itemize}
-  \item Use motion of the player as the state expansion
-  \item A\* Search Implementation
-  \end{itemize}
+\begin{frame}{Map Performance}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+       \begin{itemize}
+       \item Can be solved within 15 sec, but not 11
+       \item Requires a box to be positioned (at \texttt{x}) and not moved until the end.
+       \item Problem is caused by heuristic preferring boxes on goals
+       \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+    \begin{block}{Map 54}
+      \centering
+      \usebox{\mapff}
+    \end{block}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}
-Current Method
-  \begin{itemize}
-  \item More efficent equality check
-  \item improved heuristic - minimum matching heuristic
-  \end{itemize}
+\begin{frame}{Map Performance}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+      \item Solved very quickly
+      \item All but one box require only a single move
+      \item Heuristic gives accurate estimate to the goal
+      \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{block}{Map 66}
+        \centering
+        \usebox{\mapss}
+      \end{block}
+    \end{column}
+  \end{columns}
 \end{frame}
 
+\begin{frame}{Map Performance}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+      \item Unsolved within 15 sec
+      \item Intermediate goal area causes issues with heuristic
+      \item Requires making specific move sequences to get boxes on goals
+      \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{block}{Map 93}
+        \centering
+        \usebox{\mapnt}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Conclusions}
 \begin{frame}
-What will we  do differently if we do again
-  \begin{itemize}
-  \item Start with simple implementation that worked
-  \item A better heuristic can be used
-  \end{itemize}
+  
 \end{frame}
 
 \end{document}
