@@ -90,18 +90,18 @@
 \begin{frame}{What is Sokoban?}
   Sokoban is a puzzle game first published in 1982
   \begin{itemize}
-    \item You play a warehouse keeper
     \item The goal is to push boxes onto goal locations in a map
     \item Movements in cardinal directions
     \item Boxes can only be pushed into empty spaces
-    \item Only one box can move at a time
+    \item Can only move one box at a time
   \end{itemize}
 \end{frame} 
 
 \begin{frame}{Why is it interesting?}
   \begin{itemize}
   \item Application of AI to games can lead to investigation of new techniques
-  \item High branching factor of maximum $4N$
+  \item High branching factor comparable to chess
+  \item Solution depth much deeper than any chess game, can be infinite
   \end{itemize}
 \end{frame}
 
@@ -143,23 +143,6 @@ XXXXXXXX#######
   
 \end{frame}
 
-\begin{lrbox}{\maplock}
-  \begin{minipage}{.25\textwidth}
-\centering
-\begin{BVerbatim}
-##############
-#$     $$    #
-#  $$        #
-#$ $$     #  #
-#       #$$  #
-#   $#    $$ #
-#  #$      ###
-#          .+#
-##############
-\end{BVerbatim}
-  \end{minipage}
-\end{lrbox}%
-
 \begin{frame}{Locked State Detection}
   \begin{columns}
     \begin{column}{.5\textwidth}
@@ -170,7 +153,7 @@ XXXXXXXX#######
     \begin{column}{.5\textwidth}
       \begin{block}{Dynamic Lock Test Map}
         \centering
-        \includegraphics{dynamic.png}
+        \includegraphics[width=0.8\textwidth]{dynamic.png}
       \end{block}
     \end{column}
   \end{columns}
@@ -178,20 +161,31 @@ XXXXXXXX#######
 \end{frame}
 
 \begin{frame}{Player Space Search}
+  Our first approach
   \begin{itemize}
-  \item
+  \item Successors of states based on the motions of the player
+  \item Very slow---useless moves, even deeper solutions
+  \item Applied A* search to find solutions
+  \item Only trivial maps solved
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Board Space Search}
+  Improvement on the player space search
   \begin{itemize}
-  \item
+  \item Successors of states based on possible moves of accessible boxes
+  \item Search changed to best-first search---don't need to find optimal solution
+  \item BFS is complete, since we are using a closed list
+  \item Managed to solve some nontrivial maps
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Bi-directional Search}
+  Our final version, improved search method rather than heuristics
   \begin{itemize}
-  \item
+  \item Previous attempts at improving heuristics failed
+  \item Improving search seemed to be a better option
+  \item Reduces the complexity from $\mathcal{O}(b^d)$ to $\mathcal{O}(b^{d/2})$
   \end{itemize}
 \end{frame}
 
