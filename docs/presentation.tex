@@ -90,18 +90,18 @@
 \begin{frame}{What is Sokoban?}
   Sokoban is a puzzle game first published in 1982
   \begin{itemize}
-    \item You play a warehouse keeper
     \item The goal is to push boxes onto goal locations in a map
     \item Movements in cardinal directions
     \item Boxes can only be pushed into empty spaces
-    \item Only one box can move at a time
+    \item Can only move one box at a time
   \end{itemize}
 \end{frame} 
 
 \begin{frame}{Why is it interesting?}
   \begin{itemize}
   \item Application of AI to games can lead to investigation of new techniques
-  \item High branching factor of maximum $4N$
+  \item High branching factor comparable to chess
+  \item Solution depth much deeper than any chess game, can be infinite
   \end{itemize}
 \end{frame}
 
@@ -173,6 +173,7 @@ XXXXXXXX#######
   \end{itemize}
 \end{frame}
 
+<<<<<<< HEAD
 \begin{lrbox}{\maplocked}
   \begin{minipage}{.25\textwidth}
 \centering
@@ -190,17 +191,27 @@ XXXXXXXX#######
   \end{minipage}
 \end{lrbox}%
 
+=======
+>>>>>>> 07826fdc4cf27184f9e56948fc354bf6bb4d9d5f
 \begin{frame}{Locked State Detection}
   \begin{columns}
     \begin{column}{.5\textwidth}
       \begin{itemize}
-        \item
+        \item Not using any pattern dictionary
+        \item First implementation was building a graph of dependencies
+        \item Then improved to explore implicit graph
+        \item Should never return false positives
+        \item Side-effect: able to detect corner locks (redundancy with static check)
       \end{itemize}
     \end{column}
     \begin{column}{.5\textwidth}
       \begin{block}{Dynamic Lock Test Map}
         \centering
+<<<<<<< HEAD
         \usebox{\maplocked}
+=======
+        \includegraphics[width=0.8\textwidth]{dynamic.png}
+>>>>>>> 07826fdc4cf27184f9e56948fc354bf6bb4d9d5f
       \end{block}
     \end{column}
   \end{columns}
@@ -208,20 +219,32 @@ XXXXXXXX#######
 \end{frame}
 
 \begin{frame}{Player Space Search}
+  Our first approach
   \begin{itemize}
-  \item
+  \item Successors of states based on the motions of the player
+  \item Very slow---useless moves, even deeper solutions
+  \item Applied A* search to find solutions
+  \item Only trivial maps solved
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Board Space Search}
+  Improvement on the player space search
   \begin{itemize}
-  \item
+  \item Successors of states based on possible moves of accessible boxes
+  \item Search changed to best-first search---don't need to find optimal solution
+  \item BFS is complete, since we are using a closed list
+  \item Managed to solve some nontrivial maps
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Bi-directional Search}
+  Our final version, improved search method rather than heuristics
   \begin{itemize}
-  \item
+  \item Previous attempts at improving heuristics failed
+  \item Improving search seemed to be a better option
+  \item Reduces the complexity from $\mathcal{O}(b^d)$ to $\mathcal{O}(b^{d/2})$
+  \item Need to use multiple initial states for the reverse search
   \end{itemize}
 \end{frame}
 
